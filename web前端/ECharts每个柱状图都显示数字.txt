@@ -1,0 +1,22 @@
+series : [ {
+				name : "数量",
+				type : "bar",
+				data : yDataArray,
+				barWidth : barWidth,//柱图宽度
+//				markPoint : {
+//	                data : [
+//	                    {type : 'max', name: '最大值'},
+//	                    {type : 'min', name: '最小值'}
+//	                ]
+//	            }
+				itemStyle: {
+	                 normal: {
+	                     label: {
+	                         show: true,
+	                         textStyle: {
+	                             color: '#800080'//屏蔽 文字颜色和柱子颜色一样 添加上就是以这个颜色显示
+	                         }
+	                     }
+	                 }
+	             }
+			} ]
