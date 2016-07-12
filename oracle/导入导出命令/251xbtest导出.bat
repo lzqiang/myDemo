@@ -1,0 +1,1 @@
+exp smdj/smdj@"192.168.101.251:1521/xbtest" file=d:\dcdmp\smdj_20140604bak.dmp log=20140604smdjbak.DMP_imp.log 

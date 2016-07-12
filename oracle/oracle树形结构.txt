@@ -1,0 +1,2 @@
+SELECT LPAD('-',4*(LEVEL-1),'|-') || orgmc FROM sys_org START WITH org = 1325
+CONNECT BY PRIOR  org=forg

@@ -1,0 +1,3 @@
+INSERT INTO sys_menuitem VALUE  SELECT seq_sys_menuitem.nextval,'¡Ù ÿ∏æ≈Æ',sysid,parentid,isfolder,seq_sys_menuitem.nextval,lyzd1,lyzd2,menuurl
+,sfcd,otherurl,tree FROM sys_menuitem  WHERE menuname = '¡Ù ÿ∂˘ÕØ' 
+ 

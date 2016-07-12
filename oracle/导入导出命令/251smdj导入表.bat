@@ -1,0 +1,1 @@
+imp smdj/smdj@smdj  file=d:\dcdmp\smdj_20140604bak.dmp fromuser=smdj touser=smdj tables=(SYS_ORGANIZATION,SYS_ORGANIZATION_521)  log=20140604smdjbak.DMP_imp.log 

@@ -1,0 +1,15 @@
+SELECT c.dangerid,
+		LISTAGG(c.unitnum,'@') WITHIN GROUP( ORDER BY c.unitnum ASC) AS unitnum,
+		LISTAGG(kcc.chemcatalname,'@') WITHIN GROUP(ORDER BY c.unitnum ASC) AS chemcatalname
+		FROM dss_chemICALSINFO c
+		LEFT JOIN kno_chemical_catal kcc ON kcc.chemcatalid = c.chemcatalid GROUP BY c.dangerid 
+
+
+
+
+
+wm_concat只能是逗号分隔的
+
+SELECT c.dangerid,wm_concat(c.unitnum) AS unitnum,replace(wm_concat(kcc.chemcatalname),',','@') AS chemcatalname
+    FROM dss_chemICALSINFO c
+    LEFT JOIN kno_chemical_catal kcc ON kcc.chemcatalid = c.chemcatalid GROUP BY c.dangerid 

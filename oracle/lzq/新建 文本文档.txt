@@ -1,0 +1,138 @@
+﻿
+ with tab_log as(
+    select w.recordman,COUNT(*) gzrz from rcgz_worklog w WHERE to_char(w.recordtime,'MM') = '07'
+                       group by w.recordman),
+tab_event as(     
+                        SELECT DJR,max(DECODE(SJLXDL,181,cnt,0)) zaaqyh,max(DECODE(SJLXDL,182,cnt,0)) mdjf,max(DECODE(SJLXDL,201,cnt,0)) msfw,max(DECODE(SJLXDL,202,cnt,0)) jbts,0
+                        FROM (SELECT C.SJLXDL, C.DJR, COUNT(*) CNT 
+                        FROM NG_CASECHECKIN C
+                       WHERE C.AJLX = 1
+                         AND TO_CHAR(C.DJTIME, 'MM') = '07'
+                         AND C.SJLXDL IN (181, 182, 201, 202)
+                       GROUP BY C.SJLXDL, C.DJR) GROUP BY DJR),
+tab_update as (
+              SELECT O.USERID,COUNT(*) gxsl
+                FROM LOG_OPERATIONLOG O
+               WHERE TO_CHAR(O.OPERTIME, 'MM') = '07'
+               GROUP BY O.USERID),
+tab_gzgars as(
+                      SELECT l.zrruserid,
+                             COUNT(X.CYID)+COUNT(X1.CYID)+COUNT(X2.CYID)+COUNT(X3.CYID)+COUNT(X4.CYID)+COUNT(X5.CYID)+COUNT(X6.CYID)+COUNT(X7.CYID) gzrs ,
+                             COUNT(Y1.CYID)+COUNT(Y2.CYID)+COUNT(Y3.CYID)+COUNT(Y4.CYID)+COUNT(Y5.CYID)+COUNT(Y6.CYID)+COUNT(Y7.CYID)+COUNT(Y8.CYID)+COUNT(Y9.CYID) gars
+                        FROM QYXX_CPJTXX C
+                        LEFT JOIN SYS_JGXXB J
+                          ON C.HJXXDZ = J.JGID
+                       LEFT JOIN qyxx_kpryglb g
+                       ON c.cyid=g.cyid
+                       LEFT JOIN qyxx_kpxxb k 
+                       ON g.kpxxid=k.kpxxid
+                       LEFT JOIN sys_ldwhb l
+                       ON k.ldhm=l.ldid
+                        left JOIN (SELECT cyid,kpxxid FROM WQWW_XSJJRY WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) X
+                          ON C.CYID = X.CYID AND k.kpxxid=x.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM QYXX_SJZDRYXX WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) X1
+                          ON C.CYID = X1.CYID AND k.kpxxid=X1.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM QYXX_XFZDRY WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) X2
+                          ON C.CYID = X2.CYID AND k.kpxxid=X2.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM QYXX_ZJXYXX WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) X3
+                          ON C.CYID = X3.CYID AND k.kpxxid=X3.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM QYXX_WXJSBRYXX WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) X4
+                          ON C.CYID = X4.CYID AND k.kpxxid=X4.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM QYXX_XDRYXX WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) X5
+                          ON C.CYID = X5.CYID AND k.kpxxid=X5.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM QYXX_ZDQSNRYXX WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) X6
+                          ON C.CYID = X6.CYID AND k.kpxxid=X6.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM QYXX_WXPCYRY WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) X7
+                          ON C.CYID = X7.CYID AND k.kpxxid=X7.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM qyxx_kcxx WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y1
+                          ON C.CYID = Y1.CYID AND k.kpxxid=Y1.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM qyxx_cjry WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y2
+                          ON C.CYID = Y2.CYID AND k.kpxxid=Y2.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM qyxx_yfdxwh WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y3
+                          ON C.CYID = Y3.CYID AND k.kpxxid=Y3.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM qyxx_dbry WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y4
+                          ON C.CYID = Y4.CYID AND k.kpxxid=Y4.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM qyxx_cyszbjxx WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y5
+                          ON C.CYID = Y5.CYID AND k.kpxxid=Y5.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM qyxx_jyfwxx WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y6
+                          ON C.CYID = Y6.CYID AND k.kpxxid=Y6.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM qyxx_scjrxx WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y7
+                          ON C.CYID = Y7.CYID AND k.kpxxid=Y7.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM qyxx_cxyljz WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y8
+                          ON C.CYID = Y8.CYID AND k.kpxxid=Y8.kpxxid
+                        LEFT JOIN (SELECT cyid,kpxxid FROM xz_azbhz WHERE cyid IS NOT NULL AND kpxxid IS NOT NULL) Y9
+                          ON C.CYID = Y9.CYID AND k.kpxxid=Y9.kpxxid
+                       WHERE J.JGBM LIKE '4290040' || '%'
+                      --and to_char(x.djsj,'MM') = '07'
+                       GROUP BY l.zrruserid
+),
+temp_fwcs as(
+          select l.zrruserid,count(*) fwcs  from qyxx_gaxx_zfrz g
+                       left join qyxx_cpjtxx c on c.cyid = g.cyid
+                       left join (select a1.cyid,a1.kpxxid from qyxx_kpryglb a1 union all select a2.cyid,a2.kpxxid from qyxx_kpryglbhjry a2) k on c.cyid=k.cyid
+                       left join qyxx_kpxxb q on k.kpxxid=q.kpxxid
+                       left join sys_ldwhb l on q.ldhm=l.ldid
+                       left join sys_jgxxb j on l.jgid=j.jgid
+                       where 1 = 1 and j.jgbm like '4290040' || '%'
+                       and to_char(g.zftime, 'MM') = '07'
+                       group by l.zrruserid
+),
+temp_zxpf as(
+          select g.userid ,count(*) zxpf from khpg_grade g 
+          where 1=1 and g.type=1 and g.tjlx='MM' and g.timeinfo='07'
+          group by g.userid
+),
+temp_sqpf as(
+          select g.userid ,count(*) sqpf from khpg_grade g 
+          where 1=1 and g.type=2 and g.tjlx='MM' and g.timeinfo='07'
+          group by g.userid
+)
+        
+               select '' jgmc,'' fjgmc,null userid ,'' username,sum(gzrz) gzrz,
+               sum(zaaqyh) zaaqyh,sum(mdjf) mdjf,sum(msfw) msfw,sum(jbts) jbts,
+               sum(gxsl) gxsl,
+               sum(gzrs) gzrs,sum(gars) gars,
+               sum(fwcs) gzfwcs,sum(fwcs) gafwcs,
+               sum(zxpf) zxpf,
+               sum(sqpf) sqpf
+               from(select j1.jgmc jgmcf,j2.jgmc ,a.userid,a.username,
+               b1.gzrz,
+               b2.zaaqyh,b2.mdjf,b2.msfw,b2.jbts,
+               b3.gxsl,
+               b4.gzrs,b4.gars,
+               b5.fwcs,
+               b6.zxpf,
+               b7.sqpf
+               from sys_userinfo a left join tab_log b1 on a.userid=b1.recordman 
+               left join tab_event b2 on a.userid=b2.DJR 
+               left join tab_update b3 on a.userid=b3.USERID
+               left join tab_gzgars b4 on a.userid=b4.zrruserid  
+               left join temp_fwcs b5 on a.userid=b5.zrruserid
+               left join temp_zxpf b6 on a.userid=b6.userid
+               left join temp_sqpf b7 on a.userid=b7.userid
+               left join sys_jgxxb j1 on a.ssjg=j1.jgid 
+               left join sys_jgxxb j2 on j1.fjgid=j2.jgid)
+               union all
+               select j1.jgmc jgmcf,j2.jgmc ,a.userid,a.username,
+               b1.gzrz,
+               b2.zaaqyh,b2.mdjf,b2.msfw,b2.jbts,
+               b3.gxsl,
+               b4.gzrs,b4.gars,
+               b5.fwcs,b5.fwcs,
+               b6.zxpf,
+               b7.sqpf
+               from sys_userinfo a left join tab_log b1 on a.userid=b1.recordman 
+               left join tab_event b2 on a.userid=b2.DJR 
+               left join tab_update b3 on a.userid=b3.USERID
+               left join tab_gzgars b4 on a.userid=b4.zrruserid  
+               left join temp_fwcs b5 on a.userid=b5.zrruserid
+               left join temp_zxpf b6 on a.userid=b6.userid
+               left join temp_sqpf b7 on a.userid=b7.userid
+               left join sys_jgxxb j1 on a.ssjg=j1.jgid 
+               left join sys_jgxxb j2 on j1.fjgid=j2.jgid
+               
+
+               
+               
+               
+              

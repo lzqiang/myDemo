@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="${bussPackage}.${entityPackage}.dao.${className}Mapper" > 
+<!-- Result Map-->
+<resultMap id="BaseResultMap" type="${bussPackage}.${entityPackage}.entity.$!{className}" >
+#foreach($item in $!{columnDatas})
+	<result column="$!item.columnName" property="$item.columnName" jdbcType="$item.columnType" />
+#end
+</resultMap>
+       
+<!-- $!{tableName} table all fields -->
+<sql id="Base_Column_List" >
+	 $!{SQL.columnFields}
+</sql>
+   
+ <!-- 分页查询 -->
+<select id ="loadByPage" resultType="map">
+  	select 
+	<include refid="Base_Column_List"/>
+	from ${tableName} 
+  </select>
+
+<!-- 查询${codeName}列表 -->
+<select id="loadByList" resultMap="BaseResultMap"  parameterType="map">
+	select 
+	<include refid="Base_Column_List"/>
+	from ${tableName} 
+</select>
+
+<!-- 插入记录 -->
+<insert id="save" parameterType="${bussPackage}.${entityPackage}.entity.$!{className}"  useGeneratedKeys="true" keyProperty="xxid" >
+	<selectKey  resultType="java.lang.String" keyProperty="xxid" order="BEFORE">    
+          SELECT REPLACE(UUID(),'-','') as xxid
+    </selectKey>  
+  $!{SQL.insert}
+</insert>
+
+<!-- 根据id修改记录-->  
+ <update id="update" parameterType="${bussPackage}.${entityPackage}.entity.$!{className}" >
+  $!{SQL.update}
+ </update>
+ 
+<!-- 删除记录 -->
+<delete id="delete" parameterType="string">
+	$!{SQL.delete}
+</delete>
+
+<!-- 根据id查询 ${codeName} -->
+<select id="loadById"  resultMap="BaseResultMap" parameterType="string">
+	$!{SQL.selectById}
+</select>
+  	
+</mapper>   

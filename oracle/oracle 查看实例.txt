@@ -1,0 +1,135 @@
+查看oracle数据库中的实例：
+select * from v$instance;
+
+查看监听：
+lsnrctl status
+
+
+SELECT * FROM All_Users
+SELECT * FROM v$session
+
+//当前数据库
+[oracle@localhost ~]$ echo $ORACLE_SID
+qyrk
+
+
+
+创建表空间
+CREATE TABLESPACE qyrk
+DATAFILE 'E:\oracleTableSpace\product\11.2.0.1.0\oradata\orcl\qyrk.dbf'
+SIZE 500m AUTOEXTEND ON NEXT 10m MAXSIZE UNLIMITED;
+
+
+--查看表空间名称和大小
+SELECT t.tablespace_name, round(SUM(bytes / (1024 * 1024)), 0) ts_size 
+FROM dba_tablespaces t, dba_data_files d 
+WHERE t.tablespace_name = d.tablespace_name 
+GROUP BY t.tablespace_name; 
+
+--可以查询到表空间的路径 一些文件信息
+SELECT * FROM dba_data_files
+
+--创建用户
+CREATE USER ylqyrk--用户名
+IDENTIFIED BY ylqyrk--密码
+DEFAULT TABLESPACE qyrk-- 表空间
+TEMPORARY TABLESPACE temp
+PROFILE DEFAULT
+QUOTA UNLIMITED ON qyrk;
+--grant(授权)命令
+--grant /revoke  role privileges
+GRANT CONNECT TO ylqyrk WITH ADMIN OPTION;
+GRANT DBA TO ylqyrk WITH ADMIN OPTION;
+--grnat/revoke system privileges
+GRANT CREATE ANY SEQUENCE TO ylqyrk WITH ADMIN OPTION;
+GRANT CREATE ANY TABLE TO ylqyrk WITH ADMIN OPTION;
+GRANT DELETE ANY TABLE TO ylqyrk WITH ADMIN OPTION;
+GRANT INSERT ANY TABLE TO ylqyrk WITH ADMIN OPTION;
+GRANT SELECT ANY TABLE TO ylqyrk WITH ADMIN OPTION;
+GRANT UPDATE ANY TABLE TO ylqyrk WITH ADMIN OPTION;
+GRANT UNLIMITED TABLESPACE TO ylqyrk WITH ADMIN OPTION;
+
+
+数据泵导入数据
+C:\Users\lenovo>expdp ylqyrk/ylqyrk directory=dump_dir dumpfile=ylqyrk2014bak.dm
+p logfile=ylqyrk2014bak.log version=11.2.0.1.0
+
+SQL> impdp system/system directory=dump_dir dumpfile=ylqyrk2014bak.dmp version=11.2.0.1.0
+
+
+--删除表空间和数据
+SQL> drop tablespace qyrk including contents and datafiles;
+
+
+show parameter instance_name   --实例名
+show parameter db_name  --数据库名
+show parameter db_domain  --域名
+show parameter service_names  --服务器名落孙山
+show parameter global  --全局数据库名
+
+conn  user_name/password as sysdba，不管user_name用户是否存在，只要以这种形式，都可以以SYS的身份登录到数据库
+
+
+SYS 帐户(数据库拥有者):
+拥有 DBA 权限
+拥有 ADMIN OPTION  的所有权限
+拥有 startup, shutdown, 以及若干维护命令
+拥有数据字典
+	SYSTEM 帐户拥有 DBA 权限.
+	这些帐户并非用于常规操作
+
+1.查看所有用户：
+ 
+  select * from dba_user;
+ 
+  select * from all_users;
+ 
+  select * from user_users;
+ 
+2.查看用户系统权限：
+ 
+  select * from dba_sys_privs;
+ 
+  select * from all_sys_privs;
+ 
+  select * from user_sys_privs;
+
+ 
+3.查看用户对象权限：
+ 
+  select * from dba_tab_privs;
+ 
+  select * from all_tab_privs;
+ 
+  select * from user_tab_privs;
+ 
+4.查看所有角色：
+ 
+  select * from dba_roles;
+ 
+5.查看用户所拥有的角色：
+ 
+  select * from dba_role_privs;
+ 
+  select * from user_role_privs;
+ 
+ 
+6.查看角色所拥有的权限:
+ 
+ 
+  select * from role_sys_privs;
+ 
+ 
+  select * from role_tab_privs;
+ 
+ 
+7.查看所有系统权限
+ 
+ 
+  select * from system_privilege_map; 
+ 
+ 
+8.查看所有对象权限
+ 
+ 
+  select * from table_privilege_map;

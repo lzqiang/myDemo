@@ -1,0 +1,5 @@
+checkstyle规范常见错误参考：
+
+http://www.blogjava.net/japper/archive/2012/05/24/379054.html
+
+http://www.tuicool.com/articles/YniYBb

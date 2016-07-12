@@ -1,0 +1,21 @@
+Linux导入导出：
+导出方法1(导入导出的数据库版本匹配)
+export ORACLE_SID=qyrkng --进入全员人口宁国库
+echo $ORACLE_SID   --查看当前库
+exp qyrk/qyrk file=/home/oracle/qyrkng0814.dmp owner=qyrk
+导出方法2(高版本导入低版本，必须带上版本号)
+select * from dba_directories(DMP_DIR=/home/oracle/test);
+SELECT * FROM v$version(查看oracle版本号)
+expdp qyrk/qyrk@qyrkng DIRECTORY=DMP_DIR DUMPFILE=qyrkng0814.dmp schemas=qyrk version=10.2.0.1.0(需要导入);
+
+导入方法：
+select * from dba_directories;
+数据泵：impdp qyrk/qyrk DIRECTORY=DMP_DIR DUMPFILE=qyrkng0814.dmp schemas=qyrk version=10.2.0.1.0;
+impdp qyrkng/qyrkng DIRECTORY=DMP_DIR DUMPFILE=qyrkng0814.dmp REMAP_SCHEMA=qyrk:qyrkng VERSION=10.2.0.1.0(同库不同用户导入方法);
+
+
+//先删除用户，再用下面方式导入表，可以省去新建用户操作
+sqlplus / as sysdba；
+drop user sdcz cascade;
+impdp  system/sys DIRECTORY=DMP_DIR DUMPFILE=sdcz_0916.dmp version=10.2.0.1.0
+

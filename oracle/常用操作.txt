@@ -1,0 +1,13 @@
+--修改列的数据类型
+ALTER TABLE date_demo MODIFY (BIRTHDA VARCHAR2(1000));
+--添加列
+ALTER TABLE date_demo ADD ( birthda DATE )
+--删除列
+ALTER TABLE date_demo DROP (birthda)
+--不激活主键
+ALTER TABLE date_demo DISABLE PRIMARY KEY CASCADE;
+--激活主键
+ALTER TABLE date_demo ENABLE PRIMARY KEY;
+
+--添加主键约束 主键约束可以由多个列组成
+ALTER TABLE date_demo ADD CONSTRAINTS pk_time PRIMARY KEY(time1)

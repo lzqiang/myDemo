@@ -1,0 +1,8 @@
+Tools->Preferences->Editor->AutoReplace->选上Enabled，并Edit文件，加入以下内容： 
+sf=select * from 
+scf=select count(*) from 
+s=select 
+f=from 
+w=where 
+d=delete 
+u=update

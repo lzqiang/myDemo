@@ -1,0 +1,1 @@
+exp smdj/smdj@"192.168.101.251:1521/xbtest" file=d:\dcdmp\smdj_20140703bak.dmp tables=(SYS_ORGANIZATION,SYS_QYPOPULATION)  log=20140703smdjbak.DMP_imp.log 

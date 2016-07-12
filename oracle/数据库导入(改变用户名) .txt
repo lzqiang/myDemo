@@ -1,0 +1,5 @@
+用户名qyrk替换为 qyrksj
+
+数据泵导出的时的用户是 qyrk  导入到内网 用户名是 qyrksj
+
+impdp system/sys DIRECTORY=DATADIR  dumpfile=20140612_SJQYRK.DMP logfile=20140612_SJQYRK.imp.log remap_schema=qyrk:qyrksj

@@ -1,0 +1,11 @@
+//加入部门的回显
+				var jrbms = $("input:checkbox[name='jrbm']");
+				var jrbms2 = '${sqzzSgxx.jrbm}';
+				var jrbms3 = jrbms2.split(",");
+				jrbms.each(function(){
+					for(var i in jrbms3){
+						if(this.value == jrbms3[i]){
+							this.checked=true;
+						}
+					}
+				});

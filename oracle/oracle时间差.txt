@@ -1,0 +1,17 @@
+select months_between(sysdate,to_date('01-01-2003','dd-mm-yyyy')) from dual;
+
+
+使用函数 Months_between(d1,d2)
+
+SELECT MONTHS_BETWEEN('2002-11-12',SYSDATE)  AS DT FROM DUAL 
+
+months_between(date1,date2),计算date1,date2之间的月的数目的函数。
+SQL> select months_between(to_date('22-10-2003','dd-mm-yyyy'),
+  2  to_date('01-10-2003','dd-mm-yyyy')) "1STdate",
+  3  months_between(to_date('01-01-2003','dd-mm-yyyy'),
+  4  to_date('22-10-2003','dd-mm-yyyy')) "2NDdate" 
+  5  from dual;
+
+
+
+round(jzrq-sysdate)

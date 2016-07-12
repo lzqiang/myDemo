@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables>
+	<!-- 
+		tableName 表名称
+		codeName 表注释
+		entityPackage 生成源码包
+		keyType 默认01  主键生成方式 01:UUID 02:自增
+	 -->
+	<table tableName="sys_district" codeName="用户" entityPackage="system" keyType="01"/>
+	
+</tables>

@@ -1,0 +1,2 @@
+alter user scott account unlock;// È»ºó½âËø
+

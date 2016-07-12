@@ -1,0 +1,16 @@
+1、登录linux，以oracle用户登录（如果是root用户登录的，登录后用 su - oracle命令切换成oracle用户）
+2、以sysdba方式来打开sqlplus，命令如下： sqlplus "/as sysdba"
+3、select * from dba_directories;
+4、select name from v$datafile;
+
+CREATE TABLESPACE qyrkng DATAFILE '/home/oracle/oracle/oradata/qyrkng/qyrkng.dbf' SIZE 200M AUTOEXTEND ON EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO;
+
+CREATE USER qyrkng IDENTIFIED BY qyrkng DEFAULT TABLESPACE qyrkng;
+
+grant connect,resource,DBA to hc_notify;
+grant unlimited tablespace to hc_notify;
+grant create database link to hc_notify;
+grant select any sequence,create materialized view to hc_notify;
+
+impdp qyrkng/qyrkng DIRECTORY=DMP_DIR DUMPFILE=qyrkng0813.dmp FULL=y version=10.2.0.1.0;
+

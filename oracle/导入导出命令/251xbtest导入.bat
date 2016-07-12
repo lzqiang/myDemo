@@ -1,0 +1,1 @@
+imp smdj/smdj@xbtest  file=d:\drdmp\smdj0614.dmp fromuser=smdj touser=smdj

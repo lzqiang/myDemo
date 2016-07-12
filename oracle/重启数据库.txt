@@ -1,0 +1,14 @@
+shutdown immediate
+
+
+252 
+oracle oracle
+
+$ export ORACLE_SID=qyrkng
+$ sqlplus / as sysdba
+SQL> startup
+
+
+关闭数据库
+
+SQL> shutdown immediate
