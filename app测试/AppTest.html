@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<script src="http://www.duanxinhongzha.com/zx/mini/"></script>
+<body>
+服务器：
+<select id="service" style="width:155px;">
+	<option value="2" selected>12</option>
+	<option value="1">106</option>
+</select>
+<input type="text" name="method" id="method" value="POST"/>
+<input type="text" name="actionval" id="actionval" style="width:300px"/>
+    <form id="formId">
+        <div id="div">
+            <input type="button" onclick="submitclick()" value="提交"/>
+        </div>
+    </form>
+	<hr/>
+	<div>
+		name:<input type="text" name="name" id="name" />
+		<button onclick="createHtml()">创建</button>
+	</div>
+</body>
+<script>
+	function createHtml(){
+		var name = document.getElementById("name").value ;
+		
+		var div = document.createElement("div");
+		
+		var input = document.createElement("INPUT");
+		input.setAttribute("type","text"); 
+		input.setAttribute("name",name); 
+		input.setAttribute("id",name); 
+		
+		var _createLbl=document.createElement("label");
+            _createLbl.innerHTML=name;
+		
+		
+		div.appendChild(_createLbl);
+		div.appendChild(input);
+
+		
+		var divobj =  document.getElementById("div");
+		divobj.appendChild(div);
+	}
+
+   function submitclick(){
+	 
+	  var targetval = "";
+	  var service = document.getElementById("service").value;
+      if("1" == service){
+		targetval = "http://192.168.88.106:8080/ulab"
+	  }else{
+		targetval = "http://192.168.88.12:8094/ulab"
+	  }
+      var formobj =  document.getElementById("formId");
+      var methodval =document.getElementById("method").value ;
+      var actionval =document.getElementById("actionval").value ;
+	  
+       formobj.setAttribute("method",methodval); 
+       formobj.setAttribute("action",targetval+"/"+actionval); 
+       formobj.submit();
+   }
+
+</script>
+</html>
