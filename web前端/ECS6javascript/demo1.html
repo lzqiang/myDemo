@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+</body>
+
+<script>
+
+    var arr = [ ];for(var i=0;  i<10;  i++){
+        arr [i] = function(){
+            alert(i)
+        }
+    }
+    arr [8](); //结果：10
+
+
+    var arr = [ ];
+    for(let i=0;  i<10;  i++){
+        arr[i] = function(){
+            alert(i)
+        }
+    }
+    arr[8]();//8
+
+    var a = 1;
+    (function(){
+        alert(a);
+        var a = 2;
+    })();//undefined
+
+    var a = 1;
+    (function(){
+        alert(a);
+        let a = 2;
+    })();   // 结果：报错a未定义
+
+</script>
+</html>

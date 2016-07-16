@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+总结：Generator函数是一种特殊的函数，可以使用关键字yield和next( )实现暂停和继续执行，
+而关键字yield*专门用于调用Generator函数，看似简单的特性，在实际开发中却有极大的用处。
+</body>
+<script>
+    //声明一个Hello的Generator函数
+    function* Hello(name) {
+        yield `hello ${name}`;
+        yield `how are you`;
+        yield `bye`;
+    }
+    //调用Hello函数
+    let ite = Hello('前端君');
+    //结果：[object Generator]
+    console.log(ite.next());    //{value: "hello 前端君", done: false}
+    console.log(ite.next());    //{value: "how are you", done: false}
+    console.log(ite.next());    //{value: "bye", done: false}
+    console.log(ite.next());    //{value: undefined, done: true}
+
+</script>
+</hconsole.log(tml>
