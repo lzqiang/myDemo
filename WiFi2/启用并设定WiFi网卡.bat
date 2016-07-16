@@ -1,0 +1,1 @@
+netsh wlan set hostednetwork mode=allow ssid=12#211 key=liuqiang
