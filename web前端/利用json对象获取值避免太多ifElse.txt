@@ -1,0 +1,10 @@
+function getStatNameByStatCode(stat){
+	var statJsonArray={0:"正常",1:"待标定",2:"探头故障",4:"预警",7:"线路故障",99:"网络故障",100:"满量程",101:"低报",102:"高报"};
+	return typeof(statJsonArray[stat]) == "undefined" ? "故障":statJsonArray[stat];
+}
+
+function demo(){
+	var obj = {name:"lzqiang",age:"26"};
+	console.log(obj.name)//lzqiang
+	console.log(obj["name"]);//lzqiang
+}
