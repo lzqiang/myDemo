@@ -1,0 +1,6 @@
+//导入slf4j的jar包
+private static final Logger LOG = LoggerFactory.getLogger(DssStatisticsController.class);
+
+
+//可以打印堆栈信息
+LOG.error(e.getMessage(),e);
