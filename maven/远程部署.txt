@@ -1,0 +1,24 @@
+1.修改pom.xml
+<plugin>
+	<groupId>org.apache.tomcat.maven</groupId>
+	<artifactId>tomcat7-maven-plugin</artifactId>
+	<configuration>
+		<port>8080</port>
+		<path>/zwsafe</path>
+		<url>http://192.168.88.106:8080/manager/text</url>
+		<username>tomcat</username>
+		<password>tomcat</password>
+	</configuration>		
+</plugin>
+
+2.tomcat-user.xml
+	<role rolename="manager-gui" />
+	<role rolename="manager-script" />
+	<user username="tomcat" password="tomcat" roles="manager-gui, manager-script"/>
+	
+3.tomcat要启动
+
+4.
+初次部署可以使用 "tomcat7:deploy" 命令
+如果已经部署过使用 "tomcat7:redeploy" 命令
+如果是在dos命令行下 要加 mvn tomcat7:deploy/redploey
