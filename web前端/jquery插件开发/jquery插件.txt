@@ -1,0 +1,36 @@
+;(function($, window, document,undefined) {
+  //定义Beautifier的构造函数
+  var Beautifier = function(ele, opt) {
+    this.$element = ele,
+    this.defaults = {
+      'color': 'red',
+      'fontSize': '12px',
+      'textDecoration': 'none'
+    },
+	 /*
+        在处理插件参数的接收上，通常使用jQuery的extend方法，上面也提到过，
+        但那是给extend方法传递单个对象的情况下，这个对象会合并到jQuery身上，
+        所以我们就可以在jQuery身上调用新合并对象里包含的方法了，像上面的例子。
+        当给extend方法传递一个以上的参数时，它会将所有参数对象合并到第一个里。
+        同时，如果对象中有同名属性时，合并的时候后面的会覆盖前面的。
+     */
+    this.options = $.extend({}, this.defaults, opt)
+  }
+  //定义Beautifier的方法
+  Beautifier.prototype = {
+    beautify: function() {
+      return this.$element.css({
+        'color': this.options.color,
+        'fontSize': this.options.fontSize,
+        'textDecoration': this.options.textDecoration
+      });
+    }
+  }
+  //在插件中使用Beautifier对象
+  $.fn.myPlugin = function(options) {
+    //创建Beautifier的实体
+    var beautifier = new Beautifier(this, options);
+    //调用其方法
+    return beautifier.beautify();
+  }
+})(jQuery, window, document);
