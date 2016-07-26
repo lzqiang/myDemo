@@ -1,0 +1,34 @@
+calculable : false,//false 禁止拖动
+
+
+
+
+xAxis : [{
+				type : 'category',
+				data : xArrayData,
+				name: xName
+			     }],
+			yAxis : [ {
+				type : 'value',
+				name:yName
+			} ],
+			dataZoom : {  
+	             show : true,  
+	             realtime : true,  
+	             start : 20,  
+	             end : 100  
+	         },
+	        calculable : false,//false 禁止拖动
+			series : [ {
+				name : "企业数",
+				type : "bar",
+				data : qyData,
+//				barwidth : 10,//柱图宽度
+				itemStyle: {
+	                 normal: {
+	                     label: {
+	                         show: true
+	                     }
+	                 }
+	             }
+			   },
