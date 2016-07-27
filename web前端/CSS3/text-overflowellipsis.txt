@@ -1,0 +1,21 @@
+ CCS3属性之text-overflow:ellipsis;的用法和注意之处
+
+语法：
+
+text-overflow：clip | ellipsis
+
+默认值：clip
+
+适用于：所有元素
+
+clip： 当对象内文本溢出时不显示省略标记（...），而是将溢出的部分裁切掉。
+ellipsis： 当对象内文本溢出时显示省略标记（...）。
+
+在使用的时候，有时候发现不会出现省略标记效果，经过测试发现，使用ellipsis的时候，必须配合overflow:hidden; white-space:nowrap; width:50%;这三个样式共同使用才会有效果，示例代码：
+
+<style type="text/css">
+    .test{text-overflow:ellipsis;overflow:hidden;white-space:nowrap;width:150px;}
+</style>
+
+<div class="test">关于**产品的推广关于**产品的推广关于**产品的推广</div>
+
