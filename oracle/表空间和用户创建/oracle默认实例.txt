@@ -1,0 +1,6 @@
+oracle数据库安装好会有一个
+orcl的实例
+
+有scott/tiger的用户
+
+连接：127.0.0.1:1521/orcl

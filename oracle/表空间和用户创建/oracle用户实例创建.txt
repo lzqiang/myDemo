@@ -1,0 +1,7 @@
+命令行输入  dbca
+Runas /user:administrator  dbca
+
+使用管理员运行 dbca
+
+一直下一步就行  字符集修改成UTF-8
+
