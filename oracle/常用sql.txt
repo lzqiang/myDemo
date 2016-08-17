@@ -6,3 +6,7 @@ SELECT k.casenum,n.jzrq AS njzrq FROM ng_casecheckin k LEFT JOIN ng_handle n ON 
 
 SELECT * FROM tb_case_baseinfo b WHERE 
 INSTR(b.jmtgzr,'13')>0
+
+
+将privurl中的‘/1’去除
+SELECT REPLACE(p.privurl,'/1'),p.privurl FROM sys_priv p WHERE p.privurl LIKE '/1%'

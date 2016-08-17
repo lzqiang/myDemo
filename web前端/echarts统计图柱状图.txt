@@ -1,0 +1,54 @@
+function showPieEChart(categories,values){
+	// 按需加载  
+	require(  
+	    [  
+	        'echarts',   
+	        'echarts/chart/pie'  
+	    ],  
+	    function (ec) {  
+	        var chart = document.getElementById('p1');  
+	        var echart = ec.init(chart);  
+	          
+	        echart.showLoading({  
+	            text: '正在努力加载中...'  
+	        });  
+	          
+
+	    	var map = new Array();
+	    	for(var i=0;i<categories.length;i++){
+	    		map.push({value:values[i],name:categories[i]});
+	    	}
+	        
+	        var option = {  
+	      		title : {
+	      			text : '上海市危化品企业许可证分布图',
+	      			x : 'center',
+	      			y : 'top'
+	      		},
+      		    tooltip : {
+      		        trigger: 'item',
+      		        formatter: "{a} <br/>{b} : {c} ({d}%)"
+      		    }, 
+      		    legend: {
+      		        orient : 'vertical',
+      		        x : 'right',
+      		        y : 'bottom',
+      		        data:categories
+      		    }, 
+      		    calculable : false,//false 禁止拖动
+      		    series : [
+		      		        {
+		      		            name:'数量',
+		      		            type:'pie',
+		      		            radius : '55%',
+		      		            center: ['50%', '60%'],
+		      		            data:map
+		      		        }
+		      		    ] 
+	        };  
+	          
+	        echart.setOption(option);  
+	        echart.hideLoading();  
+	    }  
+	);
+}
