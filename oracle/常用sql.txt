@@ -10,3 +10,10 @@ INSTR(b.jmtgzr,'13')>0
 
 将privurl中的‘/1’去除
 SELECT REPLACE(p.privurl,'/1'),p.privurl FROM sys_priv p WHERE p.privurl LIKE '/1%'
+
+
+##查看时区
+SELECT DBTIMEZONE FROM dual;
+SELECT SESSIONTIMEZONE FROM dual;
+select systimestamp from dual;
+SELECT SYSDATE FROM dual   
