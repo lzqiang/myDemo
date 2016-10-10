@@ -1,3 +1,12 @@
+// 添加滚动条
+dataZoom : {  
+	             show : true,  
+	             realtime : true,  
+	             start : 20,  
+	             end : 100  
+	         },
+calculable : false,//false 禁止拖动图形
+
 function showPieEChart(categories,values){
 	// 按需加载  
 	require(  
