@@ -1,0 +1,21 @@
+1.全局安装npm
+  在nvm文件夹中新建一个npm文件夹
+2.控制台设置 prefix
+  $ npm set config prefix = ‘npm路径 ’
+3.设置npm的环境变量
+  NPM_HOME = %NVM_HOME%\npm;
+
+4.关闭npm的https 
+   $ npm config set strict-ssl false
+
+5.设置npm的获取地址
+
+  $ npm config set registry http://registry.npmjs.org/
+
+6.安装mongodb数据库
+	
+  $ npm install mongodb -g
+
+7.nrm -- NPM registry 管理工具 
+  $ npm install -g nrm
+$ nrm ls
