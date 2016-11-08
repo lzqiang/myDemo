@@ -1,0 +1,72 @@
+由于Fedora系统安装的时候会自带OpenJDK，安装完系统后 java -version 会显示 
+[root@localhost bin]# java -version 
+java version "1.6.0_22" 
+OpenJDK Runtime Environment (IcedTea6 1.10.1) (fedora-57.1.10.1.fc15-i386) 
+OpenJDK Client VM (build 20.0-b11, mixed mode) 
+
+jdk-6u33-linux-i586-rpm.bin 下载地址：http://www.oracle.com/technetwork/java/javase/downloads/jdk6-downloads-1637591.html 
+
+   下载完JDK 后，到下载目录给当前用户赋予执行权限 
+[root@localhost Downloads]# chmod +x jdk-6u33-linux-i586-rpm.bin 
+
+    终端中输入“./jdk-6u33-linux-i586-rpm.bin”执行解压及安装操作。 
+[root@localhost Downloads]# ./jdk-6u33-linux-i586-rpm.bin 
+Unpacking... 
+Checksumming... 
+Extracting... 
+UnZipSFX 5.50 of 17 February 2002, by Info-ZIP (Zip-Bugs@lists.wku.edu). 
+  inflating: jdk-6u33-linux-i586.rpm  
+  inflating: sun-javadb-common-10.6.2-1.1.i386.rpm  
+  inflating: sun-javadb-core-10.6.2-1.1.i386.rpm  
+  inflating: sun-javadb-client-10.6.2-1.1.i386.rpm  
+  inflating: sun-javadb-demo-10.6.2-1.1.i386.rpm  
+  inflating: sun-javadb-docs-10.6.2-1.1.i386.rpm  
+  inflating: sun-javadb-javadoc-10.6.2-1.1.i386.rpm  
+Preparing...                ########################################### [100%] 
+................... 
+待提示 
+Press Enter to continue..... 
+回车完成JDK 的安装 
+
+卸载OpenJDK 
+--------------------------------------------------------------- 
+1：在终端执行 rpm -qa|grep jdk 此时可以看到系统有两个jdk 如下 
+
+[root@localhost bin]# rpm -qa|grep jdk 
+jdk-1.6.0_33-fcs.i586 
+java-1.6.0-openjdk-1.6.0.0-57.1.10.1.fc15.i686 
+
+2：卸载系统自带的OpenJDK 
+root@localhost bin]# yum -y remove java java-1.6.0-openjdk-1.6.0.0-57.1.10.1.fc15.i686 
+Loaded plugins: langpacks, presto, refresh-packagekit 
+Setting up Remove Process 
+Resolving Dependencies 
+--> Running transaction check 
+---> Package java-1.6.0-openjdk.i686 1:1.6.0.0-57.1.10.1.fc15 will be erased 
+--> Processing Dependency: java-1.6.0-openjdk >= 1:1.6.0.0-55 for package: icedtea-web-1.0.2-2.fc15.i686 
+........... 
+Dependency Removed: 
+  icedtea-web.i686 0:1.0.2-2.fc15                                                                                                   
+
+Complete! 
+
+
+配置JDK 环境变量 
+--------------------------------------------------------------- 
+1：在终端打开profile文件 
+[root@localhost bin]# vi /etc/profile 
+
+2：在profile 文件中增加JDK环境变量 
+export JAVA_HOME=/usr/java/jdk1.6.0_33 
+export CLASSPATH=$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib 
+export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH:$HOME/bin 
+保存并退出 
+
+3：使环境变量生效 
+[root@localhost bin]# source /etc/profile 
+[root@localhost bin]# java -version 
+java version "1.6.0_33" 
+Java(TM) SE Runtime Environment (build 1.6.0_33-b04) 
+Java HotSpot(TM) Client VM (build 20.8-b03, mixed mode, sharing) 
+
+OK，经过以上步骤就完成了JDK 的安装并卸载了Fedora 自带的OpenJDK。

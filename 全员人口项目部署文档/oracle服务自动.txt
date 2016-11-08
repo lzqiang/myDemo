@@ -1,0 +1,76 @@
+CentOS6 下Oracle 11 g数据库安装成功
+
+一：手动启动数据库
+
+用Oracle用户登录
+
+$lsnrctl start
+
+$sqlplus / as sysdba
+
+sql>startup
+
+然后就可以操作数据库了
+
+ 
+
+二：自动启动数据库
+
+1. root用户修改oratab
+#vi /etc/oratab
+
+xx：/opt/oracle/11.2.0:Y(N改为Y)    --------xx为数据库实例名称
+
+Esc:wq!保存
+
+ 
+
+2.oracle用户修改dbstart,dbshut
+
+#vi /opt/oracle/11.2.0/bin/dbstart
+
+ORACLE_HOME_LISTNER=$ORACLE_HOME(原来为$1)
+
+Esc:wq!保存
+
+ 
+
+#vi /opt/oracle/11.2.0/bin/dbshut
+
+ORACLE_HOME_LISTNER=$ORACLE_HOME(原来为$1)
+
+Esc:wq!保存
+
+ 
+
+3.root用户添加内容到 rc.local中
+
+#vi /etc/rc.d/rc.local
+
+把下面内容加入到文件中
+
+su - oracle -c  "lsnrctl start"
+
+su - oracle -c  "dbstart"
+
+Esc:wq!保存
+
+ 
+
+4.重新启动
+
+#reboot
+
+ 
+
+5.登录使用数据库
+
+oracle用户登录
+
+$sqlplus / as sysdba
+
+sql>
+
+然后就可以使用数据库了
+
+

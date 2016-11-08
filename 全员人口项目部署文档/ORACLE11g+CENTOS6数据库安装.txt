@@ -1,0 +1,128 @@
+﻿一、修改配置文件安装必要的包
+-------------------------------------------------------------------------------------------------------------------------
+CentOS下使用yum安装ORACLE11g软件所需到文件包
+1、将CentOS镜像文件挂载到具体到目录下，如：/media/CentOS_6.0_Final
+2、进入到/etc/yum.repos.d 目录下，使用vim编辑器打开文件：CentOS-Media.repo如：
+#cd /etc/yum.repos.d   #vim CentOS-Media.repo
+3、修改CentOS-Media.repo配置文件参数baseurl和gpgkey如：baseurl=file:///media/CentOS_6.0_Final   
+gpgcheck=1   
+enabled=0  
+gpgkey=file:///media/CentOS_6.0_Final/RPM-GPG-KEY-CentOS-6
+4、使用yum --disablerepo=\* --enablerepo=c6-media [command] 安装具体到文件包
+如：#yum --disablerepo=\* --enablerepo=c6-media install gcc 
+--------------------------------------------------------------------------------------------------------------------------
+二、新建oracle用户以及权限组,设置密码等；
+# /usr/sbin/groupadd oinstall
+# /usr/sbin/groupadd dba
+
+# /usr/sbin/useradd -g oinstall -G dba oracle          (# /usr/sbin/usermod -g oinstall -G dba oracle)
+
+# passwd oracle
+--------------------------------------------------------------------------------------------------------
+三、创建安装目录： 
+# mkdir -p /u01/app/
+# chown -R oracle:oinstall /u01/app/
+# chmod -R 775 /u01/app/
+
+三、修改以下配置文件：
+----------------------------------------------------------
+vim /etc/sysctl.conf
+
+fs.aio-max-nr = 1048576 
+fs.file-max = 6815744 
+kernel.shmall = 2097152 
+kernel.shmmax = 536870912 
+kernel.shmmni = 4096 
+kernel.sem = 250 32000 100 128 
+net.ipv4.ip_local_port_range = 9000 65500 
+net.core.rmem_default = 262144 
+net.core.rmem_max = 4194304 
+net.core.wmem_default = 262144 
+net.core.wmem_max = 1048576 
+----------------------------------------------------------
+vim /etc/security/limits.conf
+
+oracle                   soft      nproc     2047 
+oracle                   hard      nproc     16384
+oracle                soft     nofile  1024 
+oracle                hard     nofile  65536 
+oracle                soft     stack    10240
+-------------------------------------------------------------------------------------------------------------------------
+vim .bash_profile
+
+ORACLE_BASE=/u01/app/oracle
+ORACLE_SID=orcl
+export ORACLE_BASE ORACLE_SID
+
+PATH=$PATH:$HOME/bin
+export ORACLE_BASE=/u01/app/oracle
+export ORACLE_HOME=/u01/app/oracle/product/11.2.0/dbhome_1
+export ORACLE_SID=xbys
+export umask=022
+export PATH=$PATH:$ORACLE_HOME/bin
+
+source .bash_profile
+--------------------------------------------------------------------------------------------------------------------------
+四、将Oracle11g安装包拷贝到对应的目录下；如/u01/app/，在执行解压到Database文件夹下；
+      执行安装：$ /u01/app/database/runInstaller
+      若在检查安装包的时候出现有失败的安装包，则再次用yum --disablerepo=\* --enablerepo=c6-media该命令进行安装；安装包完成后，再重新进行数据库11g安装；
+
+--------------------------------------------------------------------------------------------------------------------------
+五、安装完成后，配置数据库监听以及本地数据库服务，以及Linux的对应的防火墙端口；
+      $ netmgr
+      $ netca
+      # setup配置对应的防火前端口（ssh 中一般都是1521端口）
+
+-------------------------------------------------------------------------------------------------------------------------
+六、ORACLE服务自动启动配置
+
+1. root用户修改oratab
+#vi /etc/oratab
+
+xx：/opt/oracle/11.2.0:Y(N改为Y)    --------xx为数据库实例名称
+
+Esc:wq!保存
+
+ 
+
+2.oracle用户修改dbstart,dbshut
+
+#vi /opt/oracle/11.2.0/bin/dbstart
+
+ORACLE_HOME_LISTNER=$ORACLE_HOME(原来为$1)
+
+Esc:wq!保存
+
+ 
+
+#vi /opt/oracle/11.2.0/bin/dbshut
+
+ORACLE_HOME_LISTNER=$ORACLE_HOME(原来为$1)
+
+Esc:wq!保存
+
+ 
+
+3.root用户添加内容到 rc.local中
+
+#vi /etc/rc.d/rc.local
+
+把下面内容加入到文件中
+
+su - oracle -c  "lsnrctl start"
+
+su - oracle -c  "dbstart"
+
+Esc:wq!保存
+
+ 
+
+4.重新启动
+
+#reboot
+
+ 
+
+5.登录使用数据库
+
+oracle用户登录
