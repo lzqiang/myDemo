@@ -1,0 +1,2 @@
+进入要导入jar包的目录中
+mvn install:install-file -Dfile=ueditor-1.1.2.jar -DgroupId=com.baidu.ueditor -DartifactId=ueditor -Dversion=1.1.2 -Dpackaging=jar
