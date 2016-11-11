@@ -1,2 +1,23 @@
 SELECT LPAD('-',4*(LEVEL-1),'|-') || orgmc FROM sys_org START WITH org = 1325
 CONNECT BY PRIOR  org=forg
+
+WITH temp AS (
+SELECT E.ELEMENTID,
+       E.TEMPLATEID,
+       E.ELEMENTNUM,
+       E.ELEMENTNAME,
+       E.PARENTID,
+       E.UPDATETIME,
+       E.NOTES,
+         DBMS_LOB.SUBSTR(C.CONTENT) 
+	       	  
+  FROM EMS_PLA_ELEMENT E
+  LEFT JOIN EMS_PLA_CONTENT C
+    ON E.ELEMENTID = C.ELEMENTID
+  LEFT JOIN ems_pla_ELEMENT e1 ON e.parentid = e1.elementid
+ WHERE E.TEMPLATEID = '4028d8ea5850f11c015851011c5300a9'
+   )
+   SELECT connect_by_isleaf AS isleaf, LPAD('-',4*(LEVEL-1),'|-') || LEVEL || ELEMENTNAME,temp.* FROM temp START WITH parentid IS NULL
+CONNECT BY PRIOR  ELEMENTID=PARENTID
+
+
