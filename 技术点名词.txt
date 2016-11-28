@@ -14,6 +14,8 @@ memcached
 
 前端js框架
 jquery
+jsx  erb ejs php jade 模板
+ectable(兴博.表格框架)
 
 前端样式框架
 bootstrap
@@ -32,3 +34,9 @@ express 路由
 Oracle
 Mysql
 PostgreSQL
+
+GIS地理信息系统
+
+tree.js三维js
+openlayer3 图片缩放，放大（类似地图那种）
+twaver3D 三维GIS
