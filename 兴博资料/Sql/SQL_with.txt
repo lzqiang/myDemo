@@ -1,0 +1,21 @@
+with tmp_base as
+			 (select a.build_site_name,
+			         a.build_site_id,
+			         c.car_id,
+			         c.car_num,
+			         c.gps_num,
+			         c.online_flag
+			    from tb_build_site a, tb_card b, tb_car c
+			   where a.build_site_id = b.build_site_id
+			     and b.car_id = c.car_id
+		    )
+		    select *
+		      from (select base.*,
+	                     d.longitude_point,
+	                     d.dimensionality_point,
+	                     d.speede,
+	                     to_char(d.record_time,'yyyy-MM-dd hh24:mi:ss') as record_time,
+	                     row_number() over(partition by base.car_id order by d.record_time desc) rn
+	                from tmp_base base, tb_car_path d
+	               where base.gps_num = d.gps_num and  base.build_site_id =#siteid#)
+	       where rn = 1 

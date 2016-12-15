@@ -1,0 +1,12 @@
+ with tab_base as
+  (select count(1) as num, max(b.name) as name, t.levels as levels
+     from tb_scenic_spot t
+     left join tb_dic_value b
+       on t.levels = b.tb_id
+    where t.levels is not null
+      and b.name is not null
+      and t.examine = 2
+    group by t.levels
+    order by t.levels)
+ select max (nvl(decode(name, 'A级', num), 0)) A级, max(nvl(decode(name, 'AA级', num), 0)) AA级, max(nvl(decode(name, 'AAA级', num), 0)) AAA级, max(nvl(decode(name, 'AAAA级', num), 0)) AAAA级, max(nvl(decode(name, 'AAAAA级', num), 0)) AAAAA级
+   from tab_base

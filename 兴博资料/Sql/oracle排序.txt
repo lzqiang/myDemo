@@ -1,0 +1,50 @@
+oracle在9i之前是对汉字的排序是按照二进制编码进行排序的，很不适合我们的国情，在oracle9i之后，汉字的排序方式有了以下三种方式：
+        1、使用拼音排序   NLS_SORT=SCHINESE_PINYIN_M
+        2、使用笔画排序   NLS_SORT=SCHINESE_STROKE_M 第一顺序笔画，第二顺序部首；
+        3、使用偏旁部首排序    NLS_SORT=SCHINESE_RADICAL_M 第一顺序部首，第二顺序笔画；
+      
+        这样，就可以在查询的时候，指定汉字的排序方式，设定方式可以分为以下三个级别：
+        1、语句级别设置排序方式：
+             按照笔划排序：
+              select * from table order by nlssort(col,'NLS_SORT=SCHINESE_STROKE_M');
+              按照部首排序：
+              select * from table order by nlssort(col,'NLS_SORT=SCHINESE_RADICAL_M');
+              按照拼音排序：
+             select * from table order by nlssort(col,'NLS_SORT=SCHINESE_PINYIN_M');
+        2、Session级别的设置，修改ORACLE字段的默认排序方式：
+              按拼音：alter session set nls_sort = SCHINESE_PINYIN_M;
+              按笔画：alter session set nls_sort = SCHINESE_STROKE_M;
+              按偏旁：alter session set nls_sort = NLS_SORT=SCHINESE_RADICAL_M；
+        3、修改系统参数（数据库所在操作系统）：
+               set NLS_SORT=SCHINESE_RADICAL_M ;
+               export NLS_SORT （sh）setenv NLS_SORT SCHINESE_RADICAL_M (csh)  
+               HKLC\SOFTWARE\ORACLE\home0\NLS_SORT (win注册表)；
+
+可以使用如下方法可以查看oracle的一些默认参数(注意标红的参数值)：
+Connected to Oracle Database 10g Enterprise Edition Release 10.2.0.1.0
+Connected as system
+SQL>
+SQL> select * from nls_database_parameters;
+
+PARAMETER                      VALUE
+------------------------------ --------------------------------------------------------------------------------
+NLS_LANGUAGE                   AMERICAN
+NLS_NCHAR_CHARACTERSET         UTF8
+NLS_TERRITORY                  AMERICA
+NLS_CURRENCY                   $
+NLS_ISO_CURRENCY               AMERICA
+NLS_SORT                       BINARY
+NLS_NUMERIC_CHARACTERS         .,
+NLS_CHARACTERSET               AL32UTF8
+NLS_CALENDAR                   GREGORIAN
+NLS_DATE_FORMAT                DD-MON-RR
+NLS_DATE_LANGUAGE              AMERICAN
+NLS_TIME_FORMAT                HH.MI.SSXFF AM
+NLS_TIMESTAMP_FORMAT           DD-MON-RR HH.MI.SSXFF AM
+NLS_TIME_TZ_FORMAT             HH.MI.SSXFF AM TZR
+NLS_TIMESTAMP_TZ_FORMAT        DD-MON-RR HH.MI.SSXFF AM TZR
+NLS_DUAL_CURRENCY              $
+NLS_COMP                       BINARY
+NLS_LENGTH_SEMANTICS           BYTE
+NLS_NCHAR_CONV_EXCP            FALSE
+NLS_RDBMS_VERSION              10.2.0.1.0

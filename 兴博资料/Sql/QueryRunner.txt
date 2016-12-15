@@ -1,0 +1,97 @@
+在相继学习了JDBC和数据库操作之后，我们明显感到编写JDBC代码并非一件轻松的事儿。为了帮助我们更高效的学习工作，从JDBC的繁重代码中解脱出来，老佟给我们详尽介绍了一个简化JDBC操作的组件——DBUtils。我们今天主要学习了它所提供的两个类和一个接口。
+组件下载地址：http://commons.apache.org/dbutils/
+DbUtils类(org.apache.commons.dbutils.DbUtils)主要负责装载驱动、关闭连接的常规工作。
+1.       close: 检查所提供的参数是不是NULL，如果不是的话，它们就关闭连接、声明和结果集。
+2.       CloseQuietly:避免连接、声明或结果集为NULL的情况被关闭。
+3.       CommitAndCloseQuietly(Connection conn)：用来提交连接，然后关闭连接，并且在关闭连接时不向上抛出在关闭时发生的一些SQL异常。
+4.       LoadDriver(String driveClassName): 装载并注册JDBC驱动程序，如果成功就返回TRUE。
+QreryRunner类(org.apache.commons.dbutils.QueryRunner) 显著的简化了SQL查询，并与ResultSetHandler协同工作将使编码量大为减少。
+1.       query(Connection conn, String sql, Object[] params, ResultSetHandler rsh)：执行选择查询，在查询中，对象阵列的值被用来作为查询的置换参数。
+2.       query(String sql, Object[] params, ResultSetHandler rsh)：方法本身不提供数据库连接，执行选择查询，在查询中，对象阵列的值被用来作为查询的置换参数。
+3.       query(Connection conn, String sql, ResultSetHandler rsh)：执行无需参数的选择查询。
+4.       update(Connection conn, String sql, Object[] params)：被用来执行插入、更新或删除（DML）操作。
+ResultSetHandler接口(org.apache.commons.dbutils.ResultSethandler)执行处理一个结果集对象，将数据转变并处理为任何一种形式，供其他应用使用。
+1.       Object handle (java.sql.ResultSet .rs) ：结果集（ResultSet）作为参数传入方法内，处理这个结果集，返回一个对象。
+ArrayHandler
+ArrayListHandler
+BeanHandler
+BeanListHandler
+MapHandler
+MapListHandler
+ScalarHandler
+我们学习了此组件的两个类和一个接口以后，写了下列代码供参考。
+import java.sql.Connection;
+import java.sql.SQLException;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
+public class TestQueryRunner {
+         public static void main(String[] args) throws SQLException {
+                   // TODO Auto-generated method stub
+                   //queryOracle();
+                   update();
+         }
+        
+         private static void update() throws SQLException{
+                   QueryRunner runner = new QueryRunner();
+                   Connection conn = DBManager.getConnection();
+                   //删除非 manager 中工资 低于 5000 的员工
+                   String sql = "UPDATE examstudent SET student_name = ? WHERE flow_id = ?";
+                   Object [] params = new Object[]{"Jerry", 5000};
+                  
+                   runner.update(conn, sql, params);
+         }
+        
+         private static void insert() throws SQLException{
+                   QueryRunner runner = new QueryRunner();
+                   Connection conn = DBManager.getConnection();
+                   //删除非 manager 中工资 低于 5000 的员工
+                 String sql = "INSERT INTO examstudent(flow_id, type, id_card, exam_card, student_name, location, grade) VALUES(?, ?, ?, ?, ?, ?, ?)";
+                   Object [] params = new Object[]{5000, 6, "身份证", "准考证", "Tom", "北京", 99};
+                  
+                   runner.update(conn, sql, params);
+         }
+        
+         private static void delete() throws SQLException{
+                   QueryRunner runner = new QueryRunner();
+                   Connection conn = DBManager.getConnection();
+                   //删除非 manager 中工资 低于 5000 的员工
+                   String sql = "delete from employees " +
+                                                "where employee_id not in " +
+                                                "     (select distinct d.manager_id from departments d where d.manager_id is not null) " +
+                                                "and salary < ?";
+                   System.out.println(sql);
+                   Object [] params = new Object[]{5000};
+                  
+                   runner.update(conn, sql, params);
+         }
+        
+         private static void queryOracle() throws SQLException{
+                   QueryRunner runner = new QueryRunner();
+                   Connection conn = DBManager.getConnection();
+                   //oracle 中的别名可以别解析
+                   String sql = "SELECT flow_id flowid, type, id_card idcard, exam_card examcard, student_name studentname, location, grade FROM examstudent";
+                   Object obj = runner.query(conn, sql, new BeanListHandler(ExamStudent.class));
+                   System.out.println(obj);
+         }
+         private static void query() throws SQLException {
+                   //1. 创建一个 QueryRunner 的实例
+                   QueryRunner runner = new QueryRunner();
+                  
+                  
+                   Connection conn = DBManager.getConnection();
+                   String sql = "SELECT id, name, address, phone FROM customers WHERE name LIKE ?";
+                   Class type = Customer.class;
+                   Object [] params = new Object[]{"%%"};
+                  
+                   //2. 查询操作
+                   //conn: 查询需要的数据库连接, sql: 查询使用的 sql 语句, rsh: 如何转换查询得到的结果集, params: 填补 sql 语句参数的数组
+                   Object obj = runner.query(conn, sql, new BeanListHandler(type), params);
+                   //System.out.println("^^" + obj);
+                  
+                   sql = "SELECT flow_id flowid, type, id_card idcard, exam_card examcard, student_name studentname, location, grade FROM examstudent";
+                   type = ExamStudent.class;
+                  
+                   obj = runner.query(conn, sql, new BeanListHandler(ExamStudent.class));
+                   System.out.println(obj);
+                   }
+}

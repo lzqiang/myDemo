@@ -1,0 +1,4 @@
+select * from all_objects where object_name = 'PK_EAHTTPSESSION' 
+SELECT * FROM  MUCKCAR.PK_EAHTTPSESSION
+
+TRUNCATE TABLE EAHTTPSESSION ; 

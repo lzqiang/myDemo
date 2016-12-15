@@ -1,0 +1,16 @@
+ con.setAutoCommit(false);
+
+
+   Long startTime = System.currentTimeMillis();
+   PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql.toString());
+   for (int i = 0; i < list.size(); i++) {
+    ExLog exLog = (ExLog)list.get(i);
+    pst.setString(1, exLog.getExLogId());
+    pst.setString(2, exLog.getExLogDate());
+    // 把一个SQL命令加入命令列表
+    pst.addBatch();
+   }
+   // 执行批量更新
+   pst.executeBatch();
+   // 语句执行完毕，提交本事务
+   con.commit();

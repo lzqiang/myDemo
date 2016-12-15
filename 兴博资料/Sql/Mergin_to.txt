@@ -1,0 +1,27 @@
+merge into tb_car_break a " +
+	        			"   using (   " +
+	        			"      select  " +
+	        			"      t2.car_id as car_id,  " +
+	        			"      t1.record_time,  " +
+	        			"      t1.latitude,  " +
+	        			"      t1.longitude,  " +
+	        			"      t1.direction,  " +
+	        			"      t1.speed, " +
+	        			"      t1.offset_lng, " +
+	        			"      t1.offset_lat " +
+	        			"      from  " +
+	        			"      tb_car_path_his_minute t1, tb_car t2 " +
+	        			"      where  " +
+	        			"      t1.gps_num = t2.gps_num and t1.car_break_id = ?  " +
+	        			"      ) b  " +
+	        			"      on (a.car_id = b.car_id and " +
+	        			"      a.car_break_time = to_date(b.record_time, 'yyyy-MM-dd hh24:mi:ss')and a.car_break_type=3)" +
+	        			"      when not matched then  " +
+	        			"      insert " +
+	        			"     (a.car_break_id, a.car_id, a.car_break_type, a.car_break_time, a.dimensionality_point, " +
+	        			"      a.longitude_point, a.direction, a.remark, a.speed,a.build_site_id,a.company_id, " +
+	        			"      a.offset_lng, a.offset_lat) " +
+	        			"      values  " +
+	        			"     (seq_car_break.nextval, b.car_id, 3, to_date(b.record_time, 'yyyy-MM-dd hh24:mi:ss'), " +
+	        			"      b.latitude, b.longitude, b.direction, ?,b.speed,?,?," +
+	        			"      b.offset_lng, b.offset_lat)"

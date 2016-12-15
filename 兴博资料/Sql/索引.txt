@@ -1,0 +1,551 @@
+
+oracleconstraintstableusernulldelete用user_indexes和user_ind_columns系统表查看已经存在的索引
+
+
+对于系统中已经存在的索引我们可以通过以下的两个系统视图(user_indexes和user_ind_columns)来查看其具体内容，例如是属于那个表，哪个列和，具体有些什么参数等等。
+
+
+user_indexes:     系统视图存放是索引的名称以及该索引是否是唯一索引等信息。
+
+user_ind_column:  系统视图存放的是索引名称，对应的表和列等。
+
+ 
+
+查看索引个数和类别:
+
+SQL> select * from user_indexes where table='表名' ;
+
+查看索引被索引的字段:
+
+
+SQL> select * from user_ind_columns where index_name=upper('&index_name');
+
+ 
+
+我们可以通过类似下面的语句来查看一个表的索引的基本情况：
+
+select user_ind_columns.index_name,user_ind_columns.column_name,
+
+user_ind_columns.column_position,user_indexes.uniqueness
+
+from user_ind_columns,user_indexes
+
+where user_ind_columns.index_name = user_indexes.index_name
+
+and user_ind_columns.table_name = ‘你想要查询的表名字’;
+
+
+通过这条SQL语句我们能查看到一个表的具体的索引的情况，如果你想对这表的索引进行进一步的探究你应该到user_indexes中去具体的看以下这个索引的基本情况。
+
+ 
+
+ 
+
+
+完整性约束
+　　DBA_CONSTRAINTS、ALL_CONSTRAINTS和USER_CONSTRAINST  显示有关约束的一般信息。
+　　DBA_CONS_COLUMNS、ALL_CONS_COLUMNS和USER_CONS_COLUMNS 显示有关列的相关约束的一般信息。
+
+ 
+
+ALL_CONS_COLUMNS 视图和DBA_CONS_COLUMNS 视图与USER_CONS_COLUMNS有相同的列定义。
+
+
+ALL_CONS_COLUMNS 视图能够显示用户可以访问的所有表上约束的列信息，而不管所有者是谁。
+DBA_CONS_COLUMNS 视图列出了整个数据库的列级约束信息。
+USER_CONS_COLUMNS
+
+ 
+
+user_constraints 和 user_cons_columns表得作用及其联系 
+
+
+user_constraints:  是表约束的视图,描述的是约束类型(constraint_type)是什么,属于哪些表(table_name),如果约束的类型为R(外键)的话,那么r_constraint_name字段存放的就是被引用主表中的主键约束名。   
+
+user_cons_columns: 是表约束字段的视图,说明表中的和约束相关的列参与了哪些约束。这些约束有主键约束,外键约束,索引约束.
+  
+
+两者可以通过(owner,constraint_name,table_name)关联:
+
+
+select 
+a.owner 外键拥有者, 
+a.table_name 外键表, 
+substr(c.column_name,1,127) 外键列, 
+b.owner 主键拥有者, 
+b.table_name 主键表, 
+substr(d.column_name,1,127) 主键列 
+from 
+user_constraints a, 
+user_constraints b, 
+user_cons_columns c, 
+user_cons_columns d 
+where 
+    a.r_constraint_name=b.constraint_name 
+and a.constraint_type='R' 
+and b.constraint_type='P' 
+and a.r_owner=b.owner 
+and a.constraint_name=c.constraint_name 
+and b.constraint_name=d.constraint_name 
+and a.owner=c.owner 
+and a.table_name=c.table_name 
+and b.owner=d.owner 
+and b.table_name=d.table_name 
+
+数据字典表列说明：
+
+desc user_constraints
+
+Name                                                                                   Comments                                                                    
+-----------------                --------------------------------------------------------------------------- 
+OWNER                                                                   Owner of the table                                                          
+CONSTRAINT_NAME                                             Name associated with constraint definition                                  
+CONSTRAINT_TYPE                                              Type of constraint definition                                               
+TABLE_NAME                                                          Name associated with table with constraint definition                       
+SEARCH_CONDITION                                             Text of search condition for table check                                    
+R_OWNER                                                                 Owner of table used in referential constraint                               
+R_CONSTRAINT_NAME                                          Name of unique constraint definition for referenced table                   
+DELETE_RULE                                                          The delete rule for a referential constraint                                
+STATUS                                                                      Enforcement status of constraint -  ENABLED or DISABLED                     
+DEFERRABLE                                                           Is the constraint deferrable - DEFERRABLE or NOT DEFERRABLE                 
+DEFERRED                                                                 Is the constraint deferred by default -  DEFERRED or IMMEDIATE              
+VALIDATED                                                       Was this constraint system validated? -  VALIDATED or NOT VALIDATED         
+GENERATED                                         Was the constraint name system generated? -  GENERATED NAME or USER NAME    
+BAD                                                                        Creating this constraint should give ORA-02436.  Rewrite it before 2000 AD. 
+RELY                                                                                       If set, this flag will be used in optimizer                                 
+LAST_CHANGE                                                               The date when this column was last enabled or disabled                      
+INDEX_OWNER                                                                The owner of the index used by the constraint                               
+INDEX_NAME                                                                    The index used by the constraint                                            
+INVALID                                                                                          
+VIEW_RELATED      
+desc user_cons_columns;
+
+
+Name                                                                                Comments                                                                                         
+--------------- -------------- -------- ------- ------------------------------------------------------------------------------------------------ 
+OWNER                                                                         Owner of the constraint definition                                                               
+CONSTRAINT_NAME                                               Name associated with the constraint definition                                                   
+TABLE_NAME                                                        Name associated with table with constraint definition                                            
+COLUMN_NAME                    Name associated with column or attribute of object column specified in the constraint definition 
+POSITION                                                                      Original position of column or attribute in definition   
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ORACLE的索引和约束详解数据库 
+
+
+Oracle的约束
+
+* 如果某个约束只作用于单独的字段，即可以在字段级定义约束，也可以在表级定义约束，但如果某个约束作用于多个字段， 
+
+必须在表级定义约束 
+
+* 在定义约束时可以通过CONSTRAINT关键字为约束命名，如果没有指定，ORACLE将自动为约束建立默认的名称 
+
+定义primary key约束(单个字段） 
+
+create table employees (empno number(5) primary key,...) 
+
+指定约束名 
+
+create table employees (empno number(5) constraint emp_pk primary key,...) 
+
+定义primary key约束(多个字段,在表级定义约束） 
+
+create table employees 
+
+(empno number(5), 
+
+deptno number(3) not null, 
+
+constraint emp_pk primary key(empno,deptno) 
+
+using index tablespace indx 
+
+storage (initial 64K 
+
+next 64K 
+
+) 
+
+) 
+
+ORACLE自动会为具有PRIMARY KEY约束的字段(主码字段)建立一个唯一索引和一个NOT NULL约束,定义PRIMARY KEY约束时可以为它的索引 
+
+指定存储位置和存储参数 
+
+alter table employees add primary key (empno) 
+
+alter table employees add constraint emp_pk primary key (empno) 
+
+alter table employees add constraint emp_pk primary key (empno,deptno) 
+
+not null约束(只能在字段级定义NOT NULL约束,在同一个表中可以定义多个NOT NULL约束) 
+
+alter table employees modify deptno not null/null 
+
+unique约束 
+
+create table employees 
+
+( empno number(5), 
+
+ename varchar2(15), 
+
+phone varchar2(15), 
+
+email varchar2(30) unique, 
+
+deptno number(3) not null, 
+
+constraint emp_ename_phone_uk unique (ename,phone) 
+
+) 
+
+alter table employees 
+
+add constraint emp_uk unique(ename,phone) 
+
+using index tablespace indx 
+
+定义了UNIQUE约束的字段中不能包含重复值，可以为一个或多个字段定义UNIQUE约束,因此，UNIQUE即可以在字段级也可以在表级定义， 
+
+在UNIQUED约束的字段上可以包含空值. 
+
+foreign key约束 
+
+* 定义为FOREIGN KEY约束的字段中只能包含相应的其它表中的引用码字段的值或者NULL值 
+
+* 可以为一个或者多个字段的组合定义FOREIGN KEY约束 
+
+* 定义了FOREIGN KEY约束的外部码字段和相应的引用码字段可以存在于同一个表中，这种情况称为"自引用" 
+
+* 对同一个字段可以同时定义FOREIGN KEY约束和NOT NULL约束 
+
+定义了FOREIGN KEY约束的字段称为"外部码字段",被FORGIEN KEY约束引用的字段称为"引用码字段",引用码必须是主码或唯一码,包含外部码的表称为子表， 
+
+包含引用码的表称为父表. 
+
+A: 
+
+create table employees 
+
+(....., 
+
+deptno number(3) NOT NULL, 
+
+constraint emp_deptno_fk foreign key (deptno) 
+
+references dept (deptno) 
+
+) 
+
+如果子表中的外部码与主表中的引用码具有相同的名称，可以写成: 
+
+B: 
+
+create table employees 
+
+(....., 
+
+deptno number(3) NOT NULL 
+
+constraint emp_deptno_fk references dept 
+
+) 
+
+注意： 
+上面的例子(B)中not null后面没有加逗号,因为这一句的contraint是跟在那一列deptno后面的，属于列定义，所以都无需指明列。而A例中的是表定义，需要指明那一列，所以要加逗号，不能在列后面定义，还可以写成： 
+
+create table employees 
+(empno char(4), 
+deptno char(2) not null constraint emp_deptno_fk references dept, 
+ename varchar2(10) 
+) 
+表定义contraint的只能写在最后，再看两个例子： 
+
+create table employees 
+(empno number(5), 
+ename varchar2(10), 
+deptno char(2) not null constraint emp_deptno_fk references dept, 
+constraint emp_pk primary key(empno,ename) 
+) 
+
+create table employees 
+( empno number(5), 
+ename varchar2(15), 
+phone varchar2(15), 
+email varchar2(30) unique, 
+deptno number(3) not null, 
+constraint emp_pk primary key(empno,ename), 
+constraint emp_phone_uk unique (phone) 
+) 
+
+添加foreign key约束(多字段／表级） 
+alter table employees 
+add constraint emp_jobs_fk foreign key (job,deptno) 
+references jobs (jobid,deptno) 
+on delete cascade 
+
+更改foreign key约束定义的引用行为(delete cascade/delete set null/delete no action), 默认是delete on action 
+
+引用行为(当主表中一条记录被删除时，确定如何处理字表中的外部码字段）： 
+delete cascade : 删除子表中所有的相关记录 
+delete set null :　将所有相关记录的外部码字段值设置为NULL 
+delete no action: 不做任何操作 
+
+先删除原来的外键约束,再添加约束 
+ALTER TABLE employees DROP CONSTRAINT emp_deptno_fk; 
+ALTER TABLE employees ADD CONSTRAINT emp_deptno_fk FOREIGN KEY(deptno) REFERENCES dept(deptno) ON DELETE CASCADE; 
+
+check约束 
+* 在CHECK约束的表达式中必须引用到表中的一个或多个字段，并且表达式的计算结果必须是一个布尔值 
+* 可以在表级或字段级定义 
+* 对同一个字段可以定义多个CHECK约束，同时也可以定义NOT NULL约束 
+　 
+create table employees 
+(sal number(7,2) 
+constraint emp_sal_ck1 check (sal > 0) 
+) 
+
+alter table employees 
+add constraint emp_sal_ck2 check (sal < 20000) 
+
+删除约束 
+
+alter table dept drop unique (dname,loc) --指定约束的定义内容 
+alter table dept drop constraint dept_dname_loc_uk --指定约束名 
+
+删除约束时，默认将同时删除约束所对应的索引，如果要保留索引，用KEEP INDEX关键字 
+alter table employees drop primary key keep index 
+
+如果要删除的约束正在被其它约束引用，通过ALTER TABLE..DROP语句中指定CASCADE关键字能够同时删除引用它的约束 
+
+利用下面的语句在删除DEPT表中的PRIMARY KEY约束时，同时将删除其它表中引用这个约束的FOREIGN KEY约束: 
+alter table dept drop primary key cascade 
+
+禁用/激活约束(禁用/激活约束会引起删除和重建索引的操作) 
+alter table employees disable/enable unique email 
+alter table employees disable/enable constraint emp_ename_pk 
+alter tabel employees modify constraint emp_pk disable/enable 
+alter tabel employees modify constraint emp_ename_phone_uk disable/enable 
+
+
+如果有FOREIGN KEY约束正在引用UNIQUE或PRIMARY KEY约束，则无法禁用这些UNIQUE或PRIMARY KEY约束， 
+
+这时可以先禁用FOREIGN KEY约束，然后再禁用UNIQUE或PRIMARY KEY约束；或者可以在ALTER TABLE...DISABLE 
+
+语句中指定CASCADE关键字，这样将在禁用UNIQUE或PRIMARY KEY约束的同时禁用那些引用它们的FOREIGN KEY约束，如： 
+
+alter table employees disable primary key cascade 
+
+约束数据字典 
+
+all_constraints/dba_constraints/user_constraints 约束的基本信息，包括约束的名称，类型，状态 
+
+(约束类型：C(CHECK约束),P(主码约束),R(外部码约束),U(唯一码约束)) 
+
+all_cons_columns/dba/user 约束对应的字段信息 
+
+Oracle的索引
+
+    索引和对应的表应该位于不同的表空间中,oracle能够并行读取位于不同硬盘上的数据，可以避免产生I/O冲突 
+
+B树索引：在B树的叶节点中存储索引字段的值与ROWID。 
+
+唯一索引和不唯一索引都只是针对B树索引而言. 
+
+Oracle最多允许包含32个字段的复合索引 
+
+索引创建策略 
+
+1.导入数据后再创建索引 
+
+2.不需要为很小的表创建索引 
+
+3.对于取值范围很小的字段（比如性别字段）应当建立位图索引 
+
+4.限制表中的索引的数目 
+
+5.为索引设置合适的PCTFREE值 
+
+6.存储索引的表空间最好单独设定 
+
+创建不唯一索引 
+
+create index emp_ename on employees(ename) 
+
+tablespace users 
+
+storage(......) 
+
+pctfree 0; 
+
+创建唯一索引 
+
+create unique index emp_email on employees(email) 
+
+tablespace users; 
+
+创建位图索引 
+
+create bitmap index emp_sex on employees(sex) 
+
+tablespace users; 
+
+创建反序索引 
+
+create unique index order_reinx on orders(order_num,order_date) 
+
+tablespace users 
+
+reverse; 
+
+创建函数索引(函数索引即可以是普通的B树索引，也可以是位图索引) 
+
+create index emp_substr_empno 
+
+on employees(substr(empno,1,2)) 
+
+tablespace users; 
+
+修改索引存储参数(与表类似，INITIAL和MINEXTENTS参数在索引建立以后不能再改变) 
+
+alter index emp_ename storage(pctincrease 50); 
+
+由于定义约束时由oracle自动建立的索引通常是不知道名称的，对这类索引的修改经常是利用alter table ..using index语句进行的,而不是alter index语句 
+
+利用下面的语句将employees表中primary key约束对应的索引的PCTFREE参数修改为5 
+
+alter table employees enable primary key using index pctfree 5; 
+
+清理索引碎片 
+
+1.合并索引(只是简单的将B树叶结点中的存储碎片合并在一起，并不会改变索引的物理组织结构） 
+
+alter index emp_pk coalesce; 
+
+2.重建索引(不仅能够消除存储碎片,还可以改变索引的全部存储参数设置，并且可以将索引移动到其它的表空间中,重建索引 
+
+实际上就是再指定的表空间中重新建立一个新的索引,然后删除原来的索引) 
+
+alter index emp_pk rebuild; 
+
+删除索引 
+
+drop index emp_ename; 
+
+如果索引中包含损坏的数据块，或者包含过多的存储碎片，需要首先删除这个索引，然后再重建它. 
+
+如果索引是在创建约束时由oracle自动产生的,可以通过禁用约束或删除约束的方法来删除对应的索引. 
+
+在删除一个表时,oracle会自动删除所有与该表相关的索引. 
+
+索引数据字典 
+
+all_indexes/dba_indexes/user_indexes 索引的基本信息 
+
+all_ind_columns/dba_ind_columns/user_ind_columns 索引对应的字段信息 
+
+ 
+
+ 
+
+1. 查询一张表里面索引
+
+ 
+
+select * from user_indexes where table_name=upper('tableName');
+
+ 
+
+2. 查询被索引字段
+
+ 
+
+select * from user_ind_columns where index_name=('indexName');
+
+
+3. 给某一字段创建索引
+
+
+create index index_name on table_name(col_name);
+
+ 
+
+ 
+
+1.查看所有用户
+
+     select * from all_users; -------查看所有的用户
+
+     select * from user_users; --------查看当前用户
+
+2.查看用户或角色系统权限：
+
+     select * from user_sys_privs; --------查看当前用户的权限
+
+3.查看角色所包含的权限
+
+     select * from role_sys_privs;   -------
+
+4.查看用户对象权限
+
+     select * from all_tab_privs;   --------查看所用的用户的可操作表权限
+     select * from user_tab_privs; --------查看当前用户的表可操作权限
+
+5.查看用户或角色所拥有的角色
+
+     select * from user_role_privs;   ------查看当前用户的角色
+
+     select * from user_constraints where TABLE_NAME='？';    -----查看某一个表的约束
+
+6.查看用户下的索引
+
+   1.  select  * from user_indexes-          -----查看当前用户下的所有索引
+
+   2.  select  * from user_indexes where table_name='A';      -----查看当前用户下表A的索引
+      （drop index index_name去掉索引） 
+
+   3. select index_name,index_type,status,blevel from user_indexes where table_name = '？';  
+
+           -----查看某一个表的所有索引
+
+   4.  select table_name, index_name, column_name, column_position from        user_ind_columns where  table_name='？';    ----查看索引的构成
+
+ 7. 建索引
+
+       create unique clustered index 索引名on 表名(字段1)  --单索引
+
+       Create index 索引名 on 表名(字段1,字段2)  -------复合索引
+
+ 
+

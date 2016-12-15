@@ -1,0 +1,37 @@
+查询oracle表的信息（表，字段，约束，索引） 查询oracle表的信息（表，字段，约束，索引）1、查询出所有的用户表
+select   *   from   user_tables   可以查询出所有的用户表
+2、查询出用户所有表的索引
+select   *   from   user_indexes
+3、查询用户表的索引(非聚集索引): 
+select   *   from   user_indexes where   uniqueness='NONUNIQUE'
+4、查询用户表的主键(聚集索引): 
+select   *   from   user_indexes where   uniqueness='UNIQUE' 
+5、查询表的索引
+select t.*,i.index_type from user_ind_columns t,user_indexes i where t.index_name = i.index_name andt.table_name='NODE'
+6、查询表的主键
+select cu.* from user_cons_columns cu, user_constraints au where cu.constraint_name = au.constraint_name andau.constraint_type = 'P' AND cu.table_name = 'NODE'
+7、查找表的唯一性约束（包括名称，构成列）： 
+select column_name from user_cons_columns cu, user_constraints au where cu.constraint_name=au.constraint_name and
+cu.table_name='NODE'
+8、查找表的外键
+select * from user_constraints c where c.constraint_type = 'R' and c.table_name='STAFFPOSITION'
+查询外键约束的列名： 
+select * from user_cons_columns cl where cl.constraint_name = 外键名称
+查询引用表的键的列名：
+select * from user_cons_columns cl where cl.constraint_name = 外键引用表的键名
+9、查询表的所有列及其属性
+select t.*,c.COMMENTS from user_tab_columns t,user_col_comments c where t.table_name='NODE'
+
+10、查询数据库中所有的约束
+select * from user_constraints where constraint_name like 'FK%'
+
+user_constraints 
+user_tables 
+user_indexes 
+user_tables 
+
+all_constraints 
+all_tables 
+all_indexes 
+all_tables 
+ 

@@ -1,0 +1,1 @@
+select sysdate -(1/24/60),sydsdate from dual;

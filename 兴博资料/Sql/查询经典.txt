@@ -1,0 +1,36 @@
+	public static JSONArray getList(String sql, Object... params) throws Exception {
+		Connection con=DBUtils.getConnection();
+		con.setAutoCommit(false);
+		final JSONArray jsonArr = new JSONArray();
+		try {
+			QueryRunner runner = new QueryRunner();
+			runner.query(con,sql.toString(), new ResultSetHandler<Object>() {
+				public Object handle(ResultSet rs) throws SQLException {
+					ResultSetMetaData metaData = rs.getMetaData();
+					int cols = metaData.getColumnCount();
+					while (rs.next()) {
+						JSONObject jsonObj = new JSONObject();
+						for (int i = 1; i <= cols; i++) {
+							String colName = metaData.getColumnLabel(i);
+							String value = rs.getString(colName);
+							if (value != null && value.length() != 0) {
+								jsonObj.put(colName.toLowerCase(), value);// 列名全部转换成小写，便于前台代码统一处理
+							}else {
+								jsonObj.put(colName.toLowerCase(),"");
+							}
+						}
+						jsonArr.add(jsonObj);
+					}
+					return jsonArr;
+				}
+			}, params);
+			con.commit();
+		} catch (Exception e) {
+			con.rollback();
+			e.printStackTrace();
+			throw new RuntimeException(e.getMessage(), e);
+		}finally{
+			DBUtils.close(con);
+		}
+		return jsonArr;
+	}

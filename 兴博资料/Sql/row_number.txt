@@ -1,0 +1,8 @@
+功能描述：放回有序组中一行的偏移量，从而可用于按特定标准排序行号
+语法：row_number() over([query_partition_clause] order_by_clause)
+ 例子: 下列返回每个员工在每个部门中按员工号排序后的顺序号
+  
+  SELECT DEPARTMENT_ID,LAST_NAME,EMPLOYEE_ID,ROW_NUMBER() 
+    OVER (PARTITION BY DEPARTMENT_ID ORDER BY EMPLOYE_ID) AS EMP_ID
+    FROM EMPLOYEES
+    WHERE DEPARTMENT_ID <50

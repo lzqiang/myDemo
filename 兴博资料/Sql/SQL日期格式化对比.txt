@@ -1,0 +1,1 @@
+to_char(a.opt_date,'yyyy-MM-dd HH24:mi:ss') like  (select to_char(#realDate#,'yyyy-MM-dd') from dual)||'%'

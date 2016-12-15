@@ -1,0 +1,155 @@
+
+	private String getPeopleNum(String jgid,String flag){
+		String tssql="select j.jgid as id,j.jgmc as name,j.fjgid as pId,1 bs,j.qxbs qxbs from sys_jgxxb j start with j.jgid=? connect by prior  j.jgid = j.fjgid ";
+		String sql2="select u.userid as id," +
+				"           u.username || case " +
+				"           when u.linkphone is not null then " +
+				"          '(' || u.linkphone || ')' " +
+				"           end as name," +
+				"           null as pId, " +
+				"           2 bs, " +
+				"           sum(case when g.userid is null then 0 else decode(g.gpsstate, 1, 1, 0)end) over(partition by u.ssjg) online_cnt, " +
+				"           sum(case when g.userid is null then 1 else decode(g.gpsstate, 1, 0, 1)end) over(partition by u.ssjg) offline_cnt,  " +
+				"           g.gpsstate  " +
+				"          from sys_userinfo u  " +
+				"          left join kpkq_gps g on g.userid=u.userid  " +
+				"          where u.linkphone is not null  " +
+				"          and u.ssjg =?  " +
+				"          and length(u.linkphone) = 11 ";
+		int online_count=0;
+		int offline_count=0;
+		try{
+		JSONArray jsonArray = UtilsDao.getList(tssql,jgid);
+		JSONObject jsonobject=null;
+		JSONObject nodejosn = new JSONObject();
+		JSONArray treejsonArray = new JSONArray();
+		for (int i = 0; i < jsonArray.size(); i++) {
+			jsonobject = jsonArray.getJSONObject(i);
+			jsonobject.put("pId", jsonobject.remove("pid"));
+			if(jsonobject.getInt("qxbs")!=5){
+				if(i<=1){
+					jsonobject.put("open", "true");
+					jsonobject.put("isParent", "true");
+					jsonobject.put("hasChild", "true");
+				}else {
+					jsonobject.put("open", "true");
+					jsonobject.put("isParent", "true");
+					jsonobject.put("hasChild", "true");
+				}
+				treejsonArray.add(jsonobject);
+			}else {
+				jsonobject.put("open", "true");
+				jsonobject.put("isParent", "true");
+				jsonobject.put("hasChild", "true");
+				treejsonArray.add(jsonobject);
+				JSONArray jsonArray1 = UtilsDao.getList(sql2, jsonobject.get("id"));
+				if("1".equals(flag)){
+					if(jsonArray1.size()>0){
+						nodejosn=jsonArray1.getJSONObject(0);
+						online_count+=Integer.parseInt(nodejosn.get("online_cnt").toString());
+						offline_count+=Integer.parseInt(nodejosn.get("offline_cnt").toString());
+					}
+				}else{
+					
+				}
+			}
+		}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return " ||在线:"+online_count+" 离线："+offline_count;
+	}
+	/**
+	 * 考勤左边初始化
+	 * 
+	 * @param
+	 * @return
+	 */
+	public ActionForward getLeft(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		SysUserinfo sysUserinfo = (SysUserinfo) request.getSession().getAttribute("LoginBean");
+		/*String jgsql="select j.jgid,j.jgmc,1 bs from sys_jgxxb j where j.jgid=?";
+		Map<String, String> map=UtilsDao.getSingleMap(jgsql,sysUserinfo.getSysJgxxb().getJgid().toString());
+		JSONObject jsonObject=JSONObject.fromObject(map);
+		JSONObject nodejosn = new JSONObject();
+		nodejosn.put("id",jsonObject.get("jgid"));
+		nodejosn.put("pId","0");
+		nodejosn.put("name",jsonObject.get("jgmc"));
+		nodejosn.put("bs",jsonObject.get("bs"));
+		nodejosn.put("isParent", "true");
+		nodejosn.put("hasChild", "true");
+		request.setAttribute("columntree", nodejosn);*/
+		/*String jgsql="select j.jgid as id,j.jgmc as name,j.fjgid as pId,1 bs,j.qxbs qxbs from sys_jgxxb j " +
+				" where j.fjgid=? order by j.jgid asc";*/
+		//String sql=" select j.qxbs qxbs from sys_jgxxb j where j.jgid =?";
+		//getPeopleNum("1141");
+		String tssql="select j.jgid as id,j.jgmc as name,j.fjgid as pId,1 bs,j.qxbs qxbs from sys_jgxxb j start with j.jgid=? connect by prior  j.jgid = j.fjgid ";
+		//String sql2="select u.userid as id ,u.username||case when u.linkphone is not null then '('||u.linkphone||')' end as name,null as pId, 2 bs from sys_userinfo u where  u.linkphone is not null and u.ssjg=? and length(u.linkphone)=11 ";
+		String sql2="select u.userid as id," +
+		"           u.username || case " +
+		"           when u.linkphone is not null then " +
+		"          '(' || u.linkphone || ')' " +
+		"           end as name," +
+		"           null as pId, " +
+		"           2 bs, " +
+		"           g.gpsstate  " +
+		"          from sys_userinfo u  " +
+		"          left join kpkq_gps g on g.userid=u.userid  " +
+		"          where u.linkphone is not null  " +
+		"          and u.ssjg =?  " +
+		"          and length(u.linkphone) = 11 ";
+		JSONArray jsonArray = UtilsDao.getList(tssql,sysUserinfo.getSysJgxxb().getJgid().toString());
+		JSONObject jsonobject=null;
+		JSONObject nodejosn = new JSONObject();
+		JSONArray treejsonArray = new JSONArray();
+		String jgid="";
+		String name="";
+		String status="";
+		for (int i = 0; i < jsonArray.size(); i++) {
+			jsonobject = jsonArray.getJSONObject(i);
+			jsonobject.put("pId", jsonobject.remove("pid"));
+			if(jsonobject.getInt("qxbs")!=5){
+				if(i<=1){
+					jgid=getPeopleNum(jsonobject.get("id").toString(),"1");
+					name=jsonobject.get("name")+jgid;
+					jsonobject.put("open", "true");
+					jsonobject.put("isParent", "true");
+					jsonobject.put("hasChild", "true");
+					jsonobject.put("name",name);
+				}else {
+					jgid=getPeopleNum(jsonobject.get("id").toString(),"1");
+					name=jsonobject.get("name")+jgid;
+					jsonobject.put("open", "true");
+					jsonobject.put("isParent", "true");
+					jsonobject.put("hasChild", "true");
+					jsonobject.put("name",name);
+				}
+				treejsonArray.add(jsonobject);
+			}else {
+				jgid=getPeopleNum(jsonobject.get("id").toString(),"1");
+				name=jsonobject.get("name")+jgid;
+				jsonobject.put("open", "true");
+				jsonobject.put("isParent", "true");
+				jsonobject.put("hasChild", "true");
+				jsonobject.put("name",name);
+				treejsonArray.add(jsonobject);
+				JSONArray jsonArray1 = UtilsDao.getList(sql2, jsonobject.get("id"));
+				for (int j = 0; j < jsonArray1.size(); j++) {
+					nodejosn=jsonArray1.getJSONObject(j);
+					status=nodejosn.get("gpsstate").toString();
+					if("1".equals(status)){
+						nodejosn.put("icon", "./attendance/attendance/image/left_peploe.jpg");	
+					}else{
+						nodejosn.put("icon", "./attendance/attendance/image/left_peploe2.jpg");
+					}
+					nodejosn.put("pId", jsonobject.get("id"));
+					nodejosn.put("isParent", "false");
+					nodejosn.put("hasChild", "false");
+					treejsonArray.add(nodejosn);
+				}
+			}
+		}
+		request.setAttribute("columntree", treejsonArray);
+		return new ActionForward("/attendance/attendance/main/left.jsp");
+	}

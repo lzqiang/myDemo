@@ -1,0 +1,19 @@
+
+  -- Create the user 
+create user xb3dmap
+  identified by xb3dmap
+  default tablespace xb3dmap
+  temporary tablespace TEMP
+  profile DEFAULT
+  quota unlimited on xb3dmap;
+-- Grant/Revoke role privileges 
+grant connect to xb3dmap with admin option;
+grant dba to xb3dmap with admin option;
+-- Grant/Revoke system privileges 
+grant create any sequence to xb3dmap with admin option;
+grant create any table to xb3dmap with admin option;
+grant delete any table to xb3dmap with admin option;
+grant insert any table to xb3dmap with admin option;
+grant select any table to xb3dmap with admin option;
+grant unlimited tablespace to xb3dmap with admin option;
+grant update any table to xb3dmap with admin option;
