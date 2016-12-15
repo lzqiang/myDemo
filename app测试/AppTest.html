@@ -12,7 +12,7 @@
 	<option value="1">106</option>
 </select>
 <input type="text" name="method" id="method" value="POST"/>
-<input type="text" name="actionval" id="actionval" style="width:300px"/>
+<input type="text" name="actionval" id="actionval" style="width:900px"/>
     <form id="formId">
         <div id="div">
             <input type="button" onclick="submitclick()" value="提交"/>
@@ -54,14 +54,15 @@
       if("1" == service){
 		targetval = "http://192.168.88.106:8080/wtqsafe"
 	  }else{
-		targetval = "http://192.168.88.12:8094/ulab"
+		targetval = "http://192.168.88.12:8095/wtqsafe"
 	  }
       var formobj =  document.getElementById("formId");
       var methodval =document.getElementById("method").value ;
       var actionval =document.getElementById("actionval").value ;
 	  
        formobj.setAttribute("method",methodval); 
-       formobj.setAttribute("action",targetval+"/"+actionval); 
+	   var action = targetval+"/"+actionval;
+       formobj.setAttribute("action",action); 
        formobj.submit();
    }
 
