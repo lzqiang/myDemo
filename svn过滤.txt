@@ -1,0 +1,8 @@
+temp中的Ignored Resources中
+添加下面的
+
+.settings
+.project
+.classpath
+.class
+target
