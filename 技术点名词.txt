@@ -1,4 +1,6 @@
 java后端
+bboss是一个j2ee开源框架，为企业级应用开发提供一站式解决方案，并能有效地支撑移动应用开发。bboss功能涵盖ioc，mvc，jsp自定义标签库，持久层，全局事务托管，安全认证，SSO，web会话共享，cxfwebservice服务发布和管理，hessian服务发布和管理等功能。另外还提供了符合中国式自由流的bboss activiti工作流引擎。在不断的实践过程中，越来越多的好东西被吸纳到bboss这个大家庭中，使得bboss能够更好地应用于企业应用项目中，能够更好地解决开发过程中碰到的实际问题。
+
 springmvc
 spring
 mybatis
@@ -40,3 +42,6 @@ GIS地理信息系统
 tree.js三维js
 openlayer3 图片缩放，放大（类似地图那种）
 twaver3D 三维GIS
+
+git
+http://www.liaoxuefeng.com/wiki 小白入门文档
