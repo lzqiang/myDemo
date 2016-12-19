@@ -1,0 +1,12 @@
+	/*
+	<div class="up" id="up">
+   		<ul id="contentUl">
+      		 </ul>
+   	</div>
+	*/
+	//div滚动条(scrollbar)保持在最底部
+	function scrollToBottom(){
+		//var div = document.getElementById('chatCon');
+		var div = document.getElementById('up');
+		div.scrollTop = div.scrollHeight;
+	}	
