@@ -23,6 +23,8 @@ memcached
 jquery
 jsx  erb ejs php jade 模板
 ectable(兴博.表格框架)
+BigPipe学习研究:
+http://www.cnblogs.com/mofish/archive/2011/11/03/2234858.html
 
 前端样式框架
 bootstrap
