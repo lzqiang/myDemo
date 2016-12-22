@@ -1,0 +1,15 @@
+ public static void main(String[] args) throws Exception{
+    	LawCheckrecord lawCheckrecord = new LawCheckrecord();
+    	lawCheckrecord.setLegalperson("艳");
+    	lawCheckrecord.setDuty("会计");
+    	lawCheckrecord.setTel("110");
+    	
+    	Map<String,String> values = new HashMap<String, String>();
+    	values.put("legalperson","lzqiang");
+    	values.put("duty","java程序员");
+    	//org.apache.commons.beanutils.BeanUtils
+    	BeanUtils.populate(lawCheckrecord, values);
+    	System.out.println(lawCheckrecord.getTel());//110
+    	System.out.println(lawCheckrecord.getDuty());//java程序员
+    	System.out.println(lawCheckrecord.getLegalperson());//lzqiang
+	}
