@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Jsonp post 跨域方案_Ajax_第七城市</title>
+<meta name="keywords" content="方案"/>
+<meta name="description" content="近期在项目中遇到这样一问题，关于jsonp跨域问题，get传值是可以的，但post传值死活不行啊，于是网上看了一大堆关于这方面的资料，最终问题得以解决，今天抽空与大家分享下。说明： http:"/>
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="Jsonp post 跨域方案"/>
+<meta property="og:release_date" content="2015-06-01"/>
+<meta property="og:url" content="http://www.th7.cn/web/ajax/201506/104065.shtml"/>
+<meta property="og:description" content="近期在项目中遇到这样一问题，关于jsonp跨域问题，get传值是可以的，但post传值死活不行啊，于是网上看了一大堆关于这方面的资料，最终问题得以解决，今天抽空与大家分享下。说明： http:"/>
+<meta property="og:site_name" content="第七城市"/>
+<link rel="alternate" type="application/rss+xml" title="第七城市 RSS" href="http://www.th7.cn/e/web/?type=rss2">
+<link type="text/css" href="/sanda2015/css/base.css" rel="stylesheet" />
+<link type="text/css" href="/sanda2015/css/common.css" rel="stylesheet" />
+<link rel="shortcut icon" type="image/ico" href="http://www.th7.cn/favicon.ico">
+<script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+<script src="http://dup.baidustatic.com/js/ds.js"></script>
+<!--[if IE 6]>
+<script src="/sanda2015/css/iepng.js" type="text/javascript"></script>
+<script type="text/javascript">EvPNG.fix('div, ul, img, li, input, a, p, span, i');</script>
+<![endif]-->
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?718380ac77f3a5aa54394fdc1ae3853e";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+</head>
+<body>
+<div id="head">
+<div class="toolBar">
+<div class="main">
+<div class="topNav clearfix">
+<ul class="navList fl">
+<li><div class="one"><a href="http://www.th7.cn">第七城市</a></div></li>
+<li>
+<div class="one"><a href="http://www.th7.cn/program/" target="_blank">编程开发<i class="icon"></i></a></div>
+<div class="two"><a href="http://www.th7.cn/Program/java/" target="_blank">Java</a><a href="http://www.th7.cn/Program/net/" target="_blank">.Net</a><a href="http://www.th7.cn/Program/Python/" target="_blank">Python</a><a href="http://www.th7.cn/Program/Android/" target="_blank">Android</a><a href="http://www.th7.cn/Program/IOS/" target="_blank">IOS</a></div>
+</li>
+<li class="">
+<div class="one"><a href="http://www.th7.cn/pm/" target="_blank">平面设计<i class="icon"></i></a></div>
+<div class="two"><a href="/pm/Photoshop/">Photoshop</a><a href="/pm/ai/">Illustrator</a><a href="/pm/Coreldraw/">Coreldraw</a><a href="/pm/cad/">AutoCAD</a></div>
+</li>
+<li class="">
+<div class="one"><a href="/db/">数据库<i class="icon"></i></a></div>
+<div class="two"><a href="/db/mysql/">MySQL</a><a href="/db/mssql/">SQL Server</a><a href="/db/Oracle/">Oracle</a></div>
+</li>
+<li class="">
+<div class="one"><a href="/Design/">设计赏析<i class="icon"></i></a></div>
+<div class="two"><a href="/Design/pm/">平面设计</a><a href="/Design/logo/">标志设计</a><a href="/Design/pic/">插画设计</a><a href="/Design/room/">建筑设计</a><a href="/Design/ui/">UI设计欣赏</a><a href="/design/photography/">摄影艺术</a></div>
+</li>
+<li class="watch">
+<div class="one"><a href="http://weibo.com/th7cn" target="_blank" rel="nofollow"><i class="icon"></i>关注第七城市</a></div>
+</li>
+</ul>
+<div class="navUser mt5 fr"><div class="userbar">Email:service@7-inc.com</div></div>
+</div>
+</div>
+</div>
+<div class="main">
+<div class="mtb10 clearfix">
+<div class="logo"><a title="第七城市" href="http://www.th7.cn"><img src="/sanda2015/logo.png" alt="第七城市"/></a></div>
+<div class="fr ml10">
+<script>
+(function() {
+    var s = "_" + Math.random().toString(36).slice(2);
+    document.write('<div id="' + s + '"></div>');
+    (window.slotbydup=window.slotbydup || []).push({
+        id: '1112078',
+        container: s,
+        size: '728,90',
+        display: 'inlay-fix'
+    });
+})();
+</script>
+</div></div>
+<div class="navBeta">
+  <div class="navBetaInner clearfix">
+<ul class="navBetaCon">
+<li class="tit"><a href="/Program/">编程</a></li>
+<li><a href="/Program/php/">PHP</a></li>
+<li><a href="/Program/java/">Java</a></li>
+<li><a href="/Program/Python/">Python</a></li>
+<li class="tit"><a href="/Program/net/">.NET</a></li>
+<li><a href="/Program/Ruby/">Ruby</a></li>
+<li><a href="/Program/IOS/">IOS</a></li>
+<li><a href="/Program/Android/" title="Android" alt="Android"/>安卓</a></li>
+</ul>
+<ul class="navBetaCon Con2">
+<li class="tit"><a href="/pm/">设计</a></li>
+<li><a href="/pm/max/">3DS MAX</a></li>
+<li><a href="/pm/ai/">Illustrator</a></li>
+<li class="tit"><a href="/pm/Photoshop/" title="Photoshop" alt="Photoshop">Photoshop</a></li>
+<li><a href="/pm/Coreldraw/">Coreldraw</a></li>
+<li><a href="/pm/cad/" title="AutoCAD" alt="AutoCAD">CAD</a></li>
+</ul>
+<ul class="navBetaCon Con3">
+<li class="tit"><a href="/Design/">赏析</a></li>
+<li><a href="/Design/pic/">插画</a></li>
+<li><a href="/Design/pm/">平面</a></li>
+<li><a href="/Design/web/">网页</a></li>
+<li class="tit"><a href="/Design/room/">建筑</a></li>
+<li><a href="/design/photography/">摄影</a></li>
+<li><a href="/Design/3d/">三维</a></li>
+<li><a href="/Design/ui/">UI</a></li>
+</ul>
+<ul class="navBetaCon Con4">
+<li><a href="/office/word/">Word</a></li>
+<li><a href="/office/excel/">Excel</a></li>
+<li><a href="/office/ppt/" title="PowerPoint" alt="PowerPoint">PPT</a></li>
+<li><a href="/system/win/" title="Windows" alt="Windows">Win</a></li>
+<li><a href="/system/lin/">Linux</a></li>
+<li><a href="/system/mac/">OS X</a></li>
+</ul>
+<ul class="navBetaCon Con5">
+<li><a href="/db/mysql/">MySQL</a></li>
+<li><a href="/db/Oracle/">Oracle</a></li>
+<li><a href="/web/html-css/" title="HTML/CSS" alt="HTML/CSS">HTML</a></li>
+<li><a href="/web/js/"title="JavaScript" alt="JavaScript">JS</a></li>
+</ul>
+<ul class="navBetaCon Con6">
+<li class="tit"><a href="http://www.7-vk.com/" target="_blank">七城微课</a></li>
+<li class="tit"><a href="http://www.th7.cn/article/">老版入口</a></li>
+</ul>
+</div>
+</div>
+<div class="mb10">
+<script>
+(function() {
+    var s = "_" + Math.random().toString(36).slice(2);
+    document.write('<div id="' + s + '"></div>');
+    (window.slotbydup=window.slotbydup || []).push({
+        id: '1112097',
+        container: s,
+        size: '1000,60',
+        display: 'inlay-fix'
+    });
+})();
+</script>
+</div>
+<div class="indexNavBar clearfix ptb10">
+<div class="box fl  mb15 mt5 w670"><i class="icon"></i>您的位置：<a href="http://www.th7.cn/">首页</a>&nbsp;-&nbsp;<a href="http://www.th7.cn/web/">网页设计</a>&nbsp;-&nbsp;<a href="http://www.th7.cn/web/ajax/">Ajax</a></div>
+<div class="baidusearch fr w300">
+<script type="text/javascript">(function(){document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E'));var bdcs = document.createElement('script');bdcs.type = 'text/javascript';bdcs.async = true;bdcs.src = 'http://znsv.baidu.com/customer_search/api/js?sid=15428217148757316831' + '&plate_url=' + encodeURIComponent(window.location.href) + '&t=' + Math.ceil(new Date()/3600000);var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(bdcs, s);})();</script>
+</div>
+</div>
+</div>
+</div>
+<div id="content">
+<div class="main clearfix">
+<div class="w670 fl">
+<div class="newsTxtMainBar">
+<div class="txtBar">
+<div class="newsTitleBox YaHei">
+<h1 class="YaHei">Jsonp post 跨域方案</h1>
+<p class="info pr30"><span>2015-06-01 07:26:16</span><span>来源:cnblogs.com</span><span>作者:wangyulu<span><a href="#" class="blue ml10" id="click"></a>人点击</p>
+<div class="tabTxt">
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a><a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a><a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a><a href="#" class="bds_bdhome" data-cmd="bdhome" title="分享到百度新首页"></a><a href="#" class="bds_youdao" data-cmd="youdao" title="分享到有道云笔记"></a><a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a></div>
+</div>
+</div>
+<div class="newsMainBox">
+<div class="newsMainBox-textad">
+</div>
+<div id="ctrlfscont">
+<!--www.th7.cn 第七城市 Since 2005-->
+<div style="display: block; width: 200px; height: 200px; margin: 10px 20px 10px 0px; float: left; overflow: hidden; clear: both; padding: 4px; border: 1px solid rgb(205, 205, 205);">
+<script>
+(function() {
+    var s = "_" + Math.random().toString(36).slice(2);
+    document.write('<div id="' + s + '"></div>');
+    (window.slotbydup=window.slotbydup || []).push({
+        id: '1111918',
+        container: s,
+        size: '200,200',
+        display: 'inlay-fix'
+    });
+})();
+</script>
+</div>
+<p>近期在项目中遇到这样一问题，关于jsonp跨域问题，get传值是可以的，但post传值死活不行啊，于是网上看了一大堆关于这方面的资料，最终问题得以解决，今天抽空与大家分享下。</p><p>说明：<br />http://www.t1.com/index.php	服务端URL<br />当然这是我本地配置的，需要改为自己对应的地址。</p><pre class="brush:javascript;gutter:true;">客户端代码：&lt;script&gt;	$(function(){				var url = 'http://www.t1.com/index.php';		$.ajax({			type:			'post',			url:			url,			data:			{name:'wangyulu'},			dataType:		'jsonp',			success:function(result){				console.log(result);			}		});			});  &lt;/script&gt;</pre><p>　　</p><pre class="brush:php;gutter:true;">服务端代码：&lt;?phpif($_POST){	$arr = array('name'=&gt;$_POST['name'], 'age'=&gt;23);	echo json_encode($arr);}</pre><p>浏览器运行如下图：</p><p><img src="/d/file/p/2015/06/01/45ec12a53146ccbf804cd4808a6abab9.png" alt="" /></p><p>看下运行结果，即使设置传送方式为 post，Jquery也会自动转为 get，难道Jsonp真的不支持 post 方式提交吗，继续折腾...</p><p>折腾到现在最终在 stackoverflow 里找到一些关于这方面的资料，看来老外也遇到这样问题呀，地址贴给大家<br />http://stackoverflow.com/questions/3860111/how-to-make-a-jsonp-post-request-that-specifies-contenttype-with-jquery</p><p>关键点如下图：</p><p><img src="/d/file/p/2015/06/01/d050af0e476d6a2fb6a3f0b6031b149b.png" alt="" /></p><p>看上图我们发现，箭头标记处有变化，先不管这么多了，折腾这么久了，先对应放到程序里再说嘛，万一可以呢</p><p>客户端更改：<br />添加：crossDomain: true<br />修改：dataType: "json"</p><p>服务端添加：<br />header('Access-Control-Allow-Origin: *');<br />header('Access-Control-Allow-Methods: POST');<br />header('Access-Control-Max-Age: 1000');</p><p>运行结果如下图：</p><p><img src="/d/file/p/2015/06/01/fc154d23a9ef09c2001ab3c61a0ee87a.png" alt="" /></p><p><img src="/d/file/p/2015/06/01/a6e2a9940e8dc53eaad407cc139e66c4.png" alt="" /></p><p>到这里我们发现问题终于解决了，但我们详细观察发现，请求时间那是个漫长啊，，，看来老外也没个效率高的解决方案，</p><p>最后，我想说的是，要想完美支持POST方式的JSONP真心不好办啊，咱就到这吧，折腾不少时间了。</p><p>以上内容可能会关联到其它技术点，有兴趣自己可去研究哈，这里主要解决 Jsonp ，写的不好，大家请勿吐槽，谢谢！</p><!--www.th7.cn 第七城市 Since 2005-->
+</div>
+</div>
+<div class="pagebreak pageBar tc mtb20"></div>
+<div class="mtb20 bgf">
+<script>
+(function() {
+    var s = "_" + Math.random().toString(36).slice(2);
+    document.write('<div id="' + s + '"></div>');
+    (window.slotbydup=window.slotbydup || []).push({
+        id: '1119915',
+        container: s,
+        size: '668,100',
+        display: 'inlay-fix'
+    });
+})();
+</script></div>
+<div class="mb20 newsBarLayout bgf">
+<ul class="post-taglist clearfix mb5"><li class="tagh">热点聚合:<a href="http://www.th7.cn/e/tags/?tagname=%E6%96%B9%E6%A1%88" target="_blank">方案</a></li></ul>
+</div>
+<div class="mb20 newsBarLayout bgf" id="xgxw">
+<h3>相关文章</h3> 
+<ul class="xgxwlist">
+<li><a href="http://www.th7.cn/web/ajax/201507/112394.shtml" title="jquery的ajax跨域解决方案">jquery的ajax跨域解决方案</a></li><li><a href="http://www.th7.cn/web/ajax/201507/112395.shtml" title="跨域方案：jsonp的使用">跨域方案：jsonp的使用</a></li><li><a href="http://www.th7.cn/web/html-css/201507/112202.shtml" title="报表与微信公众号(企业号)集成方案">报表与微信公众号(企业号)集成方案</a></li><li><a href="http://www.th7.cn/web/js/201507/111720.shtml" title="strapdown.js HTML 内嵌 Markdown 的静态解决方案">strapdown.js HTML 内嵌 Markdown 的静态解决方案</a></li><li><a href="http://www.th7.cn/web/js/201507/111226.shtml" title="JS 跨域原因及其解决方案">JS 跨域原因及其解决方案</a></li><li><a href="http://www.th7.cn/web/js/201507/110433.shtml" title="Android4.2下 WebView的addJavascriptInterface漏洞解决方案">Android4.2下 WebView的addJavascriptInterface漏洞解</a></li><li><a href="http://www.th7.cn/web/js/201507/110208.shtml" title="跨域解决方案之HTML5 postMessage">跨域解决方案之HTML5 postMessage</a></li><li><a href="http://www.th7.cn/web/html-css/201507/110184.shtml" title="解决左边固定右边自适应宽度的方案">解决左边固定右边自适应宽度的方案</a></li><li><a href="http://www.th7.cn/web/js/201507/110136.shtml" title="AngularJs解决方案笔记(1)">AngularJs解决方案笔记(1)</a></li><li><a href="http://www.th7.cn/web/html-css/201507/110039.shtml" title="基于HTML5的Web跨设备超声波通信方案">基于HTML5的Web跨设备超声波通信方案</a></li></ul>
+</div>
+</div>
+<div class="mt20 bgf">
+<div id="hm_t_70118"></div>
+</div>
+<div class="newsBarLayout mt20 bgf">
+<div class="ds-thread" data-thread-key="22104065" data-title="Jsonp post 跨域方案" data-url="http://www.th7.cn/web/ajax/201506/104065.shtml"></div>
+</div>
+</div>
+<div class="newsBarLayout mt20 bgf">
+<h3>最新文章</h3>
+<div class="slideImgList">
+<div class="numberState"><span class="current">1</span><span>2</span><span>3</span> </div>
+<div class="imgListLayout">
+<ul class="imgList clearfix">
+<li>
+<p><a title="《 iOS 应用逆向工程》作者沙梓社专访：运用逆向工程思维来优化自己的产品" href="http://www.th7.cn/Program/IOS/201610/991236.shtml" target="_blank">《 iOS 应用逆向工程》作者</a></p>
+<p><a title="Swift基础之对FMDB第三方的使用方法" href="http://www.th7.cn/Program/IOS/201610/991235.shtml" target="_blank">Swift基础之对FMDB第三方的</a></p>
+<p><a title="Swift - 字典闹出来的笑话" href="http://www.th7.cn/Program/IOS/201610/991234.shtml" target="_blank">Swift - 字典闹出来的笑话</a></p>
+<p><a title="（swift） iOS线程一 ——Thread接口简单用法" href="http://www.th7.cn/Program/IOS/201610/991233.shtml" target="_blank">（swift） iOS线程一 ——Thread</a></p>
+<p><a title="iOS常见问题之 C字符串与NSString之间的转换" href="http://www.th7.cn/Program/IOS/201610/991231.shtml" target="_blank">iOS常见问题之 C字符串与NSS</a></p>
+<p><a title="iOS设置UIButton的字体" href="http://www.th7.cn/Program/IOS/201610/991230.shtml" target="_blank">iOS设置UIButton的字体</a></p>
+<p><a title="iOS - 程序启动播放视频" href="http://www.th7.cn/Program/IOS/201610/991229.shtml" target="_blank">iOS - 程序启动播放视频</a></p>
+</li>
+<li>
+<p><a title="Photoshop给围墙边的人物加上温馨的暖色霞光" href="http://www.th7.cn/pm/Photoshop/201610/83794.shtml" target="_blank">Photoshop给围墙边的人物加</a></p>
+<p><a title="PS合成璀璨雨夜中独行的女孩" href="http://www.th7.cn/pm/Photoshop/201610/83793.shtml" target="_blank">PS合成璀璨雨夜中独行的女孩</a></p>
+<p><a title="Photoshop详细解析9个文字处理的小技巧" href="http://www.th7.cn/pm/Photoshop/201610/83792.shtml" target="_blank">Photoshop详细解析9个文字处</a></p>
+<p><a title="史上最全面的PS快捷键图文使用指南" href="http://www.th7.cn/pm/Photoshop/201610/83791.shtml" target="_blank">史上最全面的PS快捷键图文使</a></p>
+<p><a title="Photoshop巧用液化工具给胖女孩减肥瘦身" href="http://www.th7.cn/pm/Photoshop/201610/83790.shtml" target="_blank">Photoshop巧用液化工具给胖</a></p>
+<p><a title="Photoshop完美消除人物脸部的雀斑并还原肤色细节" href="http://www.th7.cn/pm/Photoshop/201610/83789.shtml" target="_blank">Photoshop完美消除人物脸部</a></p>
+<p><a title="Photoshop打造甜美的青红色树林逆光婚片" href="http://www.th7.cn/pm/Photoshop/201610/83788.shtml" target="_blank">Photoshop打造甜美的青红色</a></p>
+</li>
+<li>
+<p><a title="Javascript实现模态窗口" href="http://www.th7.cn/web/js/201610/192512.shtml" target="_blank">Javascript实现模态窗口</a></p>
+<p><a title="JavaScript学习笔记（11）" href="http://www.th7.cn/web/js/201610/192511.shtml" target="_blank">JavaScript学习笔记（11）</a></p>
+<p><a title="初步使用bootstrap框架" href="http://www.th7.cn/web/js/201610/192509.shtml" target="_blank">初步使用bootstrap框架</a></p>
+<p><a title="js个人笔记1" href="http://www.th7.cn/web/js/201610/192508.shtml" target="_blank">js个人笔记1</a></p>
+<p><a title="js判断图片是否加载完成" href="http://www.th7.cn/web/js/201610/192507.shtml" target="_blank">js判断图片是否加载完成</a></p>
+<p><a title="javascript的JSON对象" href="http://www.th7.cn/web/js/201610/192506.shtml" target="_blank">javascript的JSON对象</a></p>
+<p><a title="Javasript实现照片墙" href="http://www.th7.cn/web/js/201610/192505.shtml" target="_blank">Javasript实现照片墙</a></p>
+</li>
+<li>
+<p><a title="#友约# #EID用户体验设计# #EIDcneter#" href="http://www.th7.cn/Design/ui/201610/790047.shtml" target="_blank">#友约# #EID用户体验设计# #</a></p>
+<p><a title="Tie Ba APP界面设计" href="http://www.th7.cn/Design/ui/201610/790046.shtml" target="_blank">Tie Ba APP界面设计</a></p>
+<p><a title="排版练习作品整理" href="http://www.th7.cn/Design/ui/201610/790045.shtml" target="_blank">排版练习作品整理</a></p>
+<p><a title="孟加拉国设计师Kazi Mohammed Erfan标志设计" href="http://www.th7.cn/Design/logo/201610/790038.shtml" target="_blank">孟加拉国设计师Kazi Mohamme</a></p>
+<p><a title="绿城玫瑰园" href="http://www.th7.cn/Design/room/201610/790036.shtml" target="_blank">绿城玫瑰园</a></p>
+<p><a title="奥山李府" href="http://www.th7.cn/Design/room/201610/790034.shtml" target="_blank">奥山李府</a></p>
+<p><a title="中海国际洗浴中心" href="http://www.th7.cn/Design/room/201610/790033.shtml" target="_blank">中海国际洗浴中心</a></p>
+</li>
+<li>
+<p><a title="Gradle 构建 android项目及APK打包（ubuntu）" href="http://www.th7.cn/system/lin/201610/185663.shtml" target="_blank">Gradle 构建 android项目及A</a></p>
+<p><a title="ubuntu 二进制安装mysql" href="http://www.th7.cn/system/lin/201610/185662.shtml" target="_blank">ubuntu 二进制安装mysql</a></p>
+<p><a title="ubuntu linux 串口配置详解" href="http://www.th7.cn/system/lin/201610/185661.shtml" target="_blank">ubuntu linux 串口配置详解</a></p>
+<p><a title="ubuntu14.04编译yael v438 遇到的一些问题" href="http://www.th7.cn/system/lin/201610/185660.shtml" target="_blank">ubuntu14.04编译yael v438 </a></p>
+<p><a title="Ubuntu 16.04安装MinGW32" href="http://www.th7.cn/system/lin/201610/185659.shtml" target="_blank">Ubuntu 16.04安装MinGW32</a></p>
+<p><a title="文章标题Ubuntu下运行shell程序出现 declare：not found 错误" href="http://www.th7.cn/system/lin/201610/185658.shtml" target="_blank">文章标题Ubuntu下运行shell</a></p>
+<p><a title="ubuntu 下安裝pycharm" href="http://www.th7.cn/system/lin/201610/185657.shtml" target="_blank">ubuntu 下安裝pycharm</a></p>
+</li>
+<li>
+<p><a title="Word2016页脚页眉问题怎么解决" href="http://www.th7.cn/office/word/201610/55215.shtml" target="_blank">Word2016页脚页眉问题怎么解</a></p>
+<p><a title="Excel数据表复制到Word后出现越界怎么办" href="http://www.th7.cn/office/excel/201610/55214.shtml" target="_blank">Excel数据表复制到Word后出</a></p>
+<p><a title="wps表格中如何标记特定数字" href="http://www.th7.cn/office/wps/201610/55213.shtml" target="_blank">wps表格中如何标记特定数字</a></p>
+<p><a title="wps表格如何批量为数字添加负号" href="http://www.th7.cn/office/wps/201610/55211.shtml" target="_blank">wps表格如何批量为数字添加</a></p>
+<p><a title="如何玩转Excel2016高级筛选" href="http://www.th7.cn/office/excel/201610/55212.shtml" target="_blank">如何玩转Excel2016高级筛选</a></p>
+<p><a title="Word如何制作等长下划线" href="http://www.th7.cn/office/word/201610/55210.shtml" target="_blank">Word如何制作等长下划线</a></p>
+<p><a title="Word如何秒变计算器" href="http://www.th7.cn/office/word/201610/55209.shtml" target="_blank">Word如何秒变计算器</a></p>
+</li>
+<li>
+<p><a title="redis.clients.jedis.exceptions.InvalidURIException: Cannot open Redis connection due invalid URI" href="http://www.th7.cn/db/nosql/201610/209159.shtml" target="_blank">redis.clients.jedis.except</a></p>
+<p><a title="redis入门思维导图" href="http://www.th7.cn/db/nosql/201610/209158.shtml" target="_blank">redis入门思维导图</a></p>
+<p><a title="redis3.0以上版本的安装与集群配置：" href="http://www.th7.cn/db/nosql/201610/209157.shtml" target="_blank">redis3.0以上版本的安装与集</a></p>
+<p><a title="redis持久化：" href="http://www.th7.cn/db/nosql/201610/209156.shtml" target="_blank">redis持久化：</a></p>
+<p><a title="redis分片：" href="http://www.th7.cn/db/nosql/201610/209155.shtml" target="_blank">redis分片：</a></p>
+<p><a title="redis存储优化经验谈：" href="http://www.th7.cn/db/nosql/201610/209154.shtml" target="_blank">redis存储优化经验谈：</a></p>
+<p><a title="redis--集群--初步安装（转）" href="http://www.th7.cn/db/nosql/201610/209153.shtml" target="_blank">redis--集群--初步安装（转）</a></p>
+</li>
+<li>
+<p><a title="禅意唯美意境图片女生背影" href="http://www.th7.cn/fzl/pic/201610/136333.shtml" target="_blank">禅意唯美意境图片女生背影</a></p>
+<p><a title="欧美男生2017图片高清 耍帅酷酷的" href="http://www.th7.cn/fzl/boy/201610/136332.shtml" target="_blank">欧美男生2017图片高清 耍帅</a></p>
+<p><a title="没有人再告诉我夜黑天冷早回家" href="http://www.th7.cn/fzl/pic/201610/136331.shtml" target="_blank">没有人再告诉我夜黑天冷早回</a></p>
+<p><a title="错误的撩妹方式" href="http://www.th7.cn/fzl/pic/201610/136330.shtml" target="_blank">错误的撩妹方式</a></p>
+<p><a title="就到这里从此我对你只字不提" href="http://www.th7.cn/fzl/pic/201610/136329.shtml" target="_blank">就到这里从此我对你只字不提</a></p>
+<p><a title="美女和丑女的不同对待" href="http://www.th7.cn/fzl/pic/201610/136328.shtml" target="_blank">美女和丑女的不同对待</a></p>
+<p><a title="初音未来萌萌哒" href="http://www.th7.cn/fzl/pic/201610/136327.shtml" target="_blank">初音未来萌萌哒</a></p>
+</li>
+<li>
+<p><a title="虚荣剑客黑羽AD攻略 剑客黑羽出装顺序攻略" href="http://www.th7.cn/game/ios/201610/250074.shtml" target="_blank">虚荣剑客黑羽AD攻略 剑客黑</a></p>
+<p><a title="乖离性百万亚瑟王纯白型珀西瓦尔实用性评测" href="http://www.th7.cn/game/ios/201610/250073.shtml" target="_blank">乖离性百万亚瑟王纯白型珀西</a></p>
+<p><a title="乖离性百万亚瑟王南方守护朱雀实用性评测" href="http://www.th7.cn/game/ios/201610/250072.shtml" target="_blank">乖离性百万亚瑟王南方守护朱</a></p>
+<p><a title="虚荣剑客黑羽AD攻略 剑客黑羽开团技巧详解" href="http://www.th7.cn/game/ios/201610/250071.shtml" target="_blank">虚荣剑客黑羽AD攻略 剑客黑</a></p>
+<p><a title="魔灵幻想前期装备获取攻略 装备选择技巧详解" href="http://www.th7.cn/game/ios/201610/250070.shtml" target="_blank">魔灵幻想前期装备获取攻略 </a></p>
+<p><a title="奇迹暖暖10支1少女级平民搭配公主级S高分攻略" href="http://www.th7.cn/game/ios/201610/250069.shtml" target="_blank">奇迹暖暖10支1少女级平民搭</a></p>
+<p><a title="乖离性百万亚瑟王职业扭蛋抽取策略详解" href="http://www.th7.cn/game/ios/201610/250068.shtml" target="_blank">乖离性百万亚瑟王职业扭蛋抽</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="newsBarLayout mt20 bgf" style="border:0px;"></div>
+</div>
+<div class="w300 fr">
+<div>
+<script type="text/javascript">var cpro_id = "u654799";</script>
+<script src="http://cpro.baidustatic.com/cpro/ui/c.js" type="text/javascript"></script>
+</div>
+<div class="tabTitleBar mt20 bgf borderTred">
+<div class="borderTnonee pb10">
+<h3 class="titleMain2 titleMain-b red"><span class="txt pl10">本站导航</span></h3>
+<h2><a href="/pm/">平面设计</a></h2>
+<div>
+<a href="/pm/Photoshop/">Photoshop</a>
+<a href="/pm/ai/">Illustrator</a>
+<a href="/pm/Fireworks/">Fireworks</a>
+<a href="/pm/Coreldraw/">Coreldraw</a>
+<a href="/pm/Flash/">Flash</a>
+<a href="/pm/max/">3DS MAX</a>
+<a href="/pm/cad/">AutoCAD</a>
+<a href="/pm/Maya/">Maya</a>
+<a href="/pm/xiuxiu/">美图秀秀</a>
+</div>
+<h2><a href="/web/">网页设计</a></h2>
+<div>
+<a href="/web/dw/">Dreamweaver</a>
+<a href="/web/html-css/">HTML/CSS</a>
+<a href="/web/js/">JavaScript</a>
+<a href="/web/ft/">FrontPage</a>
+<a href="/web/ajax/">Ajax</a>
+</div>
+<h2><a href="/Design/">设计赏析</a></h2>
+<div>
+<a href="/Design/pm/">平面设计作品</a>
+<a href="/Design/web/">网页设计欣赏</a>
+<a href="/Design/3d/">三维动画赏析</a>
+<a href="/Design/logo/">标志设计欣赏</a>
+<a href="/Design/pic/">插画设计作品</a>
+<a href="/Design/room/">建筑设计欣赏</a>
+<a href="/Design/vi/">VI设计欣赏</a><br/>
+<a href="/Design/ui/">UI设计欣赏</a>
+<a href="/design/photography/">摄影艺术</a>
+<a href="/design/idea/">设计理念</a>
+</div>
+<h2><a href="/Program/">网络编程</a></h2>
+<div>
+<a href="/Program/asp/">ASP教程</a>
+<a href="/Program/php/">PHP教程</a>
+<a href="/Program/java/">Java</a>
+<a href="/Program/net/">ASP.NET</a>
+<a href="/Program/SilverLight/">SilverLight</a>
+<a href="/Program/delphi/">Delphi</a>
+<a href="/Program/c/">C语言</a>
+<a href="/Program/cp/">C++</a>
+<a href="/Program/Python/">Python</a>
+<a href="/Program/Perl/">Perl</a>
+<a href="/Program/Ruby/">Ruby</a>
+<a href="/Program/WPF/">WPF</a>
+<a href="/Program/Android/">Android</a>
+<a href="/Program/wp7/">Windows Phone</a>
+<a href="/Program/IOS/">IOS</a>
+<a href="/Program/go/">Go语言</a>
+</div>
+<h2><a href="/system/">操作系统</a></h2>
+<div>
+<a href="/system/win/">Windows</a>
+<a href="/system/lin/">Linux</a>
+<a href="/system/mac/">Mac OS X</a>
+</div>
+<h2><a href="/office/">办公软件</a></h2>
+<div>
+<a href="/office/word/">Word教程</a>
+<a href="/office/excel/">Excel教程</a>
+<a href="/office/ppt/">PowerPoint教程</a>
+<a href="/office/wps/">WPS Office</a>
+</div>
+<h2><a href="/db/">数据库</a></h2>
+<div>
+<a href="/db/mysql/">MySQL</a>
+<a href="/db/mssql/">SQL Server</a>
+<a href="/db/Oracle/">Oracle</a>
+<a href="/db/nosql/">NoSQL</a>
+</div>
+<h2><a href="/fzl/">非主流</a></h2>
+<div>
+<a href="/fzl/girl/">非主流美女</a>
+<a href="/fzl/boy/">非主流男生</a>
+<a href="/fzl/pic/">非主流图片</a>
+<a href="/fzl/clothes/">非主流服饰</a><br/>
+<a href="/fzl/sp/">非主流饰品</a>
+<a href="/fzl/st/">非主流闪图</a>
+</div>
+<h2><a href="/qq/">QQ专区</a></h2>
+<div>
+<a href="/qq/zone/">QQ空间</a>
+<a href="/qq/fz/">QQ分组</a>
+<a href="/qq/sc/">QQ素材</a>
+<a href="/qq/blog/">QQ日志</a>
+<a href="/qq/name/">QQ网名</a>
+<a href="/qq/sign/">QQ签名</a>
+</div>
+<h2><a href="/game/">游戏频道</a></h2>
+<div>
+<a href="/game/dj/">单机游戏</a>
+<a href="/game/wl/">网络游戏</a>
+<a href="/game/ios/">iOS游戏</a>
+<a href="/game/android/">Android游戏</a>
+</div>
+</div>
+</div>
+<div class="tabTitleBar imgTxtBar-c clearfix mt10">
+<h3 class="titleMain clearfix"><span class="txt red">最新摄影</span></h3>
+<div class="imgTxtBar clearfix imgTxtBar-c mt10">
+<a href="http://www.th7.cn/Design/photography/201612/822940.shtml" target="_blank" class="cursor w140 mb15 fl">
+<div class="w140"><img src="/d/file/p/2016/12/23/smalla464ff11a7e4a511792ecbb1db5df98c1482460214.jpg" alt="国外优秀儿童摄影 温馨自然的家庭气氛" title="国外优秀儿童摄影 温馨自然的家庭气氛" width="140" height="90"/></div></a>
+<a href="http://www.th7.cn/Design/photography/201612/822939.shtml" target="_blank" class="cursor w140 mb15 fl">
+<div class="w140"><img src="/d/file/p/2016/12/23/small8dbc64ec5c873af3175a91bc6d7ba6f11482460210.jpg" alt="人像摄影技巧 教你拍摄经典单眼人像摄影照片" title="人像摄影技巧 教你拍摄经典单眼人像摄影照片" width="140" height="90"/></div></a>
+<a href="http://www.th7.cn/Design/photography/201612/822938.shtml" target="_blank" class="cursor w140 mb15 fl">
+<div class="w140"><img src="/d/file/p/2016/12/23/small6bbf2efe512dd2acd8f3b964b0ef314d1482460207.jpg" alt="Dani Fehr复古私房人像摄影 性感是由内而外散发的味道" title="Dani Fehr复古私房人像摄影 性感是由内而外散发的味道" width="140" height="90"/></div></a>
+<a href="http://www.th7.cn/Design/photography/201612/822937.shtml" target="_blank" class="cursor w140 mb15 fl">
+<div class="w140"><img src="/d/file/p/2016/12/23/small2b4dc02f1583cc977ca10cf6b5ede2da1482460203.jpg" alt="Marc Hom黑白人像摄影 令人惊叹的名人肖像" title="Marc Hom黑白人像摄影 令人惊叹的名人肖像" width="140" height="90"/></div></a>
+<a href="http://www.th7.cn/Design/photography/201612/822936.shtml" target="_blank" class="cursor w140 mb15 fl">
+<div class="w140"><img src="/d/file/p/2016/12/23/smallcf4deaec998741ae5a94892ec8281d671482460199.jpg" alt="法国炙手可热的时尚摄影师 唯美黯淡色调下的时尚摄影" title="法国炙手可热的时尚摄影师 唯美黯淡色调下的时尚摄影" width="140" height="90"/></div></a>
+<a href="http://www.th7.cn/Design/photography/201612/822935.shtml" target="_blank" class="cursor w140 mb15 fl">
+<div class="w140"><img src="/d/file/p/2016/12/23/small5af53f47f356629f795bd123cb3a733f1482460193.jpg" alt="纯粹比裸露更动人 2017年倍耐力年历掘出情感传递的独特魅力" title="纯粹比裸露更动人 2017年倍耐力年历掘出情感传递的独特魅力" width="140" height="90"/></div></a>
+<a href="http://www.th7.cn/Design/photography/201612/822934.shtml" target="_blank" class="cursor w140 mb15 fl">
+<div class="w140"><img src="/d/file/p/2016/12/23/small7e9bb006f93e0598af928dcf575f3c9f1482460189.jpg" alt="武汉摄影地推荐 | 深度拍江城 每天不一样" title="武汉摄影地推荐 | 深度拍江城 每天不一样" width="140" height="90"/></div></a>
+<a href="http://www.th7.cn/Design/photography/201612/822933.shtml" target="_blank" class="cursor w140 mb15 fl">
+<div class="w140"><img src="/d/file/p/2016/12/23/small61cea3c5f5e7f7dcd1e8b94cc91927a21482460177.jpg" alt="潜入北极水域 这位超牛生物学教授为我们带回震撼影像" title="潜入北极水域 这位超牛生物学教授为我们带回震撼影像" width="140" height="90"/></div></a>
+</div>
+</div>
+<div class="tabTitleBar tabSlideBar mb10 mt10">
+<div class="tabState"></div>
+<h3 class="titleMain clearfix tabred"><span class="txt cur">最新教程</span><span class="txt">周点击榜</span></h3>
+<div class="newsRankBar clearfix">
+<ul class="newsRankList current">
+<li><em class="no1">1</em><a href="http://www.th7.cn/db/nosql/201612/219605.shtml" target="_blank" title="linux安装redis全过程">linux安装redis全过程</a></li>
+<li><em class="no2">2</em><a href="http://www.th7.cn/db/nosql/201612/219604.shtml" target="_blank" title="常见JedisConnectionException异常分析">常见JedisConnectionException异常分析</a></li>
+<li><em class="no3">3</em><a href="http://www.th7.cn/web/html-css/201612/206046.shtml" target="_blank" title="HTML图片热区map area的用法">HTML图片热区map area的用法</a></li>
+<li><em class="no4">4</em><a href="http://www.th7.cn/system/lin/201612/196743.shtml" target="_blank" title="Ubuntu开机自动挂载磁盘分区">Ubuntu开机自动挂载磁盘分区</a></li>
+<li><em class="no5">5</em><a href="http://www.th7.cn/system/lin/201612/196742.shtml" target="_blank" title="杀死ubuntu卡死的程序">杀死ubuntu卡死的程序</a></li>
+<li><em class="no6">6</em><a href="http://www.th7.cn/web/html-css/201612/206045.shtml" target="_blank" title="canvas编写同心圆">canvas编写同心圆</a></li>
+<li><em class="no7">7</em><a href="http://www.th7.cn/system/lin/201612/196741.shtml" target="_blank" title="Ubuntu MySQL安装配置">Ubuntu MySQL安装配置</a></li>
+<li><em class="no8">8</em><a href="http://www.th7.cn/system/lin/201612/196740.shtml" target="_blank" title="Linux查看磁盘空间及文件大小命令">Linux查看磁盘空间及文件大小命令</a></li>
+<li><em class="no9">9</em><a href="http://www.th7.cn/web/html-css/201612/206044.shtml" target="_blank" title="导航条(带下拉)简单实现;不喜勿喷!">导航条(带下拉)简单实现;不喜勿喷!</a></li>
+<li><em class="no10">10</em><a href="http://www.th7.cn/web/html-css/201612/206043.shtml" target="_blank" title="JavaScript获取和设置属性，nodeType属性">JavaScript获取和设置属性，nodeType属性</a></li>
+</ul>
+<ul class="newsRankList">
+<li><em class="no1">1</em><a href="http://www.th7.cn/pm/Photoshop/201612/84154.shtml" target="_blank" title="PS合成童话故事中的悬浮场景">PS合成童话故事中的悬浮场景</a></li>
+<li><em class="no2">2</em><a href="http://www.th7.cn/pm/Photoshop/201612/84172.shtml" target="_blank" title="Photoshop如何抠出人物的细发丝">Photoshop如何抠出人物的细发丝</a></li>
+<li><em class="no3">3</em><a href="http://www.th7.cn/pm/Photoshop/201612/84165.shtml" target="_blank" title="如何把可爱的小女孩图片转为细腻的仿手绘效果">如何把可爱的小女孩图片转为细腻的仿手绘效果</a></li>
+<li><em class="no4">4</em><a href="http://www.th7.cn/pm/Photoshop/201612/84153.shtml" target="_blank" title="Photoshop把夏季树林人物图片转为唯美的秋季效果">Photoshop把夏季树林人物图片转为唯美的秋季</a></li>
+<li><em class="no5">5</em><a href="http://www.th7.cn/pm/Photoshop/201612/84156.shtml" target="_blank" title="PS合恐怖的万圣节暗黑魔王">PS合恐怖的万圣节暗黑魔王</a></li>
+<li><em class="no6">6</em><a href="http://www.th7.cn/pm/Photoshop/201612/84171.shtml" target="_blank" title="Photoshop打造唯美的中性黄绿色树林人物图片">Photoshop打造唯美的中性黄绿色树林人物图片</a></li>
+<li><em class="no7">7</em><a href="http://www.th7.cn/pm/Photoshop/201612/84155.shtml" target="_blank" title="Photoshop给古屋边的人物加上唯美的霞光">Photoshop给古屋边的人物加上唯美的霞光</a></li>
+<li><em class="no8">8</em><a href="http://www.th7.cn/pm/Photoshop/201612/84162.shtml" target="_blank" title="Photoshop制作梦幻般的人像重影效果图">Photoshop制作梦幻般的人像重影效果图</a></li>
+<li><em class="no9">9</em><a href="http://www.th7.cn/system/lin/201612/196463.shtml" target="_blank" title="运维工作中需要掌握的四大核心技能">运维工作中需要掌握的四大核心技能</a></li>
+<li><em class="no10">10</em><a href="http://www.th7.cn/office/ppt/201612/56262.shtml" target="_blank" title="PPT幻灯片中为文本框添加项目符号的操作方法">PPT幻灯片中为文本框添加项目符号的操作方法</a></li>
+</ul>
+</div>
+</div>
+<div class="borderTred mt20">
+<div id="hm_t_75055"></div>
+</div>
+<div class="mt20 newFixedBox">
+<script type="text/javascript">var cpro_id = "u1065261";</script><script type="text/javascript" src="http://cpro.baidustatic.com/cpro/ui/c.js"></script>
+<script type="text/javascript">var jd_union_unid="34692",jd_ad_ids="513:6",jd_union_pid="CNerzbOOKxCEjwIaACDtmsGSAioA";var jd_width=300;var jd_height=250;var jd_union_euid="";var p="BhQDUhJSFAcXNwpfBkgyTUMIRmtKRk9aZV8ETVxNNwpfBkgyZA8Hfj5rS2pkCHksVksIUBRuJE1kcgtZK1wQBBIGUhNZJQAXAF0YayVdVloIKxB7AyJYEUYGJQIXDlUZWREDFQ5VGFwlAyI3ZQ%3D%3D";</script><script type="text/javascript" charset="utf-8" src="//u.x.jd.com/static/js/auto.js"></script>
+<script language="javascript" src="http://u493025.778669.com/mediashowFix.php?id=228371"></script>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div class="main">
+<p>
+<a target="_blank" href="http://www.7-inc.com/">关于第七城市</a> - 
+<a target="_blank" href="http://www.7-inc.com/">联系我们</a> - 
+<a target="_blank" href="http://www.7-inc.com/">广告服务</a> - 
+<a target="_blank" href="http://www.th7.cn/e/tool/feedback/?bid=3" rel="nofollow">版权声明</a> - 
+<a target="_blank"  href="http://a.th7.cn/">手机版</a>
+</p>
+<p><a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33030202000166" rel="nofollow"><img src="/images/beian-ga.png"> 浙公网安备 33030202000166号</a></p>
+<p>工信部备案号：<a target="_blank" href="http://www.miitbeian.gov.cn" rel="nofollow">浙ICP备09062716号-2</a></p>
+<p>©CopyRight 2005-2016 <a target="_blank" href="http://www.7-inc.com">温州第七城市信息科技有限公司</a> Inc. All Rights Reserved <script language="javascript" type="text/javascript" src="http://js.users.51.la/1273053.js"></script></p>
+</div>
+</div>
+<div class="gotop hide" id="gotop"><a href="javascript:;" class="th7-weixin"></a>
+<div class="th7-weixin-con hide">
+<p class="th7-weixin-title">微信扫一扫</p>
+<div class="th7-weixin-pic"> <img src="/sanda2015/img/weixin.jpg" alt="第七城市微信公众平台" width="100" height="100"></div>
+</div>
+<a href="/e/tool/feedback/?bid=1" target="_blank" class="feedback" rel="nofollow"></a><a href="javascript:;" class="go"></a>
+</div>
+<span id="tmpAreaLmtDiv">
+<div style="z-index:1000;right:0px;bottom:0px;overflow-x: hidden;overflow-y:hidden;position:fixed;width:350px;height:238px;" id="PcPoPmarket">
+<div id="popTop" style="z-index:1000;POSITION:absolute;right:0;height:30px;overflow:hidden;">
+<span class="popBtn popClose" onclick="closeDiv()"></span>
+<span class="popBtn popShow" onclick="showDiv()" id="showvod" style="display: none;"></span>
+<span class="popBtn popHide" onclick="hideDiv()" id="hidevod" style="display: block;"></span></div>
+<iframe id="popFrame" scrolling="no" frameborder="0" width="350" allowtransparency="true" height="238" src="/poppage.html" target="_blank">-</iframe>
+</div></span>
+<script type="text/javascript">BAIDU_CLB_fillSlot("1112087");</script>
+<script src="/sanda2015/css/ads.js"></script>
+<script>
+var isAdEnabled = isAdEnabled || !1;
+if( !isAdEnabled ){
+$("body").prepend('<link rel="stylesheet" href="/sanda2015/assistance/message.css" type="text/css" media="screen"/><div class="error message"><h3>帮助 第七城市 更好的生产内容，请将我们加入广告屏蔽插件的白名单，非常感谢。<a href="/sanda2015/assistance/Ask_for_your_assistance.html" target="_blank">具体方法</a></h3></div>');
+$('.error').animate({top:"0"},500);
+$('.error').css('top',-500);
+var t1=setTimeout("$('.error').css('top',-500)",15000);
+$(document).ready(function(){
+	 $('.message').click(function(){
+		$(this).animate({top: -$(this).outerHeight()},500);
+	  });
+}); 
+}
+</script>
+</div>
+<script type="text/javascript">
+var duoshuoQuery={short_name:"th7"};(function(){var ds=document.createElement('script');ds.type='text/javascript';ds.async=true;ds.src=(document.location.protocol=='https:'?'https:':'http:')+'//static.duoshuo.com/embed.js';ds.charset='UTF-8';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(ds)})();</script>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+<script src="/sanda2015/css/common.js" type="text/javascript"></script>
+<script type="text/javascript">var cpro_id = "u2218341";</script>
+<script src="http://cpro.baidustatic.com/cpro/ui/i.js" type="text/javascript"></script>
+<script type="text/javascript">var cpro_id = "u1682280";</script>
+<script src="http://cpro.baidustatic.com/cpro/ui/cnw.js" type="text/javascript"></script>
+<script>
+$.get("http://www.th7.cn/e/public/ViewClick/?classid=22&id=104065&addclick=1", function(result){
+var arrtemp = result.split("'");
+$("#click").append(arrtemp[1]);
+});
+</script>
+</body>
+</html>
