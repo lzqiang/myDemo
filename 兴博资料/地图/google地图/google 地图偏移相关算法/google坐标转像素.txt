@@ -1,0 +1,61 @@
+前阵子一直有朋友问我经纬度转换成google像素索引值的问题，今天整理一下，写给大家看看
+
+简单说明一下：
+
+google的地图采用将地球圆表面投影成平面的方式进行贴图
+
+假设zoom=15；
+
+横坐标从左至右像素为0-256*2的15次幂，也就是每增加一级，地图大小横纵坐标加倍，256为一个标准图片的大小
+
+显示-180度到+180的范围，经度越大x越大
+
+纵坐标从上到下像素为0-256*2的15次幂，显示+85到-85度的范围，纬度越小y越大
+
+我们先看一下经度的转换
+
+经度的转换，我就不多说了，均匀分布，大家简单的看一下下面的公式就明白了
+
+经度到像素X值
+
+public static double lngToPixel(double lng, int zoom) {
+
+return (lng + 180) * (256L << zoom) / 360;
+
+}
+
+像素X到经度
+
+public static double pixelToLng(double pixelX, int zoom) {
+
+return pixelX * 360 / (256L << zoom) – 180;
+
+}
+
+纬度到像素Y
+
+public static double latToPixel(double lat, int zoom) {
+
+double siny = Math.sin(lat * Math.PI / 180);
+
+double y = Math.log((1 + siny) / (1 – siny));
+
+return (128 << zoom) * (1 – y / (2 * Math.PI));
+
+}
+
+像素Y到纬度
+
+public static double pixelToLat(double pixelY, int zoom) {
+
+double y = 2 * Math.PI * (1 – pixelY / (128 << zoom));
+
+double z = Math.pow(Math.E, y);
+
+double siny = (z – 1) / (z + 1);
+
+return Math.asin(siny) * 180 / Math.PI;
+
+}
+
+维度的这个转换，单纯去理解不是很好理解，我也没有太深入的了解，从公式来看，采用了一种非线性变化，也就是靠近赤道的地方单位像素表现的纬度间距 大，越靠近两极越小，可能是因为 经度在靠近两极的方向均匀变化，导致纬度也要进行拉伸，否则 靠近两极的地方，地理形状就该发生变化了，总之上面的转换公式大家还是可以研究一下的，google维度的表示范围是-85到+85，这个可以求出来！

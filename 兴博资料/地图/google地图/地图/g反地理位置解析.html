@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>获取当前位置并显示在google地图上</title>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBNkdtKPzQHQUjSSIGryyv_WVENW-mtMHM&sensor=false"></script>
+    <script type="text/javascript">
+	
+        function init() {
+			var mapOptions = {
+				zoom: 10,
+				center: new google.maps.LatLng(31.867204,117.289686),
+				mapTypeControl: true,
+				mapTypeControlOptions: {
+				  style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+				},
+				zoomControl: true,
+				scaleControl: true,
+				zoomControlOptions: {
+				  style: google.maps.ZoomControlStyle.LARGE
+				},
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			}
+			var map = new google.maps.Map(document.getElementById("map"),mapOptions);
+			var geoCoder = new google.maps.Geocoder();
+			var marker="";
+            geoCoder.geocode({ 
+                 location:new google.maps.LatLng(26.57, 106.72)
+             }, 
+             function(results, state) { 
+                 if (state = google.maps.GeocoderStatus.OK) { 
+                     if (results[0]) { 
+                         var point = results[0].geometry.location; 
+                         if (marker) { 
+                             marker.setMap(null); 
+                         } 
+                         marker = new google.maps.Marker({ 
+                             map: map, 
+                             position: point 
+                         }); 
+                         var infowindow = new google.maps.InfoWindow({ 
+                             content: '<h3>我在这里.</h3>' + results[0].formatted_address 
+                         }); 
+                         google.maps.event.addListener(marker, 'click', 
+                         function() { 
+                             infowindow.open(map, marker); 
+                         }); 
+                         map.setCenter(point); 
+      
+                     } 
+                 } 
+             }) 
+        }
+    </script>
+</head>
+<body onload="init()">
+    <div id="map" style="width: 800px; height: 600px"></div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+地图支持的事件监听：
+		map.addEventListener("dragend", function(e){  //移动 拖动监听
+			var cur_bssw=map.getBounds().getSouthWest();
+			alert(cur_bssw.lng+"=="+cur_bssw.lat)
+	        })
+	        map.addEventListener("zoomend", function(){  //地图缩放视野大小监听
+			var cur_bssw=map.getBounds().getSouthWest();
+			alert(cur_bssw.lng+"=="+cur_bssw.lat)
+		});
+   		map.addEventListener(“click", function(){  //地图缩放视野大小监听
+			var cur_bssw=map.getBounds().getSouthWest();
+			alert(cur_bssw.lng+"=="+cur_bssw.lat)
+		});
+		marker.addEventListener("mouseover",function(){
+			var opts ={width:280,height:100,title:title};
+			infoWindow = new BMap.InfoWindow(content,opts);
+			marker.openInfoWindow(infoWindow,point);					
+		});
+		marker.addEventListener("mouseout",function(){
+			marker.closeInfoWindow(infoWindow);			
+		});

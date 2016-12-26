@@ -1,0 +1,190 @@
+01.function baiduMapFunction(divId, hotelArray) {  
+02.    var map = new BMap.Map(divId);// 创建百度地图对象   
+03.  
+04.  
+05.    map.centerAndZoom(new BMap.Point((117.289686, 31.867204)), 12);  
+06.  
+07.  
+08.    map.enableScrollWheelZoom(); // 启用滚轮放大缩小，默认禁用   
+09.    map.enableContinuousZoom(); // 启用地图惯性拖拽，默认禁用   
+10.    map.addControl(new BMap.NavigationControl()); // 添加默认缩放平移控件,左上角   
+11.    map.addControl(new BMap.ScaleControl()); // 添加默认比例尺控件   
+12.    map.addControl(new BMap.MapTypeControl({  
+13.        anchor : BMAP_ANCHOR_TOP_RIGHT  
+14.    })); // 左上角，默认地图控件   
+15.    for ( var o in hotelArray) {  
+16.        var point = new BMap.Point(hotelArray[o].lng, hotelArray[o].lat);// 坐标点   
+17.  
+18.  
+19.        var hotelNameLabel = new BMap.Label(hotelArray[o].hotelName, {  
+20.            offset : new BMap.Size(20, -10)  
+21.        });// 标注显示名称   
+22.  
+23.  
+24.        var sContent = "<div>"  
+25.                + "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>"  
+26.                + hotelArray[o].hotelName  
+27.                + "</h4>"  
+28.                + "<img style='float:right;margin:4px' id='imgDemo' src='../images/"  
+29.                + hotelArray[o].srcImage  
+30.                + "' width='139' height='104' title=''/>"  
+31.                + "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>"  
+32.                + hotelArray[o].hotelAddress + "</p>" + "</div>";  
+33.  
+34.  
+35.        // 设置label 文本框的样式   
+36.        hotelNameLabel.setStyle({  
+37.            "borderColor" : "red",  
+38.            "color" : "red",  
+39.            "cursor" : "pointer"  
+40.  
+41.  
+42.        });  
+43.        console.log(hotelArray[o].srcImage + sContent);  
+44.        createMark = function(lng, lat, info_html) {  
+45.            var _marker = new BMap.Marker(new BMap.Point(lng, lat));  
+46.            _marker.addEventListener("click", function(e) {  
+47.                this.openInfoWindow(new BMap.InfoWindow(info_html));  
+48.            });  
+49.            _marker.addEventListener("mouseover", function(e) {  
+50.                this.setTitle("位于: " + lng + "," + lat);  
+51.            });  
+52.            return _marker;  
+53.        };  
+54.  
+55.  
+56.        var marker = createMark(hotelArray[o].lng, hotelArray[o].lat, sContent);  
+57.  
+58.  
+59.        map.addOverlay(marker);  
+60.        marker.setLabel(hotelNameLabel); // 添加百度label   
+61.  
+62.  
+63.    }  
+64.    city = new BMap.LocalSearch(map, {  
+65.        renderOptions : {  
+66.            map : map,  
+67.            autoViewport : true  
+68.        }  
+69.    }); // 地图显示到查询结果处   
+70.}  
+71.  
+72.  
+73.function searchCity() {  
+74.    var s = $("#searchValue").val();  
+75.    console.log(s);  
+76.    city.search(s); // 查找城市   
+77.}  
+function baiduMapFunction(divId, hotelArray) {
+	var map = new BMap.Map(divId);// 创建百度地图对象
+
+
+	map.centerAndZoom(new BMap.Point(116.404, 39.915), 12);
+
+
+	map.enableScrollWheelZoom(); // 启用滚轮放大缩小，默认禁用
+	map.enableContinuousZoom(); // 启用地图惯性拖拽，默认禁用
+	map.addControl(new BMap.NavigationControl()); // 添加默认缩放平移控件,左上角
+	map.addControl(new BMap.ScaleControl()); // 添加默认比例尺控件
+	map.addControl(new BMap.MapTypeControl({
+		anchor : BMAP_ANCHOR_TOP_RIGHT
+	})); // 左上角，默认地图控件
+	for ( var o in hotelArray) {
+		var point = new BMap.Point(hotelArray[o].lng, hotelArray[o].lat);// 坐标点
+
+
+		var hotelNameLabel = new BMap.Label(hotelArray[o].hotelName, {
+			offset : new BMap.Size(20, -10)
+		});// 标注显示名称
+
+
+		var sContent = "<div>"
+				+ "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>"
+				+ hotelArray[o].hotelName
+				+ "</h4>"
+				+ "<img style='float:right;margin:4px' id='imgDemo' src='../images/"
+				+ hotelArray[o].srcImage
+				+ "' width='139' height='104' title=''/>"
+				+ "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>"
+				+ hotelArray[o].hotelAddress + "</p>" + "</div>";
+
+
+		// 设置label 文本框的样式
+		hotelNameLabel.setStyle({
+			"borderColor" : "red",
+			"color" : "red",
+			"cursor" : "pointer"
+
+
+		});
+		console.log(hotelArray[o].srcImage + sContent);
+		createMark = function(lng, lat, info_html) {
+			var _marker = new BMap.Marker(new BMap.Point(lng, lat));
+			_marker.addEventListener("click", function(e) {
+				this.openInfoWindow(new BMap.InfoWindow(info_html));
+			});
+			_marker.addEventListener("mouseover", function(e) {
+				this.setTitle("位于: " + lng + "," + lat);
+			});
+			return _marker;
+		};
+
+
+		var marker = createMark(hotelArray[o].lng, hotelArray[o].lat, sContent);
+
+
+		map.addOverlay(marker);
+		marker.setLabel(hotelNameLabel); // 添加百度label
+
+
+	}
+	city = new BMap.LocalSearch(map, {
+		renderOptions : {
+			map : map,
+			autoViewport : true
+		}
+	}); // 地图显示到查询结果处
+}
+
+
+function searchCity() {
+	var s = $("#searchValue").val();
+	console.log(s);
+	city.search(s); // 查找城市
+}
+上面这个函数，就接受一个json数组对象，和一个在你页面的divId。因为要显示地图
+
+先把地图初始化之后，在循环里面一次从json中读取数据，然后new 出标注对象。再为每个标注对象添加监听方法
+
+在添加监听方法的时候，会遇到，不管点击哪一个标注，都是输出最后一条的信息。
+
+这主要是作用域的问题，之后写了个闭包的方法。
+
+如下
+
+
+[javascript] view plaincopyprint?
+01.var     createMark = function(lng, lat, info_html) {  
+02.            var _marker = new BMap.Marker(new BMap.Point(lng, lat));  
+03.            _marker.addEventListener("click", function(e) {  
+04.                this.openInfoWindow(new BMap.InfoWindow(info_html));  
+05.            });  
+06.            _marker.addEventListener("mouseover", function(e) {  
+07.                this.setTitle("位于: " + lng + "," + lat);  
+08.            });  
+09.            return _marker;  
+10.        };  
+var 	createMark = function(lng, lat, info_html) {
+			var _marker = new BMap.Marker(new BMap.Point(lng, lat));
+			_marker.addEventListener("click", function(e) {
+				this.openInfoWindow(new BMap.InfoWindow(info_html));
+			});
+			_marker.addEventListener("mouseover", function(e) {
+				this.setTitle("位于: " + lng + "," + lat);
+			});
+			return _marker;
+		};
+将经纬度，和显示信息单独放在函数里，new标注之后，立刻加监听。
+
+这样之后就解决了这个问题了
+

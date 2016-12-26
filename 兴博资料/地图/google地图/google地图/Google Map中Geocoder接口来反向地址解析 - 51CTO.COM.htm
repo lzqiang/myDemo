@@ -1,0 +1,588 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=gbk">
+<meta http-equiv="x-ua-compatible" content="ie=7">
+<title>Google Map中Geocoder接口来反向地址解析 - 51CTO.COM</title>
+<meta name="description" content="Google Map是个好东西，它提供的Geocoder接口可以对地址进行反向解析，从而得到诸如 “经纬度”，“国家”， “省”，“市”，“区”，“路” 等等的信息。">
+<meta name="keywords" content="Google Map">
+<!-- base href="http://developer.51cto.com/art/201208/352262.htm" -->
+<link href="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/grid.css" rel="stylesheet" type="text/css">
+<link type="text/css" rel="stylesheet" href="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/art_master_top.css">
+<link href="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/css3.css" rel="stylesheet" type="text/css">
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ga.js" async="" type="text/javascript"></script><script language="javaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/base_art.js"></script>
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/index_1_down.js"></script>
+<style type="text/css">
+.bds_tools a{ padding:0; margin:0;}
+</style>
+<link type="text/css" rel="stylesheet" href="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bdsstyle.css"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/logger.js"></script></head>
+<body><iframe style="display: none;" frameborder="0"></iframe><div style="display: block;" id="bdshare_s"><iframe id="bdsIfr" style="position:absolute;display:none;z-index:9999;" frameborder="0"></iframe><div style="display: none;" id="bdshare_l"><div id="bdshare_l_c"><h6>分享到</h6><ul><li><a href="#" class="bds_mshare mshare">一键分享</a></li><li><a href="#" class="bds_qzone qqkj">QQ空间</a></li><li><a href="#" class="bds_tsina xlwb">新浪微博</a></li><li><a href="#" class="bds_baidu bdsc">百度搜藏</a></li><li><a href="#" class="bds_renren rrw">人人网</a></li><li><a href="#" class="bds_tqq txwb">腾讯微博</a></li><li><a href="#" class="bds_bdxc bdxc">百度相册</a></li><li><a href="#" class="bds_kaixin001 kxw">开心网</a></li><li><a href="#" class="bds_tqf txpy">腾讯朋友</a></li><li><a href="#" class="bds_tieba bdtb">百度贴吧</a></li><li><a href="#" class="bds_douban db">豆瓣网</a></li><li><a href="#" class="bds_tsohu shwb">搜狐微博</a></li><li><a href="#" class="bds_bdhome bdhome">百度新首页</a></li><li><a href="#" class="bds_sqq sqq">QQ好友</a></li><li><a href="#" class="bds_thx thx">和讯微博</a></li><li><a href="#" class="bds_more">更多...</a></li></ul><p><a href="#" class="goWebsite">百度分享</a></p></div></div></div>
+<!-- 导航 开始-->
+<div id="home_top">    <div class="top_nav">        <div class="left" style="width:400px"><div class="logo_51cto" title="51CTO.COM - 技术成就梦想 -  中国领先的IT技术网站"></div><a href="http://www.51cto.com/">首页</a><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/top_bg_xian.gif" style="padding-top: 2px;" align="absmiddle" height="25" width="16"><a onmouseover="show(1,this);" onmouseout="popupClose();" href="http://www.51cto.com/col/35/" target="_blank">技术频道<img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/nav_ico1.gif" style="padding-left: 4px;" align="absmiddle"></a><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/top_bg_xian.gif" align="absmiddle" height="25" width="16"><a onmouseover="show(2,this);" onmouseout="popupClose();" href="http://www.51cto.com/" target="_blank">51CTO旗下网站<img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/nav_ico1.gif" style="padding-left: 4px;" align="absmiddle"></a><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/top_bg_xian.gif" align="absmiddle" height="25" width="16"><a href="http://www.51cto.com/about/map.htm" target="_blank">地图</a> <a href="http://www.51cto.com/about/rss.html" target="_blank"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/143749870.gif" style="vertical-align:middle; margin-bottom: 5px; margin-left:5px;"></a>       </div>        <div class="right">            <div class="more"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/top_shequ.gif" align="absmiddle" height="16" width="27">社区：<a href="http://bbs.51cto.com/" target="_blank">论坛</a><a href="http://blog.51cto.com/" target="_blank">博客</a><a href="http://down.51cto.com/" target="_blank">下载</a><a href="http://book.51cto.com/" target="_blank">读书</a><a onmouseover="show(3,this)" onmouseout="popupClose()" href="javascript:viod(0);">更多<img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/nav_ico1.gif" style="padding-left: 4px;" align="absmiddle"></a>            </div>            <span id="login_status"><div class="login" style="padding-top:8px; text-align:right;"><a href="http://home.51cto.com/index.php?s=/Home/index" style="background:none"><img style="margin-top:-3px" id="dia" title="今天领无忧币了吗？" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/dia.gif" align="absmiddle" width="20"></a><a href="http://home.51cto.com/?reback=http%253A%252F%252Fdeveloper.51cto.com%252Fart%252F201208%252F352262.htm" target="_self">登录</a><a href="http://ucenter.51cto.com/reg_01.php?reback=http%253A%252F%252Fdeveloper.51cto.com%252Fart%252F201208%252F352262.htm" target="_self">注册</a></div></span>                </div>    </div></div>
+<div class="subMenu1" id="s1" onmouseover="popupNoClose();" onmouseout="popupClose();">
+<ul>
+<li><a href="http://network.51cto.com/" target="_blank">网络</a></li>
+<li><a href="http://netsecurity.51cto.com/" target="_blank">安全</a></li>
+<li><a href="http://developer.51cto.com/" target="_blank">开发</a></li>
+<li><a href="http://database.51cto.com/" target="_blank">数据库</a></li>
+<li><a href="http://server.51cto.com/" target="_blank">服务器</a></li>
+<li><a href="http://os.51cto.com/" target="_blank">系统</a></li>
+<li><a href="http://virtual.51cto.com/" target="_blank">虚拟化</a></li>
+<li><a href="http://cloud.51cto.com/" target="_blank">云计算</a></li>
+<li><a href="http://developer.51cto.com/embed/" target="_blank">嵌入式</a></li>
+<li><a href="http://mobile.51cto.com/" target="_blank">移动开发</a></li>
+</ul>
+</div> 
+<div class="subMenu2" id="s2" onmouseover="popupNoClose()" onmouseout="popupClose()">
+<ul>
+<li><a href="http://www.51cto.com/" target="_blank" title="中国领先的IT技术网站">51CTO.COM</a></li>
+<li><a href="http://www.cioage.com/" target="_blank" title="中国首个专门服务于CIO的专业网站">CIOage.com</a></li>
+<li><a href="http://www.watchstor.com/" target="_blank" title="领先的中文存储网络媒体">WatchStor.com</a></li>
+<li><a href="http://www.hc3i.cn/" target="_blank" title="中国首家专注于数字医疗及医疗信息化的专业网站">HC3i.cn</a></li>
+<li><a href="http://www.linkphone.cn/" target="_blank" title="移动互联网生活门户">灵客风LinkPhone</a></li>
+</ul>
+</div>
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/jquery-1.js"></script>
+<script>
+$(function(){
+	$(".bann").height(265);	 
+	$(".bann").css("background-color","white");
+});
+
+</script>
+
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/head_art_more1.js"></script><div class="subMenu3" id="s3" onmouseover="popupNoClose()" onmouseout="popupClose()" style="z-index:9999;position: absolute;">
+<ul>
+<li><a href="http://home.51cto.com/" target="_blank">家园</a></li>
+<li><a href="http://t.51cto.com/" target="_blank">微博</a></li>
+<li><a href="http://blog.51cto.com/" target="_blank">博客</a></li>
+<li><a href="http://bbs.51cto.com/" target="_blank">论坛</a></li>
+<li><a href="http://down.51cto.com/" target="_blank">下载</a></li>
+<li><a href="http://selftest.51cto.com/" target="_blank">自测</a></li>
+<li><a href="http://doctor.51cto.com/" target="_blank">门诊</a></li>
+<li><a href="http://blog.51cto.com/newsletter/" target="_blank">周刊</a></li>
+<li><a href="http://book.51cto.com/" target="_blank">读书</a></li>
+<li><a href="http://g.51cto.com/" target="_blank">技术圈</a></li>
+<li><a href="http://zhidao.51cto.com/" target="_blank">知道</a></li>
+</ul>
+</div>
+
+<!-- 登陆信息 -->
+<!-- 导航 结束--> 
+ <div class="g_39 mb10">
+	<div id="tonglanad" class="fl"><script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ad_002.js"></script><script type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ad.htm"></script><iframe noresize="" marginheight="0" marginwidth="0" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/4.htm" align="left" frameborder="0" height="90" scrolling="No" width="760"></iframe></div>
+	<div id="list4" class="fr">
+		<ul>
+			<li id="wordlinkad1"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wordlink1.js"></script><script language="JavaScript" type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adjs_002.js"></script><a href="http://vd.51cto.com/adclick.php?bannerid=9535&amp;zoneid=477&amp;source=&amp;dest=http%3A%2F%2Ftopic.sangfor.com.cn%2Fexhibition2013%2F" target="_blank"><font color="blue">2013深信服亚太区巡展盛大起航</font></a><div id="beacon_9535" style="position: absolute; left: 0px; top: 0px; visibility: hidden;"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adlog_004.gif" alt="" style="width: 0px; height: 0px;" height="0" width="0"></div></li>
+			<li id="wordlinkad2"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wordlink2.js"></script><script language="JavaScript" type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adjs.js"></script><a href="http://vd.51cto.com/adclick.php?bannerid=6330&amp;zoneid=478&amp;source=&amp;dest=http%3A%2F%2Fdown.51cto.com%2Fdata%2F282609" target="_blank"><font color="blue">调研:移动开发者生存状况</font></a><div id="beacon_6330" style="position: absolute; left: 0px; top: 0px; visibility: hidden;"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adlog.gif" alt="" style="width: 0px; height: 0px;" height="0" width="0"></div></li>
+			<li id="wordlinkad3"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wordlink3.js"></script><script language="JavaScript" type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adjs_004.js"></script><a href="http://vd.51cto.com/adclick.php?bannerid=8981&amp;zoneid=479&amp;source=&amp;dest=https%3A%2F%2Fitunes.apple.com%2Fcn%2Fapp%2F51cto%2Fid571586495%3Fls%3D1%26mt%3D8" target="_blank"><font color="blue">指尖上的资讯 51CTO iOS版</font></a><div id="beacon_8981" style="position: absolute; left: 0px; top: 0px; visibility: hidden;"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adlog_003.gif" alt="" style="width: 0px; height: 0px;" height="0" width="0"></div></li>
+			<li id="wordlinkad4"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wordlink4.js"></script><script language="JavaScript" type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adjs_003.js"></script><a href="http://vd.51cto.com/adclick.php?bannerid=9538&amp;zoneid=480&amp;source=&amp;dest=http%3A%2F%2Fnetsecurity.51cto.com%2Fsecu%2Fsangfor%2Faf2013%2F" target="_blank"><font color="blue">春暖花开之日 防火墙升级之时</font></a><div id="beacon_9538" style="position: absolute; left: 0px; top: 0px; visibility: hidden;"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adlog_002.gif" alt="" style="width: 0px; height: 0px;" height="0" width="0"></div></li>
+		</ul>
+	</div>
+<br class="dle">
+</div>
+
+<div class="g_39 menu">
+<div class="subNav_logo"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/kaifa_logo.gif"></div>
+<div class="subNav_l"><a href="http://developer.51cto.com/">首页</a> | <a href="http://developer.51cto.com/java/">Java</a> | <a href="http://developer.51cto.com/net/">.NET</a> | <a href="http://developer.51cto.com/web/">Web</a> | <a href="http://developer.51cto.com/col/1315/">XML</a> | <a href="http://developer.51cto.com/col/585/">语言工具</a> | <a href="http://developer.51cto.com/col/1312/">测试</a> | <a href="http://developer.51cto.com/col/1314/" target="_blank">游戏</a> | <a href="http://developer.51cto.com/col/583/" target="_blank">移动</a> | <a href="http://developer.51cto.com/col/1308/">架构</a> | <a href="http://developer.51cto.com/col/586/">项目管理</a> | <a href="http://publish.51cto.com/list/460/">全部文章</a></div>
+  
+<div class="search fr">
+<dl>
+<form name="searchform" action="http://www.51cto.com/php/search.php" target="_blank" method="post" style="margin:0px; padding:0px;">
+<dt class="fl"><input name="keyword" class="searchInput f14 input" value="请输入关键字" onfocus="doempty(this, '请输入关键字');" onblur="doempty(this, '请输入关键字');" type="text"></dt>
+<dd class="fl"><input src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/search.gif" type="image"></dd></form>
+</dl>
+</div>
+<br class="dle">
+</div>
+<div class="g_39 b3-s-4273B3 rel">
+<!--width : 26*25 - 15 = 635px-->
+<div class="g_26 fl m_l">
+<div class="brief bgF8F8F8">
+<p class="crumb ">您所在的位置：<a href="http://developer.51cto.com/">开发</a> &gt; <a href="http://developer.51cto.com/col/585/">语言&amp;工具</a> &gt;  <b>Google Map中Geocoder接口来反向地址解析</b> </p>
+<h1>Google Map中Geocoder接口来反向地址解析</h1>
+<div class="msg">
+<div>2012-08-13 14:03  三度空间  博客园 <span class="f12-a"><a href="#commment" target="_self">我要评论(<span id="pinglun_1"><script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/getArtCount.htm"></script>0</span>)</a></span> 字号：<span class="f14-b"><a href="javascript:setfont(12);" target="_self">T</a></span> | <span class="f16-b"><a href="javascript:setfont(16);" target="_self">T</a></span></div>
+<div class="artHd" id="books" style="padding:5px 25px;display:none;"><script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/getBookData.htm"></script></div>
+<div class="fav"><a href="javascript:favorBox('open');" title="一键收藏，随时查看，分享好友！" target="_self"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/Fav.gif" alt="一键收藏，随时查看，分享好友！" border="0"></a></div>
+</div>
+<div class="brieftext">
+<p class="f14 green">Google Map是个好东西，它提供的Geocoder接口可以对地址进行反向解析，从而得到诸如 “经纬度”，“国家”， “省”，“市”，“区”，“路” 等等的信息。</p>
+<p class="ad">AD：<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/keywords_ad_new.js"></script><a href="http://wot.51cto.com/bigdata2013/ppt_download.html" target="_blank" style="text-decoration: none;">2013大数据全球技术峰会课程PPT下载</a>
+</p>
+</div>
+</div>
+<div class="tag bgF8F8F8" id="indexlist" style="display:none;">
+<ul id="indexliststr">
+</ul>
+<br class="dle">
+</div>
+<div class="content bgF8F8F8 f14">
+<div id="content">
+<p></p><p><span style="color: rgb(51, 51, 51); font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; ">如下图，我输入了“天河美好居”，就可以反向解析到我的具体位置）</span></p>
+<p style="margin: 5px auto; padding: 0px; color: rgb(51, 51, 51); font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; ">下面就班门弄斧的讲述一下：</p>
+<p style="margin: 5px auto; padding: 0px; color: rgb(51, 51, 51); font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; "><img class="fit-image" onload="javascript:if(this.width>498)this.width=498;" onmousewheel="javascript:return big(this)" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/1406150.png" alt="" style="margin: 0px; padding: 0px; border: 0px; " width="498"></p>
+<p style="margin: 5px auto; padding: 0px; color: rgb(51, 51, 51); font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; ">1. 引入所需的JS：</p>
+<pre><ol class="dp-c"><li class="alt"><span><span>&lt;script&nbsp;type=</span><span class="string">"text/javascript"</span><span>&nbsp;src=</span><span class="string">"https://maps.googleapis.com/maps/api/js?sensor=false"</span><span>&gt;&lt;/script&gt;&nbsp;</span></span></li><li><span>&lt;script&nbsp;type=<span class="string">"text/javascript"</span><span>&nbsp;src=</span><span class="string">"JS/jquery-1.7.min.js"</span><span>&gt;&lt;/script&gt;&nbsp;</span></span></li></ol></pre>
+<p style="margin: 5px auto; padding: 0px; color: rgb(51, 51, 51); font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; ">2. Javascript代码：</p>
+<pre><ol class="dp-c"><li class="alt"><span><span>&lt;script&nbsp;language=</span><span class="string">"javascript"</span><span>&nbsp;type=</span><span class="string">"text/javascript"</span><span>&gt;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;map,&nbsp;marker,&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//实例化地址解析器</span><span>&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geoCoder&nbsp;=&nbsp;<span class="keyword">new</span><span>&nbsp;google.maps.Geocoder(),&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//初始化地图的配置</span><span>&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myOptions&nbsp;=&nbsp;{&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zoom:&nbsp;15,&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;center:&nbsp;<span class="keyword">new</span><span>&nbsp;google.maps.LatLng(113.32152399999995,&nbsp;23.134685),&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mapTypeId:&nbsp;google.maps.MapTypeId.ROADMAP&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>&nbsp;GetGeoCoder()&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;searchAddress&nbsp;=&nbsp;$(</span><span class="string">"#txt_address"</span><span>).val();&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geoCoder.geocode({&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">'address'</span><span>:&nbsp;searchAddress&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>(results,&nbsp;state)&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(state&nbsp;=&nbsp;google.maps.GeocoderStatus.OK)&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(results[0])&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;point&nbsp;=&nbsp;results[0].geometry.location;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(marker)&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;marker.setMap(<span class="keyword">null</span><span>);&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;marker&nbsp;=&nbsp;<span class="keyword">new</span><span>&nbsp;google.maps.Marker({&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map:&nbsp;map,&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;position:&nbsp;point&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;infowindow&nbsp;=&nbsp;</span><span class="keyword">new</span><span>&nbsp;google.maps.InfoWindow({&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;content:&nbsp;<span class="string">'&lt;h3&gt;我在这里.&lt;/h3&gt;'</span><span>&nbsp;+&nbsp;results[0].formatted_address&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;google.maps.event.addListener(marker,&nbsp;<span class="string">'click'</span><span>,&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>()&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;infowindow.open(map,&nbsp;marker);&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map.setCenter(point);&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//利用html5的geolocation来获取当前位置</span><span>&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>&nbsp;GetGeoLocation()&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(navigator.geolocation)&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;navigator.geolocation.getCurrentPosition(<span class="keyword">function</span><span>(position)&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;pos&nbsp;=&nbsp;</span><span class="keyword">new</span><span>&nbsp;google.maps.LatLng(position.coords.latitude,&nbsp;position.coords.longitude);&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log(position);&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;geoCoder.geocode({&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">'latLng'</span><span>:&nbsp;pos&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>(results,&nbsp;state)&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(state&nbsp;=&nbsp;google.maps.GeocoderStatus.OK)&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(results[0])&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;point&nbsp;=&nbsp;results[0].geometry.location;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;myDirection&nbsp;=&nbsp;results[0].formatted_address;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(marker)&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;marker.setMap(<span class="keyword">null</span><span>);&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;marker&nbsp;=&nbsp;<span class="keyword">new</span><span>&nbsp;google.maps.Marker({&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map:&nbsp;map,&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;position:&nbsp;point&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;infowindow&nbsp;=&nbsp;</span><span class="keyword">new</span><span>&nbsp;google.maps.InfoWindow({&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;content:&nbsp;<span class="string">'&lt;h3&gt;我在这里&lt;/h3&gt;'</span><span>&nbsp;+&nbsp;myDirection&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;google.maps.event.addListener(marker,&nbsp;<span class="string">'click'</span><span>,&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>()&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;infowindow.open(map,&nbsp;marker);&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map.setCenter(point);&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$(<span class="string">"#txt_address"</span><span>).val(myDirection.split(</span><span class="string">'&nbsp;'</span><span>)[0]);&nbsp;</span></span></li><li><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>()&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handleNoGeolocation(<span class="keyword">true</span><span>);&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">'enableHighAccuracy'</span><span>:&nbsp;</span><span class="keyword">true</span><span>,&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">'timeout'</span><span>:&nbsp;10000,&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">'maximumAge'</span><span>:&nbsp;0&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;浏览器不支持Geolocation</span><span>&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handleNoGeolocation(<span class="keyword">false</span><span>);&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>&nbsp;handleNoGeolocation(errorFlag)&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(errorFlag)&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;content&nbsp;=&nbsp;</span><span class="string">'Error:&nbsp;The&nbsp;Geolocation&nbsp;service&nbsp;failed.'</span><span>;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;content&nbsp;=&nbsp;</span><span class="string">'Error:&nbsp;Your&nbsp;browser&nbsp;doesn\'t&nbsp;support&nbsp;geolocation.'</span><span>;&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;options&nbsp;=&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map:&nbsp;map,&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;position:&nbsp;<span class="keyword">new</span><span>&nbsp;google.maps.LatLng(113.32152399999995,&nbsp;23.134685),&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;content:&nbsp;content&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;};&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">var</span><span>&nbsp;infowindow&nbsp;=&nbsp;</span><span class="keyword">new</span><span>&nbsp;google.maps.InfoWindow(options);&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map.setCenter(options.position);&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$(<span class="keyword">function</span><span>()&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map&nbsp;=&nbsp;<span class="keyword">new</span><span>&nbsp;google.maps.Map(document.getElementById(</span><span class="string">'map_canvas'</span><span>),&nbsp;myOptions);&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//页面加载时，利用html5获取当前位置</span><span>&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetGeoLocation();&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$(<span class="string">'#txt_address'</span><span>).bind(</span><span class="string">'keyup'</span><span>,&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">function</span><span>(event)&nbsp;{&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(event.keyCode&nbsp;==&nbsp;13)&nbsp;{&nbsp;</span></span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetGeoCoder();&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span></li><li><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});&nbsp;</span></li><li><span>&nbsp;&lt;/script&gt;&nbsp;</span></li></ol></pre>
+<p style="margin: 5px auto; padding: 0px; color: rgb(51, 51, 51); font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; ">3. HTML Code：</p>
+<pre><ol class="dp-xml"><li class="alt"><span><span class="tag">&lt;</span><span class="tag-name">input</span><span>&nbsp;</span><span class="attribute">id</span><span>=</span><span class="attribute-value">"txt_address"</span><span>&nbsp;</span><span class="attribute">class</span><span>=</span><span class="attribute-value">"input_css"</span><span>&nbsp;</span><span class="attribute">type</span><span>=</span><span class="attribute-value">"text"</span><span>&nbsp;</span><span class="attribute">value</span><span>=</span><span class="attribute-value">"Where&nbsp;Are&nbsp;You&nbsp;?"</span><span class="tag">/&gt;</span><span>&nbsp;</span></span></li><li><span><span class="tag">&lt;</span><span class="tag-name">div</span><span>&nbsp;</span><span class="attribute">id</span><span>=</span><span class="attribute-value">"map_canvas"</span><span class="tag">&gt;</span><span>&nbsp;</span></span></li></ol></pre>
+<p style="margin: 5px auto; padding: 0px; color: rgb(51, 51, 51); font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; ">这
+样就可以对地址进行反向解析了，这里只进行简单的讲述，对于Google API更多更详细的描述，可以到Google Javascript API 
+V3的官方文档去了解。反向地址解析是很有用的，例如，公司数据库中有上百万的企业数据，地址不够完善，这时我们就可以利用它来帮助我们完善这些数据了。
+当然，Google 
+Map严格限制了查询的次数，多次查询会有LIMIT_QUERY的异常，这时我们就得使用一些手段来反限制，例如，在随机的时间间隔后查询等等，这里不
+详述。对于企业应用，还是付费使用，这样更稳定。</p>
+<p style="margin: 5px auto; padding: 0px; color: rgb(51, 51, 51); font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; ">
+</p><p style="margin: 10px 0px; padding: 0px; background-color: rgb(248, 248, 248); text-indent: 28px; font-family: 宋体; line-height: 28px; ">原文链接：<a href="http://www.cnblogs.com/three-zone/archive/2012/08/12/GeoCoder.html" style="font-family: verdana, Arial, Helvetica, sans-serif; line-height: 25px; ">http://www.cnblogs.com/three-zone/archive/2012/08/12/GeoCoder.html</a></p>
+<p style="margin: 10px 0px; padding: 0px; background-color: rgb(248, 248, 248); text-indent: 28px; font-family: 宋体; line-height: 28px; ">【编辑推荐】</p>
+<div style="font-family: 宋体; line-height: 28px; background-color: rgb(248, 248, 248); ">
+<ol style="margin: 0px 0px 0px 55px; padding: 0px; list-style: none outside none; word-wrap: break-word; word-break: normal; ">
+    <li style="margin: 0px; padding: 0px; list-style: none outside; word-wrap: break-word; word-break: normal; "><a href="http://developer.51cto.com/art/201203/326202.htm" target="_blank" style="color: rgb(0, 66, 118); ">Google研发先进编程技术 简化Web应用开发</a></li>
+    <li style="margin: 0px; padding: 0px; list-style: none outside; word-wrap: break-word; word-break: normal; "><a href="http://developer.51cto.com/art/201205/337301.htm" target="_blank" style="color: rgb(0, 66, 118); ">给明年依然年轻的我们:道别150万年薪,开始盒饭生活</a></li>
+    <li style="margin: 0px; padding: 0px; list-style: none outside; word-wrap: break-word; word-break: normal; "><a href="http://developer.51cto.com/art/201205/338264.htm" target="_blank" style="color: rgb(0, 66, 118); ">实时Web时代：不只Google、Twitter玩得起</a></li>
+    <li style="margin: 0px; padding: 0px; list-style: none outside; word-wrap: break-word; word-break: normal; "><a href="http://developer.51cto.com/art/201205/339636.htm" target="_blank" style="color: rgb(0, 66, 118); ">Google薪酬最高十职位：工程师最吃香</a></li>
+    <li style="margin: 0px; padding: 0px; list-style: none outside; word-wrap: break-word; word-break: normal; "><a href="http://developer.51cto.com/art/201206/340330.htm" target="_blank" style="color: rgb(0, 66, 118); ">程序员工资年薪5万起 领跑应届生求职市场</a></li>
+</ol>
+</div>
+<p></p>
+<div align="right">【责任编辑：<a class="ln" href="mailto:pengfan@51cto.com">彭凡</a> TEL：（010）68476606】</div><br> 
+<p class="blank10"></p> 
+ 
+ 
+
+
+<div class="f12"> <span class="fl">原文：<a href="http://developer.51cto.com/art/201208/352262.htm" class="blue"><b>Google Map中Geocoder接口来反向地址解析</b></a></span> <span class="fr"><a href="http://developer.51cto.com/">返回开发首页</a></span> </div>
+<p class="blank1"></p>
+</div>
+<iframe src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bulkfollow.xhtml" frameborder="0" height="239" scrolling="no" width="600"></iframe>
+<div class="tips">
+<div style="float:left;">
+<span style="float:left; margin-top:4px;">分享到：</span>
+<!-- Baidu Button BEGIN -->
+    <div id="bdshare" class="bdshare_t bds_tools get-codes-bdshare" style="margin-right:5px; float:left;">
+        <a href="#" title="分享到QQ空间" class="bds_qzone"></a>
+        <a href="#" title="分享到新浪微博" class="bds_tsina"></a>
+        <a href="#" title="分享到腾讯微博" class="bds_tqq"></a>
+        <a href="#" title="分享到人人网" class="bds_renren"></a>
+        <a href="#" title="分享到网易微博" class="bds_t163"></a>
+        <span class="bds_more"></span>
+		<a title="累计分享0次" href="#" class="shareCount">0</a>
+
+</div>
+<!--<div class="fl"> 
+    </div>
+--><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bds_s_v2.js" type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=585532"></script>
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/shell_v2.js" type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+	var bds_config = {'snsKey':{'tsina':'2378297317'}};
+	document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?t=" + new Date().getHours();
+</script>
+<!-- Baidu Button END -->
+
+
+
+</div><div class="fr blue"><a href="javascript:AddFavorite(document.location.href,document.title);" target="_self">收藏</a>|<a href="javascript:window.print();" target="_self">打印</a>|<a id="msnqqcopy" title="分享本资源给好友" target="_self">复制</a></div>
+</div>
+</div>
+<!--内容 end-->
+<div class="topbiaoqing">
+<div class="biaoqing fixfloat pad">
+<ul>
+<li><a href="javascript:getcountscom(352262,1)" target="_self"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bq1.jpg"></a>
+<div><a href="javascript:getcountscom(352262,1)" target="_self">给力</a></div>
+<span id="352262_1">(27票)</span></li>
+<li><a href="javascript:getcountscom(352262,2)" target="_self"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bq2.jpg"></a>
+<div><a href="javascript:getcountscom(352262,2)" target="_self">动心</a></div>
+<span id="352262_2">(27票)</span></li>
+<li><a href="javascript:getcountscom(352262,3)" target="_self"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bq3.jpg"></a>
+<div><a href="javascript:getcountscom(352262,3)" target="_self">废话</a></div>
+<span id="352262_3">(28票)</span></li>
+<li><a href="javascript:getcountscom(352262,4)" target="_self"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bq4.jpg"></a>
+<div><a href="javascript:getcountscom(352262,4)" target="_self">专业</a></div>
+<span id="352262_4">(27票)</span></li>
+<li><a href="javascript:getcountscom(352262,5)" target="_self"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bq5.jpg"></a>
+<div><a href="javascript:getcountscom(352262,5)" target="_self">标题党</a></div>
+<span id="352262_5">(27票)</span></li>
+<li><a href="javascript:getcountscom(352262,6)" target="_self"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/bq6.jpg"></a>
+<div><a href="javascript:getcountscom(352262,6)" target="_self">路过</a></div>
+<span id="352262_6">(27票)</span></li>
+</ul>
+</div>
+<script language="javascript"> 
+getcountscom(352262,11);
+
+</script>
+</div>
+<p class="blank10"></p>
+<div class="bor">
+<div class="titbg pl15">关于<a href="http://www.51cto.com/php/search.php?keyword=Google%20Map" target="_blank" class="underline">Google Map</a>的更多文章</div>
+<div class="reltag">
+<ul class="fl list02">
+  <li><a href="http://mobile.51cto.com/app-show-231267.htm" title="体验Android平台Google Map4.3版">体验Android平台Google Map4.3版</a></li><li><a href="http://sysapp.51cto.com/art/200705/48162.htm" title="Twitter：这个距离刚刚好">Twitter：这个距离刚刚好</a></li>
+</ul>
+<div class="fr">
+<div class="h5 f12"><a href="http://developer.51cto.com/art/201211/364725.htm" title="从程序员到项目经理：成长历程"><b>从程序员到项目经理：成长历程</b></a></div>
+<a href="http://developer.51cto.com/art/201211/364725.htm" title="从程序员到项目经理：成长历程"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/172214262.jpg" alt="从程序员到项目经理：成长历程" border="0" height="80" width="100"></a>
+<p class="c666">从程序员到项目经理，这个标题让我想起了很久以前一本书的名字《<a class="blue" href="http://developer.51cto.com/art/201211/364725.htm" title="从程序员到项目经理：成长历程">[详细]</a></p>
+</div>
+</div>
+<!--reltag end-->
+</div>
+<p class="blank10"></p>
+<div class="bor">
+<div class="f14 comm">
+<h3 class="fl">网友评论<em>TOP5</em></h3>
+<span class="fr"> <a href="http://www.51cto.com/php/feedbackt.php?id=352262">查看所有评论（<span id="pinglun_2"><script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/getArtCount.htm"></script>0</span>）</a></span> </div>
+<p class="blank1"></p>
+<div class="blank1"></div>
+<ul class="commlist">
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/artcomment1105.htm"></script>
+</ul>
+<div class="txt bgF8F8F8">
+<a name="commment"></a>
+<dl>
+<dt class="fl tlt">提交评论</dt>
+<dd><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/authart.htm"></script><form action="http://www.51cto.com/login.php?referer=http://developer.51cto.com/art/201208/352262.htm" method="post" style="padding:0px;margin:0px" target="_self">通行证：<input name="username" size="10" type="text">&nbsp;密码：<input name="password" size="10" type="password"><input name="username2" class="test1" value="" type="hidden">&nbsp;<input name="Submit" value="登录" type="submit">&nbsp;&nbsp;<a href="http://ucenter.51cto.com/reg_01.php">注册通行证</a></form><form action="http://www.51cto.com/php/sendfeedback.php" method="post" name="feedback" id="feedback" onsubmit="return commentSubmit(this)" style="padding:0px;margin:0px" target="_self"><input name="referer" value="http://developer.51cto.com/art/201208/352262.htm" type="hidden"><input name="username" value="" type="hidden"><input name="uid" class="test1" value="" type="hidden">
+<br>
+</form></dd>
+
+</dl>
+	 <script type="text/javascript" language="javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/nomal_k.htm"></script><textarea class="txtinput" name="msg" id="msg" style="height: 88px;"></textarea><br><table border="0" cellpadding="0" cellspacing="0" width="99%"><tbody><tr><td colspan="6" height="6"><input name="artID" value="352262" type="hidden"><input name="referer" value="http://developer.51cto.com/art/201208/352262.htm" type="hidden"><input name="quick" value="0" type="hidden"><input name="author2" value="51CTO网友" type="hidden"></td></tr><tr><td width="9%">验证码：</td><td width="11%"><input name="authnum" onclick="displaysecunum();" class="test3" type="text"></td><td width="51%"><img id="secunum" style="vertical-align:middle;" onclick="refimg()"><span style="display:none;" id="spanfont">点击图片可刷新验证码</span><span style="display:inline;" id="clickfont">请点击后输入验证码</span></td><td width="4%"><input name="nouser" value="1" onclick="author2username2()" type="checkbox"></td><td width="12%">匿名发表</td><td width="13%"><input style="background: url(&quot;http://www.51cto.com/php/tijiao.gif&quot;) no-repeat scroll 0% 0% transparent;cursor: pointer; height: 30px; width: 80px;" name="Submit32" value="" type="submit"></td></tr><tr><td colspan="6" height="6"></td></tr></tbody></table>
+	
+</div>
+</div>
+<!--box end-->
+<p class="blank10"></p>
+<div class="relart fl bor">
+<div class="titbg">
+<h3 class="fl t1">栏目热门</h3>
+<a href="http://developer.51cto.com/click/585" class="tmore">更多&gt;&gt;</a></div>
+<ul>
+  
+	  <li><a href="http://developer.51cto.com/art/201210/358937.htm" title="10月编程语言排行榜：Dart发力，欲将JS赶下神坛">10月编程语言排行榜：Dart发力，欲将JS赶下</a></li>
+	  
+	  <li><a href="http://developer.51cto.com/art/201210/361108.htm" title="完整的前端工程师面试问题列表">完整的前端工程师面试问题列表</a></li>
+	  
+	  <li><a href="http://developer.51cto.com/art/201211/364194.htm" title="C++程序员和Java程序员的差异">C++程序员和Java程序员的差异</a></li>
+	  
+	  <li><a href="http://developer.51cto.com/art/201211/363214.htm" title="Java程序员的堕落">Java程序员的堕落</a></li>
+	  
+	  <li><a href="http://developer.51cto.com/art/201211/363235.htm" title="一堂如何提高代码质量的培训课">一堂如何提高代码质量的培训课</a></li>
+	  
+</ul>
+</div>
+<div class="cathot fr bor">
+<div class="titbg">
+<h3 class="fl t1">同期最新</h3>
+<a href="http://developer.51cto.com/col/585" class="tmore">更多&gt;&gt;</a></div>
+<ul>
+	
+	  <li><a href="http://developer.51cto.com/art/201208/352195.htm" title="王垠：如何掌握程序语言">王垠：如何掌握程序语言</a></li>
+	  
+	  <li><a href="http://developer.51cto.com/art/201208/352181.htm" title="为什么我们要使用Go语言以及如何使用它的">为什么我们要使用Go语言以及如何使用它的</a></li>
+	  
+	  <li><a href="http://developer.51cto.com/art/201208/352054.htm" title="30个在规划和制作时值得借鉴的API">30个在规划和制作时值得借鉴的API</a></li>
+	  
+	  <li><a href="http://developer.51cto.com/art/201208/352004.htm" title="代码审查最佳实践">代码审查最佳实践</a></li>
+	  
+	  <li><a href="http://developer.51cto.com/art/201208/351673.htm" title="Google Go语言实现http共享（带trace）">Google Go语言实现http共享（带trace）</a></li>
+	  
+</ul>
+</div>
+<p class="blank10"></p>
+<div class="bor">
+<div class="titbg">
+<h3 class="fl t1"><a href="http://developer.51cto.com/">开发</a></h3>
+<span class="pl10">频道导航</span></div>
+ <ul class="xtlist">
+<li><span class="tit">Java</span>
+<div><a href="http://developer.51cto.com/java/">Java开发</a>|<a href="http://developer.51cto.com/col/1005/">Java基础</a>|<a href="http://developer.51cto.com/col/1014/">Java EE开发</a>|<a href="http://developer.51cto.com/col/1004/">Java框架</a>|<a href="http://developer.51cto.com/col/1007/">设计模式</a></div>
+</li>
+<li><span class="tit">WEB开发</span>
+<div><a href="http://developer.51cto.com/col/1441/">PHP开发</a>|<a href="http://developer.51cto.com/col/1455/">Python</a>|<a href="http://developer.51cto.com/col/1552/">Ruby</a>|<a href="http://developer.51cto.com/col/1552/">JSP</a>|<a href="http://developer.51cto.com/art/200907/133407.htm">HTML 5</a>|<a href="http://developer.51cto.com/col/1450/">DIV+CSS</a></div>
+</li>
+<li class="last"><span class="tit">综合</span>
+<div><a href="http://developer.51cto.com/net/">.NET开发</a>|<a href="http://developer.51cto.com/embed/">嵌入式开发</a>|<a href="http://developer.51cto.com/col/586/">项目管理</a>|<a href="http://developer.51cto.com/col/1308/">架构设计</a></div>
+</li>
+</ul> 
+</div> 
+<p class="blank10"></p>
+<div class="leftbotcon">
+<div class="bor jdlist">
+<div class="titbg">
+<h3 class="t2">热点推荐</h3></div>
+<ul>
+<li><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-t-4']);" href="http://mobile.51cto.com/mobile-182392.htm"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/153546162.jpg"></a> 
+<div class="name"><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-t-4']);" href="http://mobile.51cto.com/mobile-182392.htm">Android开发应用详解</a></div></li>
+<li><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-t-4']);" href="http://developer.51cto.com/art/201106/266369.htm"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/133620622.jpg"></a> 
+<div class="name"><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-t-4']);" href="http://developer.51cto.com/art/201106/266369.htm">那些性感的让人尖叫的程序员</a></div></li>
+<li><a href="http://developer.51cto.com/art/200907/133407.htm"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/134217922.jpg"></a> 
+<div class="name"><a href="http://developer.51cto.com/art/200907/133407.htm">HTML5 下一代Web开发标准详解</a></div></li>
+<li><a href="http://developer.51cto.com/art/201104/257581.htm"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/123123954.jpg"></a> 
+<div class="name"><a href="http://developer.51cto.com/art/201104/257581.htm">高性能WEB开发应用指南</a></div></li>
+<li><a href="http://os.51cto.com/art/200706/49181.htm"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/195816929.jpg"></a> 
+<div class="name"><a href="http://os.51cto.com/art/200706/49181.htm">Ubuntu开源技术交流频道</a></div></li></ul></div>
+<p class="blank10"></p>
+<div class="bor hotTag"><strong>热门标签：</strong> <a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-2]);" href="http://os.51cto.com/windows/">windows频道</a><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-w']);" href="http://mobile.51cto.com/">移动开发</a><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-w']);" href="http://cloud.51cto.com/">云计算</a><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-w']);" href="http://mobile.51cto.com/mobile/objc/">objective-c</a><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-w']);" href="http://network.51cto.com/art/200909/151122.htm">tp-link路由器设置图解</a><a onclick="javascript: _gaq.push(['_trackPageview', '/51cto/neirong/d-w']);" href="http://developer.51cto.com/art/200907/133407.htm">html5</a> </div></div>
+<div class="leftbotbox"> </div>
+</div>
+<!--left end-->
+<div class="g_13 fr">
+<div class="focus fixfloat"> 
+ <img style="border: 1px solid #CCCCCC; margin:5px 0px 5px;" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/weixin.png" width="298"><div class="hot">
+<ul>
+<li class="tit"><em>头条</em> <a href="http://developer.51cto.com/art/201305/392833.htm">5月编程语言排行榜UNIX下的Bash</a> </li>
+<li class="con"><dl><dt><a href="http://developer.51cto.com/art/201305/392833.htm"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wKioJlGMp6GxfsFDAAAZrjAg6bU781.jpg" border="0"></a></dt>
+<dd>今天我们要关注的是排在TOP 20后半部的一门语言——Bash。</dd>
+</dl></li></ul><ol class="hotlist"><li><a href="http://developer.51cto.com/art/201304/390187.htm">开发月刊副刊：敏捷开发PDF下载</a></li><li><a href="http://cnrdn.com/Mjg5">WP7.5专题讲座之WP7入门系列视频</a></li></ol></div>
+<p>
+<script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ad_003.js" type="text/javascript"></script><script type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ad_002.htm"></script><iframe noresize="" marginheight="0" marginwidth="0" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/4_002.htm" align="left" frameborder="0" height="400" scrolling="No" width="300"></iframe>
+</p>
+</div>
+<div class="rank">
+<div class="tlt">
+      <h3>文章排行</h3>
+      <a onmouseover="change_top10(3);" id="top_3">本月</a><a onmouseover="change_top10(2);" id="top_2">本周</a><a onmouseover="change_top10(1);" class="myon" id="top_1">24小时</a> </div>
+ <div id="top10_1" style="display: block;" class="list"><ul>
+<li><a href="http://developer.51cto.com/art/201007/214478.htm" target="_blank" title="Eclipse插件大全 挑选最牛的TOP30">Eclipse插件大全 挑选最牛的TOP30</a>
+</li><li><a href="http://developer.51cto.com/art/201005/202726.htm" target="_blank" title="Eclipse安装SVN插件方式简明介绍">Eclipse安装SVN插件方式简明介绍</a>
+</li><li><a href="http://developer.51cto.com/art/200903/117512.htm" target="_blank" title="详解Java解析XML的四种方法">详解Java解析XML的四种方法</a>
+</li><li><a href="http://developer.51cto.com/art/201305/394584.htm" target="_blank" title="你应该知道的10种软件工具">你应该知道的10种软件工具</a>
+</li><li><a href="http://developer.51cto.com/art/200601/17308.htm" target="_blank" title="UML类图详解">UML类图详解</a>
+</li><li><a href="http://developer.51cto.com/art/201305/392833.htm" target="_blank" title="2013年5月编程语言排行榜：UNIX下的Bas">2013年5月编程语言排行榜：UNIX下的Bas</a>
+</li><li><a href="http://developer.51cto.com/art/200906/128274.htm" target="_blank" title="Java数组声明、创建、初始化">Java数组声明、创建、初始化</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393992.htm" target="_blank" title="C# 5.0新特性：Async和Await使异步编程">C# 5.0新特性：Async和Await使异步编程</a>
+</li><li><a href="http://developer.51cto.com/art/201006/207993.htm" target="_blank" title="三大UML建模工具Visio、Rational Rose">三大UML建模工具Visio、Rational Rose</a>
+</li><li><a href="http://developer.51cto.com/art/201106/266369.htm" target="_blank" title="IT界那些性感的让人尖叫的程序员">IT界那些性感的让人尖叫的程序员</a>
+</li></ul></div>
+<div id="top10_2" style="display: none;" class="list"><ul>
+<li><a href="http://developer.51cto.com/art/201305/393495.htm" target="_blank" title="网站如何做到完全不需要jQuery">网站如何做到完全不需要jQuery</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393992.htm" target="_blank" title="C# 5.0新特性：Async和Await使异步编程">C# 5.0新特性：Async和Await使异步编程</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393587.htm" target="_blank" title="Go1.1新特性介绍(语言和库更完善/性能">Go1.1新特性介绍(语言和库更完善/性能</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393623.htm" target="_blank" title="创业故事：为什么两个男人会在一辆面包">创业故事：为什么两个男人会在一辆面包</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393446.htm" target="_blank" title="程序员面试什么最重要？">程序员面试什么最重要？</a>
+</li><li><a href="http://developer.51cto.com/art/201305/394028.htm" target="_blank" title="Google发布GAE PHP Runtime">Google发布GAE PHP Runtime</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393926.htm" target="_blank" title="甲骨文改变Java版本号命名方式">甲骨文改变Java版本号命名方式</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393595.htm" target="_blank" title="Go1.1性能测试报告(和C差距在10%以内)">Go1.1性能测试报告(和C差距在10%以内)</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393568.htm" target="_blank" title="Go语言1.1版发布">Go语言1.1版发布</a>
+</li><li><a href="http://developer.51cto.com/art/201305/393978.htm" target="_blank" title="学习新技术的10个建议">学习新技术的10个建议</a>
+</li></ul></div>
+<div id="top10_3" style="display: none;" class="list"><ul>
+<li><a href="http://developer.51cto.com/art/201305/392833.htm" target="_blank" title="2013年5月编程语言排行榜：UNIX下的Bas">2013年5月编程语言排行榜：UNIX下的Bas</a>
+</li><li><a href="http://developer.51cto.com/art/201305/392755.htm" target="_blank" title="从程序员到项目经理：不要试图和下属做">从程序员到项目经理：不要试图和下属做</a>
+</li><li><a href="http://developer.51cto.com/art/201305/392308.htm" target="_blank" title="Java 8的新特性和改进总览">Java 8的新特性和改进总览</a>
+</li><li><a href="http://developer.51cto.com/art/201304/391242.htm" target="_blank" title="失业的程序员(九):创业就是一场戏">失业的程序员(九):创业就是一场戏</a>
+</li><li><a href="http://developer.51cto.com/art/201304/390461.htm" target="_blank" title="两年内从零到月十亿PV的发展来谈Pinter">两年内从零到月十亿PV的发展来谈Pinter</a>
+</li><li><a href="http://developer.51cto.com/art/201305/392422.htm" target="_blank" title="挑战大数据 浅析NoSQL技术">挑战大数据 浅析NoSQL技术</a>
+</li><li><a href="http://developer.51cto.com/art/201304/390795.htm" target="_blank" title="程序员不是包身工">程序员不是包身工</a>
+</li><li><a href="http://developer.51cto.com/art/201305/392504.htm" target="_blank" title="全世界只有我们Erlang程序员是正确的">全世界只有我们Erlang程序员是正确的</a>
+</li><li><a href="http://developer.51cto.com/art/201305/392616.htm" target="_blank" title="高效程序员的7个共同特征">高效程序员的7个共同特征</a>
+</li><li><a href="http://developer.51cto.com/art/201304/390867.htm" target="_blank" title="JavaScript奥秘之让人捉摸不定的this">JavaScript奥秘之让人捉摸不定的this</a>
+</li></ul></div>
+ 
+ </div>
+<p class="blank1"></p>
+
+<div class="bor">
+<div class="titbg">
+<h3 class="fl t1">热点专题</h3>
+<a href="http://developer.51cto.com/speclist/585" class="tmore">更多&gt;&gt;</a></div>
+<ul class="plist01">
+<li><a href="http://developer.51cto.com/art/201206/342106.htm" title="大数据“三重门”"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/105909527.jpg" alt="大数据“三重门”" height="80" width="100"></a>
+<h5><a href="http://developer.51cto.com/art/201206/342106.htm" title="大数据“三重门”">大数据“三重门”</a></h5>
+<div class="c666">大数据时代来临，Hadoop等已成为炙手可热的技术词汇。</div>
+</li><li><a href="http://developer.51cto.com/art/201206/341015.htm" title="架构设计之基础设计与层次设计"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/135732157.jpg" alt="架构设计之基础设计与层次设计" height="80" width="100"></a>
+<h5><a href="http://developer.51cto.com/art/201206/341015.htm" title="架构设计之基础设计与层次设计">架构设计之基础设计与</a></h5>
+<div class="c666">一个软件架构师或者系统架构师陈述软件构架以作为满足</div>
+</li><li><a href="http://developer.51cto.com/art/201206/340718.htm" title="10款常用Java测试工具"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/134113548.jpg" alt="10款常用Java测试工具" height="80" width="100"></a>
+<h5><a href="http://developer.51cto.com/art/201206/340718.htm" title="10款常用Java测试工具">10款常用Java测试工具</a></h5>
+<div class="c666">本专题主要推荐了10款Java开发者常用的测试工具。</div>
+</li> 
+</ul>
+</div>
+<p class="blank10"></p>
+<div class="tagCloud">
+<div class="tlt">
+<h3>热点标签</h3>
+</div>
+<div class="taglist"><a title="编程语言排行榜" href="http://developer.51cto.com/art/200911/165281.htm">编程语言排行榜</a> <a title="敏捷开发" href="http://developer.51cto.com/art/200803/68222.htm">敏捷开发</a> <a title="Eclipse" href="http://developer.51cto.com/art/201006/207407.htm">Eclipse 3.6</a> <a title="PHP设计模式" href="http://developer.51cto.com/art/201004/195765.htm">PHP设计模式</a> <a title="NetBeans7" href="http://developer.51cto.com/art/201105/259431.htm">NetBeans 7</a> <a title="Java7" href="http://developer.51cto.com/art/201001/175830.htm">Java7</a> <a title="Scala编程语言" href="http://developer.51cto.com/art/200906/127830.htm">Scala编程语言</a> <a title="Python编程世界" href="http://developer.51cto.com/art/201011/234347.htm">Python编程世界</a> <a title="Ruby" on="" rails开发="" href="http://developer.51cto.com/art/201007/215101.htm">Ruby On Rails开发</a> <a class="imp" title="LINQ" href="http://developer.51cto.com/art/200911/165090.htm">LINQ</a> <a title="ASP.NET视频教程" href="http://developer.51cto.com/art/200904/120314.htm">ASP.NET视频教程</a> <a title="Visual Studio" href="http://developer.51cto.com/art/201004/194262.htm">Visual Studio</a> <a title="智能手机" href="http://p.linkphone.cn/">智能手机</a> <a title="软件下载" href="http://download.linkphone.cn/">软件下载</a></div>
+</div>
+<div class="rss">
+<ul>
+<li class="lin f12-c"><a href="http://news.51cto.com/col/1323/"><strong>点击这里查看样刊</strong></a></li>
+<li>
+<dl>
+<dt> </dt>
+<dd><a href="http://home.51cto.com/index.php?s=/Subscribe"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/dingy.gif"></a></dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="bor">
+<div class="titbg">
+<h3 class="t1">全站热点</h3>
+</div>
+<div class="webhot fixfloat">
+<ul>
+
+<li>
+  <a href="http://www.microsoft.com/click/services/Redirect2.ashx?CR_CC=200135251" title="Windows Sever 2012体验下载"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/161847291.jpg"></a>
+  <div><a href="http://www.microsoft.com/click/services/Redirect2.ashx?CR_CC=200135251" title="Windows Sever 2012体验下载">Windows Sever 2012体验下载</a></div>
+</li>
+
+<li>
+  <a href="http://os.51cto.com/art/201208/355049.htm" title="《Linux运维趋势》8月号 总21期"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/105753259.jpg"></a>
+  <div><a href="http://os.51cto.com/art/201208/355049.htm" title="《Linux运维趋势》8月号 总21期">《Linux运维趋势》8月号 总21期</a></div>
+</li>
+
+</ul>
+</div>
+<p class="blank1"></p>
+<ul class="list03">
+
+<li><a href="http://mobile.51cto.com/comment-357613.htm" title="移动互联网 谁能挣到钱">移动互联网 谁能挣到钱</a></li>
+
+<li><a href="http://mobile.51cto.com/web-357535.htm" title="iOS及Android 4.1版Chrome发布 HTML5得到进一步发展">iOS及Android 4.1版Chrome发布 HTML5</a></li>
+
+<li><a href="http://developer.51cto.com/art/201209/357523.htm" title="Web服务小姐的嫁衣">Web服务小姐的嫁衣</a></li>
+
+<li><a href="http://mobile.51cto.com/android-357498.htm" title="Android，也可以更美">Android，也可以更美</a></li>
+
+<li><a href="http://mobile.51cto.com/web-357441.htm" title="企业级跨平台解决方案：Worklight开发初探">企业级跨平台解决方案：Worklight开</a></li>
+
+</ul>
+</div>
+<p class="blank10"></p>
+<div class="bor">
+<div class="titbg">
+<h3 class="t1">读书</h3>
+</div>
+  
+<div class="catbook"><a href="http://book.51cto.com/art/200711/59953.htm" title="SQL实用简明教程(第2版)"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/161831744.gif" border="0" height="98" width="66"></a>
+<h5><a href="http://book.51cto.com/art/200711/59953.htm">SQL实用简明教程(第2版)</a></h5>
+<div class="c666 text">SQL(结构化查询语言)是数据库系统的通用语言，利用它可以用几乎同样的语句在不同的数据库系统上执行同样的操作，在数据库系统的</div>
+</div>
+
+
+<ul class="list03">
+
+<li><a href="http://book.51cto.com/art/200704/45427.htm" title="网络管理员考前辅导">网络管理员考前辅导</a></li>
+
+<li><a href="http://book.51cto.com/art/200704/45459.htm" title="计算机与网络基础知识——考点解析及模拟训练">计算机与网络基础知识——考点解析及模拟训练</a></li>
+
+<li><a href="http://book.51cto.com/art/200704/45528.htm" title="软件设计师考试全真模拟试题及解析">软件设计师考试全真模拟试题及解析</a></li>
+
+<li><a href="http://book.51cto.com/art/200704/45590.htm" title="网络管理员考试全真模拟试题与解析">网络管理员考试全真模拟试题与解析</a></li>
+
+</ul>
+</div>
+<p class="blank10"></p>
+<div class="bor">
+<div class="titbg">
+<h3 class="t1 fl">博文推荐</h3>
+<a class="tmore" href="http://blog.51cto.com/">更多&gt;&gt;</a></div>
+
+<ul class="list03">
+ <li><a href="http://simon.blog.51cto.com/80/217064/" target="_blank" title="如何选择一款好的集群产品">如何选择一款好的集群产品</a></li><li><a href="http://simeon.blog.51cto.com/18680/217051/" target="_blank" title="Md5（base64）加密与解密实战">Md5（base64）加密与解密实战</a></li><li><a href="http://sysadmin.blog.51cto.com/83876/217049/" target="_blank" title="在多节点群集中同步emcpower设备符">在多节点群集中同步emcpower设备符</a></li><li><a href="http://wenbomao.blog.51cto.com/697898/216985/" target="_blank" title="云计算安全">云计算安全</a></li>
+</ul>
+</div>
+<p class="blank10"></p>
+<div class="tj">
+<div class="tlt">
+<h3>最新热帖</h3>
+<a class="more" href="http://bbs.51cto.com/hotthreads.php">更多&gt;&gt;</a></div>
+<ul>
+<li><a href="http://bbs.51cto.com/thread-28543-1.html" target="_blank" title="最新SQL SERVER 2000/2005精华贴（陆续更新ing）">最新SQL SERVER 2000/2005精华贴（陆</a></li><li><a href="http://bbs.51cto.com/thread-28543-1.html" target="_blank" title="最新SQL SERVER 2000/2005精华贴（陆续更新ing）">最新SQL SERVER 2000/2005精华贴（陆</a></li>
+</ul>
+</div>
+<div class="picAD">
+<script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ad.js" type="text/javascript"></script><script type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ad_003.htm"></script><iframe class="bann" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/baidu.htm" style="height: 265px; width: 300px; padding: 0px; margin: 0px; overflow: hidden; background-color: white;" frameborder="0" scrolling="No"></iframe><script type="text/javascript"> var cpro_id = 'u708626';</script><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/c.js" type="text/javascript"></script><script type="text/javascript" charset="utf-8" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ecom"></script><div style="display:none">-</div> <iframe id="cproIframe1" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/uijs.htm" marginwidth="0" marginheight="0" allowtransparency="true" align="center,center" frameborder="0" height="250" scrolling="no" width="300"></iframe>
+</div>
+</div>
+<p class="blank1"></p> 
+<!--leftbotcon end-->
+</div> 
+<div class="subweb">
+<h4>51CTO旗下网站</h4>
+<div>
+<a target="_blank" href="http://www.51cto.com/">领先的IT技术网站 51CTO</a>
+<a target="_blank" href="http://www.watchstor.com/">领先的中文存储媒体 WatchStor</a>
+<a target="_blank" href="http://www.cioage.com/">中国首个CIO网站 CIOage</a>
+<a target="_blank" href="http://www.hc3i.cn/">中国首家数字医疗网站 HC3i</a>
+<a target="_blank" href="http://www.linkphone.cn/">移动互联网生活门户 灵客风LinkPhone</a>
+</div>
+</div>
+<div id="ft"><div id="foot" align="center"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/copy_right.js"></script>Copyright&#169;2005-2013 <a href="http://www.51cto.com/">51CTO.COM</a> 版权所有 未经许可 请勿转载</div></div>
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/count.js"></script><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/count.htm"></script>
+<!-- START GA.js -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-20883758-1']);
+  _gaq.push(['_setDomainName', 'none']);
+  _gaq.push(['_setAllowLinker', true]);
+  _gaq.push(['_addOrganic', 'baidu', 'word']);
+  _gaq.push(['_addOrganic', 'google', 'q']);
+  _gaq.push(['_addOrganic', 'soso', 'w']);
+  _gaq.push(['_addOrganic', '3721', 'name']);
+  _gaq.push(['_addOrganic', 'yodao', 'q']);
+  _gaq.push(['_addOrganic', 'vnet', 'kw']);
+  _gaq.push(['_addOrganic', 'sogou', 'query']);
+  _gaq.push(['_trackPageview']);
+  _gaq.push(['_trackPageLoadTime']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+<!-- END GA.js -->
+
+<!-- baidu.js -->
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Ff77ea1ecd95cb2a1bc65cbcb3aaba7d4' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/h.js" type="text/javascript"></script>
+<!--end baidu.js -->
+
+
+<!-- 新监测代码 -->
+<!-- 新监测代码 -->
+<div id="MyMoveAd" style="display: none; height: 2px;">
+<span id="wordlink_1"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wordlink1.js"></script><script language="JavaScript" type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adjs_002.js"></script><a href="http://vd.51cto.com/adclick.php?bannerid=9535&amp;zoneid=477&amp;source=&amp;dest=http%3A%2F%2Ftopic.sangfor.com.cn%2Fexhibition2013%2F" target="_blank"><font color="blue">2013深信服亚太区巡展盛大起航</font></a><div id="beacon_9535" style="position: absolute; left: 0px; top: 0px; visibility: hidden;"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adlog_004.gif" alt="" style="width: 0px; height: 0px;" height="0" width="0"></div></span>
+<span id="wordlink_2"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wordlink2.js"></script><script language="JavaScript" type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adjs.js"></script><a href="http://vd.51cto.com/adclick.php?bannerid=6330&amp;zoneid=478&amp;source=&amp;dest=http%3A%2F%2Fdown.51cto.com%2Fdata%2F282609" target="_blank"><font color="blue">调研:移动开发者生存状况</font></a><div id="beacon_6330" style="position: absolute; left: 0px; top: 0px; visibility: hidden;"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adlog.gif" alt="" style="width: 0px; height: 0px;" height="0" width="0"></div></span>
+<span id="wordlink_3"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wordlink3.js"></script><script language="JavaScript" type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adjs_004.js"></script><a href="http://vd.51cto.com/adclick.php?bannerid=8981&amp;zoneid=479&amp;source=&amp;dest=https%3A%2F%2Fitunes.apple.com%2Fcn%2Fapp%2F51cto%2Fid571586495%3Fls%3D1%26mt%3D8" target="_blank"><font color="blue">指尖上的资讯 51CTO iOS版</font></a><div id="beacon_8981" style="position: absolute; left: 0px; top: 0px; visibility: hidden;"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adlog_003.gif" alt="" style="width: 0px; height: 0px;" height="0" width="0"></div></span>
+<span id="wordlink_4"><script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/wordlink4.js"></script><script language="JavaScript" type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adjs_003.js"></script><a href="http://vd.51cto.com/adclick.php?bannerid=9538&amp;zoneid=480&amp;source=&amp;dest=http%3A%2F%2Fnetsecurity.51cto.com%2Fsecu%2Fsangfor%2Faf2013%2F" target="_blank"><font color="blue">春暖花开之日 防火墙升级之时</font></a><div id="beacon_9538" style="position: absolute; left: 0px; top: 0px; visibility: hidden;"><img src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/adlog_002.gif" alt="" style="width: 0px; height: 0px;" height="0" width="0"></div></span>
+<span id="pinglun"><script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/getArtCount.htm"></script>0</span>
+<span id="tonglan"></span>
+<span id="wordlink"><script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ad_004.js"></script></span>
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ad_004.js"></script>
+<span id="bookss"><script language="JavaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/getBookData.htm"></script></span>
+</div>   
+<script language="javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/favorite.js"></script>
+
+<script language="javaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/dialog_utf8.js"></script>
+<script language="javaScript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/mail.js"></script>  
+<script type="text/javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/favorbox.js"></script>
+<script language="javascript" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/clipboard.js"></script>
+<script language="javaScript"> 
+	var thistid=352262; 
+	
+	//收藏按钮
+	var favor_url = 'http://developer.51cto.com/art/201208/352262.htm';  // 如：http://bbs.51cto.com/thread-789649-1.html
+	var favor_title = 'Google Map中Geocoder接口来反向地址解析';       //  
+	
+	//绑定复制按钮
+	copy('msnqqcopy', 'http://developer.51cto.com/art/201208/352262.htm', '分享到MSN/QQ的链接复制成功!');
+//	copy('bbscopy', '[url=http://developer.51cto.com/art/201208/352262.htm][u]Google Map中Geocoder接口来反向地址解析[/u][/url]', '分享到论坛的UBB代码复制成功!');
+
+</script><div style="position: absolute; left: 901px; top: 3915px; width: 34px; height: 13px; z-index: 99;"><embed id="ZeroClipboardMovie_1" src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" name="ZeroClipboardMovie_1" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=1&amp;width=34&amp;height=13" wmode="transparent" align="middle" height="13" width="34"></div> 
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/index.htm" charset="utf-8"></script>
+<script src="Google%20Map%E4%B8%ADGeocoder%E6%8E%A5%E5%8F%A3%E6%9D%A5%E5%8F%8D%E5%90%91%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%20-%2051CTO.COM_files/count_002.htm" language="javascript"></script>
+<script language="javascript">
+document.getElementById('books').innerHTML = document.getElementById("bookss").innerHTML; 
+</script>
+
+
+
+</body></html>

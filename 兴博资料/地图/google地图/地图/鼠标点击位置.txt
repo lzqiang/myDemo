@@ -1,0 +1,1 @@
+document.onclick=function(ev){var oEvent=ev||event;var oLeft=oEvent.clientX+'px';var oTop=oEvent.clientY+'px'alert(oLeft+','+oTop)}

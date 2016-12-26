@@ -1,0 +1,27 @@
+var geoCoder = new google.maps.Geocoder();
+// 反地理解析
+function replaceLoc(x,y){//把纬度，经度，换成地址
+   var mypoint=new google.maps.LatLng(x,y);
+   geoCoder.geocode({ 
+        location:mypoint
+     }, 
+   function(results,state) {  
+	 getLocInfo(results,state);
+   }); 
+}
+
+function getLocInfo(results,state){//获取地理位置
+	var locAddress="未知";
+		if (state = google.maps.GeocoderStatus.OK) { 
+              if (results[0]||results!=null) { 
+                  //locAddress=(results[0].formatted_address).substring(0,(results[0].formatted_address).indexOf(' '));
+                  var loc=results[0].address_components;
+                  for(var i=0;i<loc.length;i++){
+                    if(loc[i].types=='route'){//获取路线名称
+                       locAddress=loc[i].short_name;
+                    }
+                  }
+                    linesDesc.push(locAddress);
+		            showWay2(linesDesc);
+                } 
+            }

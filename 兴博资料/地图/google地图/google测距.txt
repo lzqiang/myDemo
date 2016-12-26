@@ -1,0 +1,304 @@
+var flag;//第一次执行单击事件 0不画线
+var dravelWayDesc; //坐标字符串
+var backFlag;//双击取消画线功能 禁止单击 禁止双击
+var linesDesc;//路线描述数组
+var step;//没有点击画路线 禁止撤销
+var lineArea; //线对象
+var lineArray;//坐标数组
+var polyArray;//坐标数组
+var wayLayer;//marker图层
+var markerArray;//marker对象数组
+var layer;//0 启动 图层功能 1 关闭图层功能
+var markerpoint;//marker临时坐标组，因为 名称和定位不同步
+var total;//存放路线距离和
+var start=0;//第一次绑定单击事件
+
+function distance(){//调用开启整个js
+ flag=0;//第一次执行单击事件 0不画线
+ dravelWayDesc =""; //坐标字符串
+ backFlag=0;//双击取消画线功能 禁止单击 禁止双击
+ linesDesc=[];//路线描述数组
+ step=0;//没有点击画路线 禁止撤销
+ lineArea=null; //线对象
+ lineArray=[];//坐标数组
+ polyArray=[];//坐标数组
+ wayLayer=new Array();//marker图层
+ markerArray=new Array();//marker对象数组
+ layer=0//0 启动 图层功能 1 关闭图层功能
+ markerpoint=new Array();//marker临时坐标组，因为 名称和定位不同步
+ total=new Array();//存放路线距离和;
+ addEvent(map);//添加单击事件
+}
+//-------------------------------提示
+function message(contents,times){
+art.dialog({//提示框 1.5/s
+	    time: times,
+	    content: contents
+	  });
+}
+//-------------------------------------------测距
+function betweenFrom(latlng){
+         var latlng1 = latlng[latlng.length-1].split(',');//倒数第一的坐标
+         var latlng2 = latlng[latlng.length-2].split(','); //倒数第二的坐标
+         var R = 6378.137; //地球半径 单位km 
+         var a1= (latlng1[0]) * Math.PI /180;//纬度
+         var b1= (latlng2[0]) * Math.PI /180;//纬度
+         var a = (latlng1[0] - latlng2[0]) * Math.PI / 180;//纬度减纬度
+         var b = (latlng1[1] - latlng2[1]) * Math.PI / 180;//经度减经度
+         var s=2*Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2)+Math.cos(a1)*Math.cos(b1)*Math.pow(Math.sin(b/2),2)));//计算两点间距离的公式
+         s=s*R;
+         s=Math.round(s*10000)/10000;
+         return s;
+        } 
+//线路描述显示方法
+
+function del(sumarray){
+
+var list = art.dialog.list;//删除弹出框
+for (var i in list) {
+    list[i].close();
+};
+var s=0;
+ for(var i=0;i<sumarray.length;i++){
+     s+=sumarray[i];
+ }
+
+art.dialog({
+		id:"dravelWayDesc",
+		padding: 0,
+    	title: '提示',
+    	left: '100%',
+   	 	top: '0%',
+   	 	height: 30,
+   	 	resize: true,
+	    content: "<iframe id='frameShowWay' name='frameShowWay' src='../map/showDistance.jsp?cfg="+s+"' height='auto' width='100%' frameborder='0'></iframe>"
+	});
+}
+
+function showWay2(cfg){
+var desc=cfg;
+if(cfg[cfg.length-1]==cfg[cfg.length-2]){//去重复
+   cfg.pop();
+} 
+
+cfg='';
+var list = art.dialog.list;//删除弹出框
+for (var i in list) {
+    list[i].close();
+};
+
+var sum=0;
+if(markerpoint.length>1){//两点坐标
+      var s=betweenFrom(markerpoint);
+      total.push(s);
+}
+
+for(var i=0;i<total.length;i++){
+   sum+=total[i];
+}
+
+art.dialog({
+		id:"dravelWayDesc",
+		padding: 0,
+    	title: '提示',
+    	left: '100%',
+   	 	top: '0%',
+   	 	height: 30,
+   	 	resize: true,
+	    content: "<iframe id='frameShowWay' name='frameShowWay' src='../map/showDistance.jsp?cfg="+sum+"' height='auto' width='100%' frameborder='0'></iframe>"
+	}); 
+	
+	if(layer==0&&desc.length!=0){//判断是否准许添加图标 和 地理名称不能为零
+                var array=markerpoint[markerpoint.length-1].split(',');//坐标点数组
+                
+				var mypoint=new google.maps.LatLng(array[0],array[1]);
+				var iconImg="../images/mapicon/car_tu11.png";	
+			    var labeltext="&nbsp;<font color='#fff'>"+desc[desc.length-1]+"</font>&nbsp;";
+		    	var carnumlayer = new MyMarker(map,{latlng:mypoint,labelClass:'markerlabel2',labelText:labeltext,image:""});
+		    	//添加覆盖物
+			    marker = new google.maps.Marker({
+			        position: mypoint,
+			        map: map,
+			        icon: iconImg
+			    }); 
+				wayLayer.push(carnumlayer);//文字图层
+				markerArray.push(marker);//标记图层
+		 }	 
+}
+//--------------------------------------------//实现画线功能
+function drawLine2(maps,pathArray){
+  lineArea = new google.maps.Polyline({                    
+		path: pathArray,  //路径数组                     
+		strokeColor: "#00ffff",                 
+		strokeOpacity: 1.0,                   
+		strokeWeight: 5,//粗细                
+		fillColor: "#00F",//填充色 
+		strokeOpacity:0.4, //透明度  
+		strokeStyle:"solid", //补充线样式 
+		strokeDasharray:[10,5]            
+		});             
+		lineArea.setMap(maps);//在地图上画线
+		polyArray.push(lineArea);
+}
+var geoCoder = new google.maps.Geocoder();
+// 反地理解析
+function replaceLoc(x,y){//把纬度，经度，换成地址
+   var mypoint=new google.maps.LatLng(x,y);
+   geoCoder.geocode({ 
+        location:mypoint
+     }, 
+   function(results,state) {  
+	 getLocInfo(results,state);
+   }); 
+}
+
+function getLocInfo(results,state){//获取地理位置
+	var locAddress="未知";
+		if (state = google.maps.GeocoderStatus.OK) { 
+              if (results[0]||results!=null) { 
+                  //locAddress=(results[0].formatted_address).substring(0,(results[0].formatted_address).indexOf(' '));
+                  var loc=results[0].address_components;
+                  for(var i=0;i<loc.length;i++){
+                    if(loc[i].types=='route'){//获取路线名称
+                       locAddress=loc[i].short_name;
+                    }
+                  }
+                    linesDesc.push(locAddress);
+		            showWay2(linesDesc);
+                } 
+            }
+}
+//添加地图上的单击事件 google 3.9
+function addEvent(map){
+    //绑定单击事件
+    if(start==0){
+     google.maps.event.addListener(map,"click",function(event){
+		     lineArray.push(new google.maps.LatLng(event.latLng.lat(),event.latLng.lng()));//放入坐标对象数组
+		     markerpoint.push(event.latLng.lat()+","+event.latLng.lng());
+		     if(flag==0&&backFlag==0){
+		        flag=1;//处理第一次单击
+		        replaceLoc(event.latLng.lat(),event.latLng.lng());
+		      }else{
+		        if (lineArray.length<1) {//第一次单击不做处理，第二次单击 把第一次与第二次连线
+				}else{
+				  if(backFlag==0){
+				      drawLine2(map,lineArray);//画线方法
+				      step=1;//启动撤销功能
+				      //----------------------------------反地理地址解析处理
+		              replaceLoc(event.latLng.lat(),event.latLng.lng());
+				  }else{
+				      layer=1;//取消添加marker标记功能
+				  }
+			    }
+		      }
+    });
+     start=1;//取消绑定
+   }
+}
+  
+
+//清除地图上的覆盖物
+function clearAll2(){
+ 	//根据倾倒点ID将数据库中的倾倒点范围清除掉
+ 	  for(var i=0;i<polyArray.length;i++){
+			     polyArray[i].setMap(null);
+			   }
+			   markerpoint=[];
+			   polyArray=[];//初始化
+			   lineArray=[];
+			   drawLine2(map,lineArray);
+			   backFlag=0;//开启单击画线功能
+			   dravelWayDesc="null";//初始化 request请求 得到字符串null
+			   flag=0;
+			   dravelWayPoint=null;
+			   linesDesc=[];
+			   markerpoint=[];///清除计算距离的坐标点
+			   
+			   total=[];//清空测量值
+			   del(total);//数据清空
+	           //清除自定义层
+			   for(var i=0;i<markerArray.length;i++){
+				    markerArray[i].setMap(null);
+					var slayer=wayLayer[i];
+					slayer.setMap(null);
+				}
+				//清空
+				wayLayer=[];
+				markerArray=[];
+				layer=0;//禁止添加图层
+				//showWay2(linesDesc);
+}
+//建筑工地范围画线后退显示方法
+function backOneStep2(){
+      if(polyArray.length&&step==1){   
+         linesDesc.pop();//路线描述 后退   
+         polyArray[polyArray.length-1].setMap(null);//路线清楚
+         if(markerArray.length){
+	         markerArray[markerArray.length-1].setMap(null)//覆盖物的清楚
+	         wayLayer[wayLayer.length-1].setMap(null);
+	         markerpoint.pop();//marker坐标标删除
+	         wayLayer.pop();//txt删除空值
+	         markerArray.pop();//删除marker图标
+          } 
+         total.pop();
+		 del(total);//数据清空
+		 polyArray.pop();
+		 lineArray.pop();
+		 if(polyArray.length==0){
+		      //清除自定义层
+			   for(var i=0;i<markerArray.length;i++){
+				    markerArray[i].setMap(null);
+					var slayer=wayLayer[i];
+					slayer.setMap(null);
+			   }
+				//清空
+			   wayLayer=[];
+			   markerArray=[];
+			   layer=0;//禁止添加图层
+		       polyArray=[];//初始化
+			   lineArray=[];
+			   backFlag=0;//开启单击画线功能
+			   dravelWayDesc="null";//初始化 request请求 得到字符串null
+			   linesDesc=[];//路线描述 后退
+		       step=0;//撤销设为无效
+		       total=[];
+		       del(total);//数据清空
+		 }
+      }else{}
+}
+function clearDistance(){
+//根据倾倒点ID将数据库中的倾倒点范围清除掉
+ 	  //根据倾倒点ID将数据库中的倾倒点范围清除掉
+ 	  for(var i=0;i<polyArray.length;i++){
+			     polyArray[i].setMap(null);
+			   }
+			   markerpoint=[];
+			   polyArray=[];//初始化
+			   lineArray=[];
+			   drawLine2(map,lineArray);
+			   backFlag=1;//关闭单击画线功能
+			   dravelWayDesc="null";//初始化 request请求 得到字符串null
+			   flag=1;//关闭
+			   dravelWayPoint=null;
+			   linesDesc=[];
+			   markerpoint=[];///清除计算距离的坐标点
+			   
+			   total=[];//清空测量值
+			   del(total);//数据清空
+	           //清除自定义层
+			   for(var i=0;i<markerArray.length;i++){
+				    markerArray[i].setMap(null);
+					var slayer=wayLayer[i];
+					slayer.setMap(null);
+				}
+				//清空
+				wayLayer=[];
+				markerArray=[];
+				layer=0;//禁止添加图层
+				//showWay2(linesDesc);
+			   var list = art.dialog.list;
+				for (var i in list) {
+				    list[i].close();
+				}
+}
+      

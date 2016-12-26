@@ -1,0 +1,7 @@
+左上角点LTPoint:  ( bounds.getSouthWest().lng, bounds.getNorthEast().lat)　右上角点RTPoint: bounds.getNorthEast()
+
+ 　　左下角点LBPoint:　bounds.getSouthWest()　　　　　　　　　　　                  右下角点RBPoint: bounds.getNorthEast().lng,bounds.getSouthWest().lat)
+
+ 
+
+ map.getBounds().getSouthWest().lng lat 和 .getNorthEast() .lng lat 

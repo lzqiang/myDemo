@@ -1,0 +1,12 @@
+// 定义地图对象
+
+var mapObj = new AMap.Map("container");
+
+...
+
+// 获取两点间距离，单位为米
+
+var distance = mapObj.getDistance(new AMap.LngLat(116.39, 39.98), new AMap.LngLat(116.39, 39.97));
+
+alert("distance is: " + distance);
+

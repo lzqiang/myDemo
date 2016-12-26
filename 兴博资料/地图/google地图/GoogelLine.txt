@@ -1,0 +1,9 @@
+ lineArea = new google.maps.Polyline({                    
+ path: linePath,  //路径数组                     
+ strokeColor: "#FF0000",                 
+ strokeOpacity: 1.0,                   
+ strokeWeight: 1 //粗细                
+ // fillColor: "#FF0000",//填充色 
+ //  fillOpacity: 0.1//透明度               
+});             
+lineArea.setMap(map); 

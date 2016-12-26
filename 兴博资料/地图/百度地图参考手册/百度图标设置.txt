@@ -1,0 +1,19 @@
+  5.添加label:
+var myLabel = new BMap.Label(
+	"<a style='color:red;text-decoration:none' target='_blank' href='http://dev.baidu.com/wiki/static/index.htm'>百度地图API 0元</a>",     //为lable填写内容 
+    {offset:new BMap.Size(-60,-60),//label的偏移量，为了让label的中心显示在点上
+     position:point
+    }
+);                                //label的位置
+myLabel.setStyle({//给label设置样式，任意的CSS都是可以的
+   fontSize:"14px",               //字号
+   border:"0",                    //边
+   height:"120px",                //高度
+   width:"125px",                 //宽
+   textAlign:"center",            //文字水平居中显示
+   lineHeight:"120px",            //行高，文字垂直居中显示
+   background:"url(http://cdn1.iconfinder.com/data/icons/CrystalClear/128x128/actions/gohome.png)",    //背景图片，这是房产标注的关键！
+   cursor:"pointer"
+});
+myLabel.setTitle("我是文本标注label");               //为label添加鼠标提示
+map.addOverlay(myLabel);                             //把label添加到地图上

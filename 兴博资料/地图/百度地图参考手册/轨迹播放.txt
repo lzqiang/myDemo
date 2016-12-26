@@ -1,0 +1,240 @@
+ //begin 兴博地图对象的定义
+	function xbMaps(){};
+	xbMaps.prototype.VERSION = '1.0';	// 版本
+	xbMaps.prototype.currtMap;			// 当前的百度地图
+	xbMaps.prototype.enterprisename;	//人姓名
+	xbMaps.prototype.telephone;			//电话
+	xbMaps.prototype.detailaddress;		//地址
+	xbMaps.prototype.flag;				//类型
+	
+	var map = new BMap.Map("map");   // 创建地图实例
+    map.enableScrollWheelZoom();
+	map.addControl(new BMap.NavigationControl());
+	map.addControl(new BMap.MapTypeControl());
+	map.disableDoubleClickZoom();
+	map.addControl(new BMap.OverviewMapControl());
+	
+	var bounds = null;
+	var linesPoints = null;
+		
+	var point = new BMap.Point("117.310", "31.860");
+    map.centerAndZoom(point, 12);
+    var xbMap = new xbMaps();
+	xbMap.currtMap = map;
+	
+	
+	/**
+	 * 添加地图企业覆盖物
+	 * @param {Object} point marker的位置
+	 * @param {Object} infos marker显示的信息
+	 */
+	xbMaps.prototype.addMarker = function (point,infos){
+		 var currt = xbMap;
+		 // 创建企业图标对象  
+		 var myIcon = new BMap.Icon("../axfw/images/qy.png", new BMap.Size(50, 50), {  
+			// 指定定位位置。当标注显示在地图上时，其所指向的地理位置距离图标左上  
+		   offset: new BMap.Size(10, 25)  
+		   // 设置图片偏移。  
+		   //imageOffset: new BMap.Size(0, 0 - index * 25)   // 设置图片偏移  
+		 });
+		 // 创建标注对象并添加到地图
+		 
+		 var marker = new BMap.Marker(point, {icon: myIcon});
+		 currt.currtMap.addOverlay(marker);
+		 
+		 marker.addEventListener("click", function(){
+		  var qycontent="";//弹出框显示内容
+		  var titname="";//弹出框标题
+ 	       if(infos.flag=='1'){
+ 	       		 titname="<span style='font-size:13px;font-family: 微软雅黑'>企业信息</span>";
+ 	       		 qycontent="<span style='font-size:13px;'>名称："+infos.enterprisename+"<br/>联系电话："+infos.telephone+"<br/>地址："+infos.detailaddress+"</span><br/>&nbsp;";
+ 	       }else if(infos.flag=='2'){
+ 	         	 titname="<span style='font-size:13px;font-family: 微软雅黑'>服务机构信息<span";
+	  			 qycontent="<span style='font-size:13px;'>名称："+infos.enterprisename+"<br/>联系电话："+infos.telephone+"<br/>地址："+infos.detailaddress+"</span><br/>&nbsp;";
+          }else if (infos.flag=='3'){
+          		 titname="<span style='font-size:13px;font-family: 微软雅黑'>自愿者信息<span>";
+          		 qycontent="<span style='font-size:13px;'>姓名："+infos.enterprisename+"<br/>联系电话："+infos.telephone+"<br/>地址："+infos.detailaddress+"</span><br/>&nbsp;";
+          }
+          else{
+         		 titname="<span style='font-size:13px;font-family: 微软雅黑'>站点人员信息<span>";
+          		 qycontent="<span style='font-size:13px;'>姓名："+infos.enterprisename+"<br/>联系电话："+infos.telephone+"<br/>岗位："+infos.detailaddress+"</span><br/>&nbsp;";
+          }
+           //设置弹出框
+		  var searchInfoWind3=new BMapLib.SearchInfoWindow(map,qycontent, {
+	        title  : titname,      //标题
+	        width  : 200,             //宽度
+	        panel  : "panel",         //检索结果面板
+	        enableAutoPan : true,     //自动平移
+	        searchTypes   :[]
+	    }); 
+		  searchInfoWind3.open(marker); //在marker上打开信息窗口
+		
+		});
+	}
+	
+	
+	/**
+	 * 添加老人覆盖物
+	 * @param {Object} point marker的位置
+	 * @param {Object} infos marker显示的信息
+	 */
+	xbMaps.prototype.addMarkerLr = function (point,infos){
+		 var currt = xbMap;
+		 // 创建企业图标对象  
+		 var myIcon = new BMap.Icon("../axfw/images/lr.png", new BMap.Size(50, 50), {  
+			// 指定定位位置。当标注显示在地图上时，其所指向的地理位置距离图标左上  
+		   offset: new BMap.Size(10, 25) 
+		 });
+		 
+		  // 创建标注对象并添加到地图
+		  var marker = new BMap.Marker(point, {icon: myIcon});
+		  currt.currtMap.addOverlay(marker);
+		
+		 marker.addEventListener("click", function(){
+		   var qycontent="<span style='font-size:13px;'>名称："+infos.enterprisename+"<br/>联系电话："+infos.telephone+"<br/>地址："+infos.detailaddress+"<span><br/>&nbsp;";//弹出框显示内容
+          //设置弹出框
+		  var searchInfoWind=new BMapLib.SearchInfoWindow(map,qycontent, {
+	        title  : "<span style='font-size:13px;font-family: 微软雅黑'>服务对象信息</span>",      //标题
+	        width  : 200,             //宽度
+	        panel  : "panel",         //检索结果面板
+	        enableAutoPan : true,     //自动平移
+	        searchTypes   :[]
+	    }); 
+		  searchInfoWind.open(marker); //在marker上打开信息窗口
+		});
+	}
+	
+	
+	 
+	var ptss = new Array();
+	 var pts = [];
+	var kk=0;
+	//处理轨迹
+	function  chuliguiji(msg){
+	     kk=0;
+		ptss = new Array();
+		 pts = [];
+		 var jsonData=eval("("+msg+")");//处理返回的json格式
+	              
+	               
+	                var pt0 = new BMap.Point(jsonData.fwry.GPSLA,jsonData.fwry.GPSLU);
+	                var fwryinfo=new xbMaps();//服务人员
+	                
+	                fwryinfo.enterprisename=jsonData.fwry.NAME;
+	                fwryinfo.telephone=jsonData.fwry.TELEPHONE;
+	                fwryinfo.detailaddress=jsonData.fwry.ADDRESS;
+	                fwryinfo.flag=jsonData.fwry.ENTERTYPE;
+	               
+	                xbMap.addMarker(pt0,fwryinfo);
+	                pts.push(pt0);
+	                  var driving = new BMap.DrivingRoute(map);//驾车实例
+	              for(var k=0;k<jsonData.fwdxs.length;k++){
+	              
+			     	  var pt1 = new BMap.Point(jsonData.fwdxs[k].gpsla, jsonData.fwdxs[k].gpslu);
+					  pts.push(pt1);
+					  var fwdxinfo=new xbMaps();//服务对象
+					  	fwdxinfo.enterprisename=jsonData.fwdxs[k].eldername;
+	                	fwdxinfo.telephone=jsonData.fwdxs[k].rootphone;
+	                	fwdxinfo.detailaddress=jsonData.fwdxs[k].detailaddress;
+					    xbMap.addMarkerLr(pt1, fwdxinfo);//把加载的数据以标注形式添加到地图上
+					    var pt2 =pt0;
+						    if(k>0){	
+							  pt2 = new BMap.Point(jsonData.fwdxs[k-1].gpsla, j sonData.fwdxs[k-1].gpslu);
+								}
+					   		 driving.search(pt2,pt1);    
+				} 
+				
+				   map.setViewport(pts);
+				   xbMap.currtMap.centerAndZoom(pts,15);
+					   
+				  
+				
+				if(pts.length>1){  
+				  driving.setSearchCompleteCallback(function(){
+					       		 var  pts1 = driving.getResults().getPlan(0).getRoute(0).getPath();    //通过驾车实例，获得一系列点的数组   
+					             var polyline = new BMap.Polyline(pts1);           
+					               xbMap.currtMap.addOverlay(polyline);
+					               ptss=ptss.concat(pts1);
+					               }); 
+				setTimeout(function(){
+	   					run(kk);
+						},800);
+						}
+		
+	}
+	
+	
+	/*function run(){
+        var paths = ptss.length;    //获得有几个点
+         // 创建企业图标对象  
+		 var myIcon = new BMap.Icon("../axfw/images/fwrytb.png", new BMap.Size(32, 70), {  
+			// 指定定位位置。当标注显示在地图上时，其所指向的地理位置距离图标左上  
+		   offset: new BMap.Size(0, 0) 
+		 });
+        var carMk = new BMap.Marker(ptss[0],{icon: myIcon});
+        map.addOverlay(carMk);
+        i=0;
+        function resetMkPoint(i){
+            carMk.setPosition(ptss[i]);
+            if(i < paths){
+                setTimeout(function(){
+                    i++;
+                    resetMkPoint(i);
+                },10);
+            }
+        }
+        setTimeout(function(){
+            resetMkPoint(5);
+        },10)
+
+	}*/
+	// 创建企业图标对象  
+		 var fwrytbIcon = new BMap.Icon("../axfw/images/fwrytb.png", new BMap.Size(32, 70), {  
+			// 指定定位位置。当标注显示在地图上时，其所指向的地理位置距离图标左上  
+		   offset: new BMap.Size(0, 0) 
+		 });
+	 var carMk;
+	function run(kl){
+	 var driving = new BMap.DrivingRoute(map);    //驾车实例
+      driving.search(pts[kl], pts[kl+1]);
+      driving.s
+Administrator 17:39:56
+
+  function run(kl){
+	 var driving = new BMap.DrivingRoute(map);    //驾车实例
+      driving.search(pts[kl], pts[kl+1]);
+      driving.setSearchCompleteCallback(function(){
+        var ptsstss = driving.getResults().getPlan(0).getRoute(0).getPath();    //通过驾车实例，获得一系列点的数组
+        var paths = ptsstss.length;    //获得有几个点
+		 
+       if(kl>0){
+        	// carMk.setPosition(pts[kl]);
+       }else{
+            carMk = new BMap.Marker(pts[0],{icon:fwrytbIcon});
+       		 map.addOverlay(carMk);
+       }
+        i=0;
+        function resetMkPoint(i){
+            carMk.setPosition(ptsstss[i]);
+            if(i < paths){
+                setTimeout(function(){
+                    i++;
+                    resetMkPoint(i);
+                },10);
+            }else{
+            	tuzhu();
+            }
+        }
+        setTimeout(function(){
+            resetMkPoint(5);
+        },10)
+
+    });
+  }
+  
+  function tuzhu(){
+  	if(kk<pts.length){
+  		kk++;
+  		run(kk)
+  	}
+  }

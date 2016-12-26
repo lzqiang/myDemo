@@ -1,0 +1,1055 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>添加点覆盖物</title>
+<!--<style>
+body{ margin:0; padding:0;font:12px/16px Verdana, Helvetica, Arial, sans-serif;}
+</style>-->
+<link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+<script language="javascript">
+var mapObj,tool,view,scale;
+function mapInit(){
+	mapObj = new AMap.Map("map",{
+		center:new AMap.LngLat(116.392936,39.919479)
+	});
+	mapObj.plugin(["AMap.ToolBar","AMap.OverView,AMap.Scale"],function(){
+		//加载工具条
+		tool = new AMap.ToolBar({
+			direction:false,
+			ruler:false,
+			autoPosition:false//禁止自动定位
+		});
+		mapObj.addControl(tool);
+		//加载鹰眼
+		view = new AMap.OverView({visible:false});
+		mapObj.addControl(view);
+		//加载比例尺
+		scale = new AMap.Scale();
+		mapObj.addControl(scale);
+	});
+}
+function addMarker(){
+	//构建点对象
+	var marker = new AMap.Marker({
+		map:mapObj,
+		position:new AMap.LngLat(116.373881,39.907409), //基点位置
+		icon:"http://webapi.amap.com/images/marker_sprite.png", //marker图标，直接传递地址url
+		offset:{x:-8,y:-34} //相对于基点的位置
+	});
+
+
+	var info = [];
+	info.push("<b>&nbsp;&nbsp;高德软件</b>");
+	info.push("&nbsp;&nbsp;电话 : 010-84107000   邮编 : 100102");
+	info.push("&nbsp;&nbsp;地址 : 北京市望京阜通东大街方恒国际中心A座16层");
+	
+	var inforWindow = new AMap.InfoWindow({
+		offset:new AMap.Pixel(0,-30),
+		content:info.join("<br />")
+	});
+	
+	AMap.event.addListener(marker,'click',function(e){
+		inforWindow.open(mapObj,marker.getPosition());
+	})
+	
+	
+	mapObj.setCenter(marker.getPosition());
+}
+</script>
+</head>
+<body onLoad="mapInit()"> 
+<div id="map" style="width:659px;height:400px;border:#F6F6F6 solid 1px;"></div>
+<a href="javascript:addMarker()">添加普通点覆盖物</a>
+</body>
+</html>
+
+--------------------------------------------------------------------------------------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>删除地图上的覆盖物</title>
+<!--<style>
+body{ margin:0; padding:0;font:12px/16px Verdana, Helvetica, Arial, sans-serif;}
+</style>-->
+<link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+<script language="javascript">
+
+var mapObj,toolbar,overview,scale,marker,polyline1,polyline2,polygon1,polygon2,circle,Mmarker;
+function mapInit()
+{
+	var opt = {
+	level:13, //设置地图缩放级别
+	center:new AMap.LngLat(116.397428,39.90923), //设置地图中心点	
+	doubleClickZoom:true, //双击放大地图
+	scrollWheel:true//鼠标滚轮缩放地图
+	}
+	mapObj = new AMap.Map("iCenter",opt);
+	mapObj.plugin(["AMap.ToolBar","AMap.OverView","AMap.Scale"],function()
+	{ 
+	toolbar = new AMap.ToolBar();
+	toolbar.autoPosition=false; //加载工具条
+    toolbar.hideDirection();	
+	mapObj.addControl(toolbar);  	
+	overview = new AMap.OverView(); //加载鹰眼
+	mapObj.addControl(overview);  	
+	scale = new AMap.Scale(); //加载比例尺
+	mapObj.addControl(scale);
+	}); 
+}
+function addMarker(){  //画点
+   mapObj.clearMap();
+   marker = new AMap.Marker({ 					 			 
+   position:new AMap.LngLat(116.397428,39.90923), //位置 
+   icon:"http://webapi.amap.com/images/0.png",//复杂图标
+   offset:new AMap.Pixel(0,-36), //相对于基点的偏移量
+   draggable:true, //可拖动 
+   cursor:"default",//鼠标悬停时显示的光标
+   visible:true//可见
+   }); 
+ marker.setMap(mapObj);
+}
+function addMPolyline() {  //在地图上画多折线
+     mapObj.clearMap();
+	 var arr=new Array();//经纬度坐标数组 
+     arr.push(new AMap.LngLat("116.368904","39.913423")); 
+     arr.push(new AMap.LngLat("116.382122","39.901176")); 
+     arr.push(new AMap.LngLat("116.387271","39.912501")); 
+     arr.push(new AMap.LngLat("116.398258","39.904600")); 
+    polyline1=new AMap.Polyline({ 
+	 
+	 path:arr, 
+	 //线颜色 
+	 strokeColor:"#F00", 
+	 //线透明度 
+	 strokeOpacity:0.4, 
+	 //线宽 
+	 strokeWeight:3, 
+	 //线样式 
+	 strokeStyle:"dashed", 
+	 //补充线样式 
+	 strokeDasharray:[10,5] 
+	 }); 
+	  polyline1.setMap(mapObj);
+ 
+}
+function addMPolygon(){  //在地图上画多边形
+     mapObj.clearMap();
+	 var arr1=new Array();//经纬度坐标数组 
+     arr1.push(new AMap.LngLat("116.403322","39.920255")); 
+     arr1.push(new AMap.LngLat("116.410703","39.897555")); 
+     arr1.push(new AMap.LngLat("116.402292","39.892353")); 
+     arr1.push(new AMap.LngLat("116.389846","39.891365")); 
+	 polygon1=new AMap.Polygon({ 
+	 path:arr1, //线经纬度数组
+	 editable:false, //是否可编辑 
+	 strokeColor:"#0000ff", //线颜色
+	 strokeOpacity:0.2, //线透明度   
+	 strokeWeight:3, //线宽 
+	 fillColor: "#f5deb3", //填充色
+	 fillOpacity: 0.35 ,//填充透明度 
+	 }); 
+	 polygon1.setMap(mapObj);
+	
+}
+function addMCircle() {  //在地图上画圆
+   mapObj.clearMap();
+   circle = new AMap.Circle({ 
+   center:new AMap.LngLat("116.403322","39.900255"),// 圆心
+   radius:1000, //半径
+   strokeColor: "#F33", //线颜色
+   strokeOpacity: 1, //线透明度
+   strokeWeight: 3, //线粗细度
+   fillColor: "#ee2200", //填充颜色
+   fillOpacity: 0.35 ,//填充透明度
+   }); 
+   circle.setMap(mapObj);
+ 
+}
+function addAllOverlays(){
+	mapObj.clearMap();
+	//添加点
+  Mmarker=new AMap.Marker({
+    map:mapObj,  
+	icon:"http://webapi.amap.com/images/0.png",
+	position:new AMap.LngLat(116.403322,39.900255)
+	});
+	//添加线
+  var arr=new Array();  //经纬度坐标数组 
+   arr.push(new AMap.LngLat("116.368904","39.913423")); 
+   arr.push(new AMap.LngLat("116.382122","39.901176")); 
+   arr.push(new AMap.LngLat("116.387271","39.912501")); 
+   arr.push(new AMap.LngLat("116.398258","39.904600")); 
+   polyline2=new AMap.Polyline({ 
+   path:arr, //线经纬度数组
+   map:mapObj,  
+   strokeColor:"#F00", //线颜色
+   strokeOpacity:0.4, //线透明度 
+   strokeWeight:3, //线宽
+   strokeStyle:"dashed", //线样式
+   strokeDasharray:[10,5] //补充线样式 
+   }); 
+	//添加多边形
+   var arr1=new Array();  //经纬度坐标数组 
+   arr1.push(new AMap.LngLat("116.403322","39.920255")); 
+   arr1.push(new AMap.LngLat("116.410703","39.897555")); 
+   arr1.push(new AMap.LngLat("116.402292","39.892353")); 
+   arr1.push(new AMap.LngLat("116.389846","39.891365")); 
+   polygon2=new AMap.Polygon({ 
+   path:arr1,//面经纬度数字
+   map:mapObj,  
+   strokeColor:"#0000ff", //线颜色
+   strokeOpacity:0.2, //线透明度 
+   strokeWeight:3,    //线宽 
+   fillColor: "#f5deb3", //填充色
+   fillOpacity: 0.35 ,//填充透明度
+  }); 
+	
+}
+function removemarker(){
+  marker.setMap(null);
+
+   }
+function removepolyline(){
+  polyline1.setMap(null);
+   }
+function removePolygon(){ 
+ polygon1.setMap(null);//删除多边形
+ }
+function removeCircle(){
+  circle.setMap(null);
+ }
+ function removeAllOverlays(){
+   mapObj.clearMap();//删除所有覆盖物
+ }
+
+</script>
+</head>
+<body onload="mapInit();">
+<table border="0" cellspacing="0" cellpadding="0" width="400px">
+  <tr>
+    <td colspan="5"><div id="iCenter" style="height:400px;width:659px"></div></td>
+  </tr>
+  <tr>
+  	<td><a href="javascript:addMarker();">添加点</a></td>
+  	<td><a href="javascript:addMPolyline();">添加线</a></td>
+  	<td><a href="javascript:addMCircle();">添加圆</a></td>
+  	<td><a href="javascript:addMPolygon();">添加多边形</a></td>
+  	<td><a href="javascript:addAllOverlays();">添加一组覆盖物</a></td>
+  </tr>
+  <tr>
+  	<td><a href="javascript:removemarker();">删除点</a></td>
+  	<td><a href="javascript:removepolyline();">删除线</a></td>
+  	<td><a href="javascript:removeCircle();">删除圆</a></td>
+  	<td><a href="javascript:removePolygon();">删除多边形</a></td>
+  	<td><a href="javascript:removeAllOverlays();">删除一组覆盖物</a></td>
+  	
+  </tr>
+
+</table>
+</body>
+</html>
+
+
+--------------------------------------------------------------------------------------------
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>添加自定义文本标注</title>
+<style>
+.markerlabel{position:relative;}
+.markerlabel span{background-color: #ffffff;color:#000;border:1px solid red;position:absolute;top:-10px;left:30px;white-space:nowrap}
+</style>
+<link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+<script language="javascript">
+var mapObj,tool,view,scale;
+function mapInit(){
+	mapObj = new AMap.Map("map",{
+		center:new AMap.LngLat(116.392936,39.919479)
+	});
+	mapObj.plugin(["AMap.ToolBar","AMap.OverView,AMap.Scale"],function(){
+		//加载工具条
+		tool = new AMap.ToolBar({
+			direction:false,
+			ruler:false,
+			autoPosition:false//禁止自动定位
+		});
+		mapObj.addControl(tool);
+		//加载鹰眼
+		view = new AMap.OverView({visible:false});
+		mapObj.addControl(view);
+		//加载比例尺
+		scale = new AMap.Scale();
+		mapObj.addControl(scale);
+		mapObj.setZoom("12");
+	});
+}
+function addCustomMarker(){
+	//自定义覆盖物dom 元素
+	var m = document.createElement("div");
+	m.className = "markerlabel";
+
+	var markeruri= document.createElement("img");
+     markeruri.className="markerlnglat";
+	 markeruri.src="http://webapi.amap.com/images/marker_sprite.png";	
+	 m.appendChild(markeruri);
+	 var n = document.createElement("span");
+
+	 n.innerHTML = "文本标注可以自定义哦";
+	 m.appendChild(n);
+	var marker = new AMap.Marker({
+		map:mapObj,
+		position:new AMap.LngLat(116.373881,39.907409), //基点位置
+		offset:new AMap.Pixel(0,0), //相对于基点的偏移位置
+		//draggable:true,  //是否可拖动
+		content:m   //自定义覆盖物内容
+	});
+	
+	
+}
+</script>
+</head>
+<body onLoad="mapInit()">
+<div id="map" style="width:659px;height:400px;border:#F6F6F6 solid 1px;"></div>
+<a href="javascript:addCustomMarker()">添加自定义文本标注</a>
+
+</body>
+</html>
+----------------------------------------------------------------------------------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>设置地图自适应视野级别范围</title>
+<!--<style>
+body{ margin:0; padding:0;font:12px/16px Verdana, Helvetica, Arial, sans-serif;}
+</style>-->
+<link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+<script language="javascript">
+
+var mapObj,toolbar,overview,scale;
+function mapInit()
+{
+	var opt = {
+	level:13,//设置地图缩放级别
+	center:new AMap.LngLat(116.397428,39.90923),//设置地图中心点	
+	doubleClickZoom:true,//双击放大地图
+	scrollWheel:true//鼠标滚轮缩放地图
+	}
+	mapObj = new AMap.Map("iCenter",opt);
+	mapObj.plugin(["AMap.ToolBar","AMap.OverView","AMap.Scale"],function()
+	{ 
+	toolbar = new AMap.ToolBar();
+	toolbar.autoPosition=false; //加载工具条 
+	mapObj.addControl(toolbar);  	
+	overview = new AMap.OverView(); //加载鹰眼
+	mapObj.addControl(overview);  	
+	scale = new AMap.Scale(); //加载比例尺
+	mapObj.addControl(scale);
+	}); 
+}
+var Mmarker,polyline,polygon;
+function addAllOverlays(){
+	mapObj.clearMap();
+	//添加点
+    Mmarker=new AMap.Marker({	
+    map:mapObj,  	
+	icon:"http://webapi.amap.com/images/0.png",
+	position:new AMap.LngLat(116.405467,39.907761)
+	});
+	//添加线
+  var arr=new Array();//经纬度坐标数组 
+   arr.push(new AMap.LngLat("116.368904","39.913423")); 
+   arr.push(new AMap.LngLat("116.382122","39.901176")); 
+   arr.push(new AMap.LngLat("116.387271","39.912501")); 
+   arr.push(new AMap.LngLat("116.398258","39.904600")); 
+   polyline=new AMap.Polyline({ 
+   map:mapObj,     
+   path:arr, //线经纬度数组
+   strokeColor:"#F00", //线颜色
+   strokeOpacity:0.4, //线透明度 
+   strokeWeight:3, //线宽
+   strokeStyle:"dashed", //线样式
+   strokeDasharray:[10,5] //补充线样式 
+   }); 
+	//添加多边形
+   var arr1=new Array();//经纬度坐标数组 
+   arr1.push(new AMap.LngLat("116.403322","39.920255")); 
+   arr1.push(new AMap.LngLat("116.410703","39.897555")); 
+   arr1.push(new AMap.LngLat("116.402292","39.892353")); 
+   arr1.push(new AMap.LngLat("116.389846","39.891365")); 
+   polygon=new AMap.Polygon({ 
+   map:mapObj,  
+   path:arr1,//面经纬度数字
+   strokeColor:"#0000ff", //线颜色
+   strokeOpacity:0.2, //线透明度 
+   strokeWeight:3,    //线宽 
+   fillColor: "#f5deb3", //填充色
+   fillOpacity: 0.35 ,//填充透明度
+  }); 
+}
+function setFitView(){
+	mapObj.setFitView();
+}
+
+</script>
+</script>
+</head>
+<body onload="mapInit();">
+<div id="iCenter" style="width:659px;height:400px"></div>
+<table>
+<tr>
+	<td><a href="javascript:addAllOverlays();">添加所有覆盖物</a></td>
+	<td><a href="javascript:setFitView();">设置自适应视野级别</a></td>
+</tr>
+</table>
+</body>
+</html>
+----------------------------------------------------------------------------
+?<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>反地理解析（位置描述）</title>
+    <!--<style>
+body{ margin:0; padding:0;font:12px/16px Verdana, Helvetica, Arial, sans-serif;}
+</style>-->
+    <link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+    <script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+    <script language="javascript">
+
+        var mapObj, toolbar, overview, scale;
+        var date, startTime;
+        function showTime() {
+            var date = new Date();
+            document.getElementById("textSearchTime").value = date.getTime() - startTime + "毫秒";
+        }
+
+        function initTimer() {
+            date = new Date();
+            startTime = date.getTime();
+        }
+
+        function mapInit() {
+            var opt = {
+                level: 13, //设置地图缩放级别  
+                center: new AMap.LngLat(116.397428, 39.90923), //设置地图中心点   
+                doubleClickZoom: true, //双击放大地图  
+                scrollWheel: true//鼠标滚轮缩放地图  
+            }
+            mapObj = new AMap.Map("iCenter", opt); AMap.Conf.network = 1;
+            mapObj.plugin(["AMap.ToolBar", "AMap.OverView", "AMap.Scale"], function () {
+                toolbar = new AMap.ToolBar();
+                toolbar.autoPosition = false; //加载工具条   
+                mapObj.addControl(toolbar);
+                overview = new AMap.OverView(); //加载鹰眼  
+                mapObj.addControl(overview);
+                scale = new AMap.Scale(); //加载比例尺  
+                mapObj.addControl(scale);
+            });
+
+           
+        }
+
+        function geocodeSearch() {
+		mapObj.clearMap();
+            var xy = document.getElementById("lnglat").value;
+            if (xy == "") {
+                return;
+            } else {
+                var coor = xy.split(",");
+                var lnglatXY = new AMap.LngLat(coor[0], coor[1])
+                var GeocoderOption = {
+                    range: 3000, //范围  
+                    crossnum: 2, //道路交叉口数  
+                    roadnum: 3, //路线记录数  
+                    poinum: 2//POI点数  
+                };
+                var geo = new AMap.Geocoder(GeocoderOption);
+                geo.regeocode(lnglatXY, poiToAddressSearch_CallBack);
+                initTimer();
+                addMarker(lnglatXY);
+            }
+        }
+        function addMarker(lnglat) {
+            var marker = new AMap.Marker({
+                map:mapObj,
+                icon: "http://webapi.amap.com/images/0.png",
+                position: lnglat,
+                offset: new AMap.Pixel(-10, -34)
+            });
+            
+            mapObj.setCenter(lnglat);
+        }
+
+        function poiToAddressSearch_CallBack(data) {
+            showTime(); document.getElementById("textUniqId").value = data.uniqid;
+            var resultStr = "";
+            if (data.status == "E0") {
+                var province, city, district, road, address;
+
+                province = data.list[0].province.name;
+                if (province == "北京市") {
+                    city = province;
+                }
+                else {
+                    city = data.list[0].city.name;
+                }
+                district = data.list[0].district.name;
+                road = data.list[0].roadlist[0].name;
+                address = data.list[0].poilist[0].address;
+
+                resultStr = province + "," + city + "," + district + "," + road + "," + address;
+                //alert(resultStr);
+
+                /*
+                for (var i = 0; i < data.list.length; i++) {
+                resultStr += "省：" + data.list[i].province.name + "<br />市：" + data.list[i].city.name + "<br />区：" + data.list[i].district.name + "</span>";
+
+                for (var j = 0; j < data.list[i].roadlist.length; j++) {
+                resultStr += "<br />道路：" + data.list[i].roadlist[j].name + "&nbsp;&nbsp;<br />距离：" + data.list[i].roadlist[j].distance + "<br />";
+                }
+                for (var j = 0; j < data.list[i].poilist.length; j++) {
+                resultStr += "<br />名称：" + data.list[i].poilist[j].name + "<br />地址：" + data.list[i].poilist[j].address + "<br />类型：" + data.list[i].poilist[j].type + "<br />距离：" + data.list[i].poilist[j].distance + "<br />经度：" + data.list[i].poilist[j].x + "<br />纬度：" + data.list[i].poilist[j].y + "<br />";
+                }
+                }
+                */
+            }
+            else if (data.status == "E1") {
+                resultStr = "未查找到任何结果!<br />建议：<br />1.请确保所有字词拼写正确。<br />2.尝试不同的关键字。<br />3.尝试更宽泛的关键字。";
+            }
+            else {
+                resultStr = "错误信息：" + data.state + "请对照API Server v2.0.0 简明提示码对照表查找错误类型";
+            }
+            document.getElementById("result").innerHTML = resultStr;
+
+        }  
+      
+    </script>
+</head>
+<body onload="mapInit();">
+    <table width="661px" border="0" cellpadding="0" cellspacing="0">
+        <tr height="100%">
+            <td>
+                <div id="iCenter" style="height: 300px; width: 661px">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 247px; solid #666;" valign="top">
+                <div style="padding: 2px 0px 0px 2px; font-size: 12px;">
+                    <div>
+                        反地理解析（位置描述）<b>经纬度坐标：</b><input type="text" id="lnglat" name="lnglat" value="116.334,39.9872" />
+                        <input type="button" value="查询" onclick="geocodeSearch()" style="margin-left: 5px" />
+                        <br>
+                        <b>端到端往返延迟（round-trip delay）：</b>
+                        <input type="text" id="textSearchTime" readonly="yes" style="border: 0px; width: 60%" /><br>
+                        <b>本次请求 ID：</b><input type="text" id="textUniqId" readonly="yes" style="border: 0px;
+                            width: 60%" /></input>
+                    </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="padding: 0px 0 4px 2px; background-color: #D1EEEE">
+                    <b>搜索结果:</b></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="result" name="result" style="overflow: auto; margin-top: 5px; width: 661px;
+                    height: 255px">
+                </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+----------------------------------------------------------------------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>设置是否允许鼠标拖拽地图</title>
+<!--<style>
+body{ margin:0; padding:0;font:12px/16px Verdana, Helvetica, Arial, sans-serif;}
+</style>-->
+<link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+<script language="javascript">
+
+var mapObj,toolbar,overview,scale;
+function mapInit()
+{
+	var opt = {
+	level:13,//设置地图缩放级别
+	center:new AMap.LngLat(116.397428,39.90923),//设置地图中心点	
+	doubleClickZoom:true,//双击放大地图
+	scrollWheel:true//鼠标滚轮缩放地图
+	}
+	mapObj = new AMap.Map("iCenter",opt);
+	mapObj.plugin(["AMap.ToolBar","AMap.OverView","AMap.Scale"],function()
+	{ 
+	toolbar = new AMap.ToolBar();
+	toolbar.autoPosition=false; //加载工具条 
+	mapObj.addControl(toolbar);  	
+	overview = new AMap.OverView(); //加载鹰眼
+	mapObj.addControl(overview);  	
+	scale = new AMap.Scale(); //加载比例尺
+	mapObj.addControl(scale);
+	}); 
+}
+function  mapsetdragEnable(){
+mapObj.setStatus({dragEnable:true});
+}
+
+function  mapsetdragDisable(){
+mapObj.setStatus({dragEnable:false});
+}
+
+</script>
+</head>
+<body onload="mapInit();">
+<div id="iCenter" style="width:659px; height:400px;"></div>
+是否允许鼠标拖拽地图
+<a href="javascript:mapsetdragEnable();">允许</a>
+<a href="javascript:mapsetdragDisable();">禁止</a>
+</body>
+</html>
+
+------------------------------------------------------------------------------
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+    <html xmlns="http://www.w3.org/1999/xhtml">  
+    <head>  
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+    <!--<style>
+body{ margin:0; padding:0;font:12px/16px Verdana, Helvetica, Arial, sans-serif;}
+</style>-->
+<link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+    <title>地理解析（地址匹配）</title>  
+    <script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>  
+    <script language="javascript">  
+      
+    var mapObj,toolbar,overview,scale;
+    var date, startTime;
+    function showTime() {
+        var date = new Date();
+        document.getElementById("textSearchTime").value = date.getTime() - startTime + "毫秒";
+    }
+
+    function initTimer() {
+        date = new Date();
+        startTime = date.getTime();
+    }
+    function mapInit()  
+    {  
+        var opt = {  
+          level:13,//设置地图缩放级别  
+          center:new AMap.LngLat(116.397428,39.90923),//设置地图中心点   
+          doubleClickZoom:true,//双击放大地图  
+          scrollWheel:true//鼠标滚轮缩放地图  
+        }  
+        mapObj = new AMap.Map("iCenter",opt);AMap.Conf.network = 1;  
+        mapObj.plugin(["AMap.ToolBar","AMap.OverView","AMap.Scale"],function()  
+        {   
+          toolbar = new AMap.ToolBar();  
+        toolbar.autoPosition=false; //加载工具条   
+          mapObj.addControl(toolbar);     
+          overview = new AMap.OverView(); //加载鹰眼  
+          mapObj.addControl(overview);        
+          scale = new AMap.Scale(); //加载比例尺  
+          mapObj.addControl(scale);  
+        });   
+    }  
+    function geocodeSearch(){  
+        var addressName = document.getElementById('address').value;  
+        if(addressName== ""){  
+            alert("请输入地址！");  
+            return;  
+        }else{  
+            var GeocoderOption = {  
+            range:300,//范围  
+            crossnum:2,//道路交叉口数  
+            roadnum :3,//路线记录数  
+            poinum:2//POI点数  
+            };  
+        var geo = new AMap.Geocoder(GeocoderOption);  
+            geo.geocode(addressName,addressToGeoSearch_CallBack);
+            initTimer();
+          }  
+    }  
+       
+    function addressToGeoSearch_CallBack(data){
+        showTime();document.getElementById("textUniqId").value = data.uniqid;
+        var resultStr="";  
+        if(data.status =="E0")  
+        {  
+                for (var i = 0; i < 1; i++) {  
+                    resultStr += "<span class=\"spoi\"><a href=\"javascript:var s=mapObj.setCenter(new AMap.LngLat('"+ data.list[i].x +"','"+ data.list[i].y +"'));\">"+data.list[i].name+"</a></span>";  
+                    var windowsArr = new Array();  
+                    var markerOption = {
+                    map:mapObj,					
+                    icon:"http://api.amap.com/webapi/static/Images/"+(i+1)+".png",  
+                    position:new AMap.LngLat(data.list[i].x,data.list[i].y)  
+                    };            
+                    var mar =new AMap.Marker(markerOption);  
+                    
+                    var infoWindow = new AMap.InfoWindow  
+                    ({  
+                    content:data.list[i].name,  
+                    size:new AMap.Size(150,0),  
+                    offset:{x:0,y:-30}
+                    });  
+                    windowsArr.push(infoWindow);  
+                    
+                    var aa=function(e){infoWindow.open(mapObj,mar.getPosition());};  
+                    AMap.event.addListener(mar,"click",aa);  
+                }  
+                mapObj.setFitView();  
+        }       
+        else if(data.status =="E1")  
+        {  
+             resultStr = "未查找到任何结果!<br />建议：<br />1.请确保所有字词拼写正确。<br />2.尝试不同的关键字。<br />3.尝试更宽泛的关键字。";     
+        }  
+        else  
+        {  
+             resultStr= "错误信息："+data.state+"请对照API Server v2.0.0 简明提示码对照表查找错误类型";  
+        }  
+        document.getElementById("result").innerHTML = resultStr;  
+    }  
+    </script>  
+    </head>  
+    <body onload="mapInit();">  
+    <table width="661px"  border="0" cellpadding="0" cellspacing="0">  
+        <tr>  
+            <td><div id="iCenter" style="height:300px;width:661px"> </div></td></tr>
+        <tr> <td>  
+            <div>地理解析（地址匹配）<b>地址：</b><input type="text" id="address" name="address" value="北京市海淀区苏州街" />
+                <input type="button" value="查询" onclick="geocodeSearch()" />
+                <br><b>端到端往返延迟（round-trip delay）：</b>
+                <input type="text" id="textSearchTime" readonly="yes" style="border: 0px;width:60%"/><br><b>本次请求 ID：</b><input type="text" id="textUniqId" readonly="yes" style="border: 0px;width:60%" /></input>
+            </div>
+           </td> 
+       </tr>  
+         <tr><td><div style="padding:0px 0 4px 2px; background-color:#D1EEEE"><b>搜索结果:</b></div></td></tr>
+       <tr> <td><div id="result" name="result" style="overflow:auto;margin-top:5px"> </div></td> </tr>
+    </table>  
+    </body>  
+    </html>
+-----------------------------------------------------------------------------------------------------------
+?<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>反地理解析（位置描述）</title>
+    <!--<style>
+body{ margin:0; padding:0;font:12px/16px Verdana, Helvetica, Arial, sans-serif;}
+</style>-->
+    <link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+    <script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+    <script language="javascript">
+
+        var mapObj, toolbar, overview, scale;
+        var date, startTime;
+        function showTime() {
+            var date = new Date();
+            document.getElementById("textSearchTime").value = date.getTime() - startTime + "毫秒";
+        }
+
+        function initTimer() {
+            date = new Date();
+            startTime = date.getTime();
+        }
+
+        function mapInit() {
+            var opt = {
+                level: 13, //设置地图缩放级别  
+                center: new AMap.LngLat(116.397428, 39.90923), //设置地图中心点   
+                doubleClickZoom: true, //双击放大地图  
+                scrollWheel: true//鼠标滚轮缩放地图  
+            }
+            mapObj = new AMap.Map("iCenter", opt); AMap.Conf.network = 1;
+            mapObj.plugin(["AMap.ToolBar", "AMap.OverView", "AMap.Scale"], function () {
+                toolbar = new AMap.ToolBar();
+                toolbar.autoPosition = false; //加载工具条   
+                mapObj.addControl(toolbar);
+                overview = new AMap.OverView(); //加载鹰眼  
+                mapObj.addControl(overview);
+                scale = new AMap.Scale(); //加载比例尺  
+                mapObj.addControl(scale);
+            });
+
+           
+        }
+
+        function geocodeSearch() {
+		mapObj.clearMap();
+            var xy = document.getElementById("lnglat").value;
+            if (xy == "") {
+                return;
+            } else {
+                var coor = xy.split(",");
+                var lnglatXY = new AMap.LngLat(coor[0], coor[1])
+                var GeocoderOption = {
+                    range: 3000, //范围  
+                    crossnum: 2, //道路交叉口数  
+                    roadnum: 3, //路线记录数  
+                    poinum: 2//POI点数  
+                };
+                var geo = new AMap.Geocoder(GeocoderOption);
+                geo.regeocode(lnglatXY, poiToAddressSearch_CallBack);
+                initTimer();
+                addMarker(lnglatXY);
+            }
+        }
+        function addMarker(lnglat) {
+            var marker = new AMap.Marker({
+                map:mapObj,
+                icon: "http://webapi.amap.com/images/0.png",
+                position: lnglat,
+                offset: new AMap.Pixel(-10, -34)
+            });
+            
+            mapObj.setCenter(lnglat);
+        }
+
+        function poiToAddressSearch_CallBack(data) {
+            showTime(); document.getElementById("textUniqId").value = data.uniqid;
+            var resultStr = "";
+            if (data.status == "E0") {
+                var province, city, district, road, address;
+
+                province = data.list[0].province.name;
+                if (province == "北京市") {
+                    city = province;
+                }
+                else {
+                    city = data.list[0].city.name;
+                }
+                district = data.list[0].district.name;
+                road = data.list[0].roadlist[0].name;
+                address = data.list[0].poilist[0].address;
+
+                resultStr = province + "," + city + "," + district + "," + road + "," + address;
+                //alert(resultStr);
+
+                /*
+                for (var i = 0; i < data.list.length; i++) {
+                resultStr += "省：" + data.list[i].province.name + "<br />市：" + data.list[i].city.name + "<br />区：" + data.list[i].district.name + "</span>";
+
+                for (var j = 0; j < data.list[i].roadlist.length; j++) {
+                resultStr += "<br />道路：" + data.list[i].roadlist[j].name + "&nbsp;&nbsp;<br />距离：" + data.list[i].roadlist[j].distance + "<br />";
+                }
+                for (var j = 0; j < data.list[i].poilist.length; j++) {
+                resultStr += "<br />名称：" + data.list[i].poilist[j].name + "<br />地址：" + data.list[i].poilist[j].address + "<br />类型：" + data.list[i].poilist[j].type + "<br />距离：" + data.list[i].poilist[j].distance + "<br />经度：" + data.list[i].poilist[j].x + "<br />纬度：" + data.list[i].poilist[j].y + "<br />";
+                }
+                }
+                */
+            }
+            else if (data.status == "E1") {
+                resultStr = "未查找到任何结果!<br />建议：<br />1.请确保所有字词拼写正确。<br />2.尝试不同的关键字。<br />3.尝试更宽泛的关键字。";
+            }
+            else {
+                resultStr = "错误信息：" + data.state + "请对照API Server v2.0.0 简明提示码对照表查找错误类型";
+            }
+            document.getElementById("result").innerHTML = resultStr;
+
+        }  
+      
+    </script>
+</head>
+<body onload="mapInit();">
+    <table width="661px" border="0" cellpadding="0" cellspacing="0">
+        <tr height="100%">
+            <td>
+                <div id="iCenter" style="height: 300px; width: 661px">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 247px; solid #666;" valign="top">
+                <div style="padding: 2px 0px 0px 2px; font-size: 12px;">
+                    <div>
+                        反地理解析（位置描述）<b>经纬度坐标：</b><input type="text" id="lnglat" name="lnglat" value="116.334,39.9872" />
+                        <input type="button" value="查询" onclick="geocodeSearch()" style="margin-left: 5px" />
+                        <br>
+                        <b>端到端往返延迟（round-trip delay）：</b>
+                        <input type="text" id="textSearchTime" readonly="yes" style="border: 0px; width: 60%" /><br>
+                        <b>本次请求 ID：</b><input type="text" id="textUniqId" readonly="yes" style="border: 0px;
+                            width: 60%" /></input>
+                    </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="padding: 0px 0 4px 2px; background-color: #D1EEEE">
+                    <b>搜索结果:</b></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="result" name="result" style="overflow: auto; margin-top: 5px; width: 661px;
+                    height: 255px">
+                </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+--------------------------------------------------------------------------------------------------
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>添加复杂点覆盖物</title>
+<!--<style>
+body{ margin:0; padding:0;font:12px/16px Verdana, Helvetica, Arial, sans-serif;}
+</style>-->
+<link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+<script language="javascript">
+var mapObj,tool,view,scale;
+function mapInit(){
+	mapObj = new AMap.Map("map",{
+		center:new AMap.LngLat(116.392936,39.919479)
+	});
+	mapObj.plugin(["AMap.ToolBar","AMap.OverView,AMap.Scale"],function(){
+		//加载工具条
+		tool = new AMap.ToolBar({
+			direction:false,
+			ruler:false,
+			autoPosition:false//禁止自动定位
+		});
+		mapObj.addControl(tool);
+		//加载鹰眼
+		view = new AMap.OverView({visible:false});
+		mapObj.addControl(view);
+		//加载比例尺
+		scale = new AMap.Scale();
+		mapObj.addControl(scale);
+	});
+}
+function addComplexMarker(){
+	//构建点对象
+	var marker = new AMap.Marker({
+		map:mapObj,
+		position:new AMap.LngLat(116.373881,39.907409),//基点位置
+		// icon:"http://webapi.amap.com/images/marker_sprite.png",//marker 简单图标，直接传递地址url
+		offset:new AMap.Pixel(-14,-34),//相对于基点的位置
+		icon:new AMap.Icon({  //复杂图标
+			size:new AMap.Size(27,36),//图标大小
+			image:"http://webapi.amap.com/images/custom_a_j.png", //大图地址
+			imageOffset:new AMap.Pixel(-28,0)//相对于大图的取图位置
+		})
+	});
+	// marker.setContent("<img src='http://webapi.amap.com/images/3.png'/>");
+	var info = [];
+	info.push("<b>高德软件</b>");
+	info.push("电话 : 010-84107000   邮编 : 100102");
+	info.push("地址 : 北京市望京阜通东大街方恒国际中心A座16层");
+	
+	var inforWindow = new AMap.InfoWindow({
+	offset:new AMap.Pixel(0,-30),
+	content:info.join("<br/>")
+	});
+	AMap.event.addListener(marker,'click',function(e){
+		inforWindow.open(mapObj,marker.getPosition());
+	})
+	
+}
+</script>
+</head>
+<body onLoad="mapInit()">
+<div id="map" style="width:659px;height:400px;border:#F6F6F6 solid 1px;"></div>
+<a href="javascript:addComplexMarker()">添加复杂点覆盖物</a>
+</body>
+</html>
+
+----------------------------------------------------------------------------
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>添加自定义点覆盖物</title>
+<style>
+body{ margin:0; padding:0;font:12px/16px Verdana,Helvetica,Arial,sans-serif;}
+/* 定义自定义点样式 */
+div.marker{height:40px;width:120px;background:url(http://pages.haozu.ajkcdn.com/20110909/img/map/marker.png) left top no-repeat;white-space:nowrap;}
+div.marker span{ display:inline-block;height:28px;line-height:28px;margin:0 10px;color:#FFF;background:url(http://pages.haozu.ajkcdn.com/20110909/img/map/marker_bg_170x28.gif) right top no-repeat;padding-right:10px;}
+
+/* 修改背景URL */
+div.change{display:inline-block;background-image:url(http://pages.haozu.ajkcdn.com/20110909/img/map/marker-h.png);}
+div.change span{background-image:url(http://pages.haozu.ajkcdn.com/20110909/img/map/marker-h-l.gif);}
+</style>
+<link rel="stylesheet" href="/Public/Css/demo.Default.css" type="text/css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.2【&key=Your Key】"></script>
+<script language="javascript">
+var mapObj,tool,view,scale;
+function mapInit(){
+	mapObj = new AMap.Map("map",{
+		center:new AMap.LngLat(116.392936,39.919479)
+	});
+	mapObj.plugin(["AMap.ToolBar","AMap.OverView,AMap.Scale"],function(){
+		//加载工具条
+		tool = new AMap.ToolBar({
+			direction:false,
+			ruler:false,
+			autoPosition:false//禁止自动定位
+		});
+		mapObj.addControl(tool);
+		//加载鹰眼
+		view = new AMap.OverView({visible:false});
+		mapObj.addControl(view);
+		//加载比例尺
+		scale = new AMap.Scale();
+		mapObj.addControl(scale);
+	});
+}
+function addCustomMarker(){
+	//自定义覆盖物dom 元素
+	var m = document.createElement("div");
+	m.className = "marker";
+	var n = document.createElement("span");
+	n.innerHTML = "Amap";
+	m.appendChild(n);
+	
+	var marker1 = new AMap.Marker({
+		map:mapObj,
+		position:new AMap.LngLat(116.373881,39.907409), //基点位置
+		offset:new AMap.Pixel(0,-40), //相对于基点的偏移位置
+		//draggable:true,  //是否可拖动
+		content:m   //自定义覆盖物内容
+	});
+	
+	
+	//mouseover,换个皮肤
+	AMap.event.addListener(marker1,'mouseover',function(){
+		n.innerHTML = "高德地图"; //修改内容
+		m.className = "marker change";//增加样式
+	});
+	
+	
+	//mouseout,换回皮肤
+	AMap.event.addListener(marker1,'mouseout',function(){
+		n.innerHTML = "Amap"; //修改内容
+		m.className = "marker";
+	});
+	
+}
+</script>
+</head>
+<body onLoad="mapInit()">
+<div id="map" style="width:659px;height:400px;border:#F6F6F6 solid 1px;"></div>
+<a href="javascript:addCustomMarker()">添加自定义点覆盖物</a>
+</body>
+</html>
+

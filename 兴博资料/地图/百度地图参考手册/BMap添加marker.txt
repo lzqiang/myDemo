@@ -1,0 +1,5 @@
+var map = new BMap.Map('container');
+map.centerAndZoom(new BMap.Point(116.380797, 39.918497), 18);
+var icon = new BMap.Icon('pin.png', new BMap.Size(20, 32), {anchor: new BMap.Size(10, 30)});
+var mkr = new BMap.Marker(new BMap.Point(116.38075,39.918986), {    icon: icon});
+map.addOverlay(mkr);

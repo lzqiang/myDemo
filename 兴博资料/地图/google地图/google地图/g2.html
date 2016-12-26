@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<title>Google 地图 JavaScript API 示例: 控件定位</title>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNkdtKPzQHQUjSSIGryyv_WVENW-mtMHM&sensor=true"></script>
+<script type="text/javascript">
+	function initialize() { //地图初始化函数
+		var map = new GMap2(document.getElementById("map_canvas"));//创建地图
+		map.setCenter(new GLatLng(40.7142691,-74.0059729), 13);     //区域 深度
+
+		var point = new GLatLng(40.7142691, -74.0059729);            //坐标
+		map.addOverlay(new GMarker(point));                      //增加标点
+		map.openInfoWindow(map.getCenter(),document.createTextNode("Hello, world")); //增加提示框
+
+		var topRight = new GControlPosition(G_ANCHOR_TOP_LEFT, new GSize(10,10));//取得右上10*10的中心点
+		var bottomRight = new GControlPosition(G_ANCHOR_BOTTOM_RIGHT, new GSize(10,10));//取得右下10*10的中心点
+
+		map.addControl(new GSmallMapControl(), topRight);       //增加控件 左上角放大缩小工具
+	   
+		///var smallMapControl = new GOverviewMapControl();        //创建右下缩略图
+		map.addControl(smallMapControl, topRight);              //增加控件     
+	   
+	}
+  
+	function vok2(){ //获取经纬度函数
+		var address=document.getElementById('t').value;
+		if (address=="") return "请输入要查询的地址";
+		var map = new GMap2(document.getElementById("map_canvas"));//创建地图
+		var geocoder = new GClientGeocoder();
+		   geocoder.getLatLng(
+			address,
+			function(point) {
+			  if (!point) {
+				alert(address + " 无地址！");
+			  } else {
+				map.setCenter(point, 14);
+				var marker = new GMarker(point);
+				document.getElementById('v').innerHTML=point;
+				map.addOverlay(marker);
+				marker.openInfoWindowHtml(address);
+			  }
+			}
+		);
+	}
+
+	function calDis(){//调用函数
+		var lat1 = document.getElementById( "X1").value * 1;
+		var lng1 = document.getElementById( "Y1").value * 1;
+		var lat2 = document.getElementById( "X2").value * 1;
+		var lng2 = document.getElementById( "Y2").value * 1;
+		var dis = GetDistance(lat1, lng1, lat2, lng2);
+		document.getElementById("ss").innerHTML ="2点距离是: "+ dis+" km";
+	}
+
+	function rad(d)//函数中间调用
+	{
+		return d * Math.PI / 180.0;
+	}
+
+	function GetDistance( lat1, lng1, lat2, lng2)//获取公里数
+	{
+		if( ( Math.abs( lat1 ) > 90 ) ||( Math.abs( lat2 ) > 90 ) ){
+			return false;
+		}
+		if( ( Math.abs( lng1 ) > 180 ) ||( Math.abs( lng2 ) > 180 ) ){
+			return false;
+		}
+		var radLat1 = rad(lat1);
+		var radLat2 = rad(lat2);
+		var a = radLat1 - radLat2;
+		var b = rad(lng1) - rad(lng2);
+		var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a/2),2) +
+		Math.cos(radLat1)*Math.cos(radLat2)*Math.pow(Math.sin(b/2),2)));
+		s = s *6378.137 ;// EARTH_RADIUS;
+		s = Math.round(s * 10000) / 10000;
+		return s;
+	}
+</script>
+
+
+</head>
+<body onload="initialize()" onunload="GUnload()">
+	<div id="map_canvas" style="width: 500px; height: 300px"></div>
+	<div> 
+		<input name="t" type="text" id="t"/>
+		<span onclick="vok2();" style="cursor:pointer">[查询]</span>
+		<span id="v"></span>
+    </div>
+	<br /><br />
+    <div >
+		A:<input type="text" id="X1"/>-<input type="text" id="Y1"/><br />
+		B:<input type="text" id="X2"/>-<input type="text" id="Y2"/>
+		<span onclick="calDis();" style="cursor:pointer">[计算]</span>
+		<span id="ss"></span>
+    </div>
+   
+</body>
+</html>

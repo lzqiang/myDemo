@@ -1,0 +1,73 @@
+/-------------------------------提示
+function message(contents,times){
+art.dialog({//提示框 1.5/s
+	    time: times,
+	    content: contents
+	  });
+}
+//-------------------------------------------路线显示
+//线路描述显示方法
+function showWay(cfg){ 
+var list = art.dialog.list;
+for (var i in list) {
+    list[i].close();
+};
+	art.dialog({
+		id:"dravelWayDesc",
+		padding: 0,
+    	title: '路线描述',
+    	left: '100%',
+   	 	top: '0%',
+   	 	height: 30,
+   	 	resize: true,
+	    content: "<iframe id='frameShowWay' name='frameShowWay' src='../map/showWay.jsp?cfg="+cfg+"' height='auto' width='100%' frameborder='0'></iframe>"
+	});  
+}
+//--------------------------------------------//实现画线功能
+function drawLine(map,pathArray){
+  lineArea = new google.maps.Polyline({                    
+		path: pathArray,  //路径数组                     
+		strokeColor: "#00ffff",                 
+		strokeOpacity: 1.0,                   
+		strokeWeight: 5,//粗细                
+		fillColor: "#00F",//填充色 
+		strokeOpacity:0.4, //透明度  
+		strokeStyle:"solid", //补充线样式 
+		strokeDasharray:[10,5]            
+		});             
+		lineArea.setMap(map);//在地图上画线
+		polyArray.push(lineArea);
+}
+
+var geoCoder = new google.maps.Geocoder();
+// 反地理解析
+function replaceLoc(y,x){//把纬度，经度，换成地址
+   var mypoint=new google.maps.LatLng(y,x);
+   geoCoder.geocode({ 
+        location:mypoint
+        
+     }, 
+  function(results, state) { 
+	 getLocInfo(results,state);
+  }); 
+}
+
+function getLocInfo(results,state){
+	//获取地理位置
+	var locAddress="未知";
+		if (state = google.maps.GeocoderStatus.OK) { 
+              if (results[0]) { 
+                  //locAddress=(results[0].formatted_address).substring(0,(results[0].formatted_address).indexOf(' '));
+                  
+                  var loc=results[0].address_components;
+                  for(var i=0;i<loc.length;i++){
+                    if(loc[i].types=='route'){
+                       locAddress=loc[i].short_name;
+                    }
+                  }
+                  
+                } 
+            }
+        lineDesc=lineDesc+locAddress+'->';
+		showWay(lineDesc);
+}

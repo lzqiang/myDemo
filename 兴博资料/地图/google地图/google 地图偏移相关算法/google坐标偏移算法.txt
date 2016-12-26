@@ -1,0 +1,172 @@
+11
+Aug/11
+0Google Maps API 相关算法
+1.通过明文经度和纬度获得静态地图，地图大小可以指定，地图比例尺可以指定，地图上可以添加标注，标注的颜色和字母可以自定义
+2.通过街道名称获得明文经纬度，这个功能正在进行尝试
+下面的代码是Google的经纬度转块号算法：
+
+package com.datuu.googlemap;/**
+* Created by IntelliJ IDEA.
+* User: ShiChaoYun
+* Date: 2008-11-17
+* Time: 17:43:10
+*/
+
+/**
+* <p>Title: </p>
+* <p>Description: </p>
+* <p/>
+* <p>Copyright: Copyright (c) 2006</p>
+* <p/>
+* <p>Company: </p>
+*
+* @author not attributable
+* @version 1.0
+*/
+public class MapProjectionUtil {
+
+    public MapProjectionUtil() {
+}
+
+    private final static int pixelsPerTile = 256;                                                //每块象素
+    public final static double minLatitude = -85.0511287798;                                    //最小纬度
+    public final static double maxLatitude = 85.0511287798;                                     //最大纬度
+    public final static double minLongitude = -180;                                             //最小经度
+    public final static double maxLongitude = 180;                                              //最大经度
+    //采用WGS84-长半径6378137,短半径6356752.3142
+    private final static double earthRadiusInMeters = 6378137;                                 //地球半径
+   private final static double earthCircumferenceInMeters = 2 * Math.PI * earthRadiusInMeters; //地球周长
+
+/**
+* 功能:返回一个范围在minValue和maxValue之间的数
+*
+* @param n
+* @param minValue
+* @param maxValue
+* @return 返回n,如果n小于minValue则返回minValue,如果n大于maxValue则返回maxValue;
+*/
+private static double clip(double n, double minValue, double maxValue) {
+return Math.min(Math.max(n, minValue), maxValue);
+}
+
+    /**
+* 功能:将经地理坐标转换为象素坐标
+*
+* @param latitude      double
+* @param longitude     double
+* @param levelOfDetail int
+* @return long[]
+*/
+public static long[] translateLongLatToPixels(
+double longitude, double latitude,
+int levelOfDetail) {
+long xPixel = 0;
+long yPixel = 0;
+latitude = clip(latitude, minLatitude, maxLatitude) * Math.PI / 180;
+longitude = clip(longitude, minLongitude, maxLongitude) * Math.PI / 180;
+double sinLatitude = Math.sin(latitude);
+double xMeters = earthRadiusInMeters * longitude;
+double yMeters = earthRadiusInMeters / 2 *
+Math.log((1 + sinLatitude) / (1 - sinLatitude));
+
+        long numPixels = (long) 256 << levelOfDetail;
+double metersPerPixel = earthCircumferenceInMeters / numPixels;
+xPixel = (long) clip((earthCircumferenceInMeters / 2 + xMeters) /
+metersPerPixel + 0.5, 0, numPixels - 1);
+
+        yPixel = (long) clip((earthCircumferenceInMeters / 2 - yMeters) /
+metersPerPixel + 0.5, 0, numPixels - 1);
+long[] ret = new long[2];
+ret[0] = xPixel;
+ret[1] = yPixel;
+return ret;
+}
+
+    /**
+* 将象素坐标转换为块号和块内像素位置
+*
+* @param xPixel long
+* @param yPixel long
+* @return long[]
+*/
+public static long[] translatePixelsToTile(long xPixel, long yPixel) {
+long xTile = 0, yTile = 0, xTilePixel = 0, yTilePixel = 0;
+xTile = xPixel / pixelsPerTile;
+yTile = yPixel / pixelsPerTile;
+xTilePixel = xPixel % pixelsPerTile;
+yTilePixel = yPixel % pixelsPerTile;
+long[] ret = new long[4];
+ret[0] = xTile;
+ret[1] = yTile;
+ret[2] = xTilePixel;
+ret[3] = yTilePixel;
+return ret;
+}
+
+    /**
+* 将象素坐标转换为地理坐标
+*
+* @param xPixel        long
+* @param yPixel        long
+* @param levelOfDetail int
+* @return double[]
+*/
+public static double[] pixelsToLongLat(long xPixel, long yPixel,
+int levelOfDetail) {
+double[] ret = new double[2];
+double fd = 40075016.685578488D /
+(double) ((1 << levelOfDetail) * 256);
+double ia = (double) xPixel * fd - 20037508.342789244D;
+double hT = 20037508.342789244D - (double) yPixel * fd;
+ret[0] = ia / 6378137D;
+ret[0] *= 57.295779513082323D;
+ret[1] = 1.5707963267948966D - 2D * Math.atan(Math.exp(-hT / 6378137D));
+ret[1] *= 57.295779513082323D;
+return ret;
+}
+
+    /**
+* 将地理坐标转换为块号和块内像素位置
+*
+* @param latitude      double
+* @param longitude     double
+* @param levelOfDetail int
+* @return long[]
+*/
+public static long[] translateLongLatToTile(double longitude,
+double latitude,
+int levelOfDetail) {
+long[] tuple = null;
+tuple = translateLongLatToPixels(latitude, longitude, levelOfDetail);
+return translatePixelsToTile(tuple[0], tuple[1]);
+}
+
+    /**
+* @param args
+*/
+public static void main(String[] args) {
+double x = 116.397, y = 39.917;
+int zoom = 14;
+//经纬度转像素坐标
+        long[] result = MapProjectionUtil.translateLongLatToPixels(x, y, zoom);
+System.out.println("像素:" + result[0] + "," + result[1]);
+//27624630,12711262
+        long xPixel = result[0];
+long yPixel = result[1];
+//像素坐标转块号
+        result = MapProjectionUtil.translatePixelsToTile(xPixel, yPixel);
+System.out.println("块号:" + result[0] + "," + result[1] + " 块内像素:" + result[2] + ","+ result[3]);
+//431634,198613
+        //215817,99306
+
+//像素转经纬度
+        double[] longLat = MapProjectionUtil.pixelsToLongLat(xPixel, yPixel, zoom);
+System.out.println("经纬度:" + longLat[0] + "," + longLat[1]);
+
+//        像素:3453079,1588908
+//        块号:53954,24826 块内像素:23,44
+//        经纬度:116.38014793395995,39.93211714223259
+    }
+
+}
+ 

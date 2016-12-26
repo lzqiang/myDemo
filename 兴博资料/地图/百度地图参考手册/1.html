@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">   
+<html>   
+<head>   
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
+<title>地图</title>   
+<!--<script type="text/javascript" src="http://api.map.baidu.com/api?key=1c9e87d6e503e41335c10add50a2d4ff&v=1.0&services=false" ></script>   -->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.4"></script>
+</head>   
+<body>   
+<div style="width:520px;height:520px;border:1px solid gray" id="container"></div>   
+</body>   
+</html>   
+  
+  
+  
+<SCRIPT LANGUAGE="JavaScript">   
+        var map = new BMap.Map("container");   
+        var point1 = new BMap.Point(117.289686, 31.867204);//地图的经纬度坐标（经度坐标，纬度坐标）   
+           
+        map.centerAndZoom(point1, 13); // 初始化：point初始要定位到的点,15:地图显示级别即比例尺，值越大显示的越详细 
+		
+        map.addControl(new BMap.NavigationControl({type: BMAP_NAVIGATION_CONTROL_SMALL}));   
+        var marker = new BMap.Marker(new BMap.Point(117.31297, 31.854446));   
+        map.addOverlay(marker);  
+		
+		var marker2 = new BMap.Marker(new BMap.Point(117.33297, 31.834446));   
+        map.addOverlay(marker2);   
+          
+        //marker.addEventListener("click", function(){this.openInfoWindow(infoWin);});
+		marker.enableDragging(true);    // 设置标注可拖拽
+		marker.addEventListener("dragend", function(e){
+			alert(e.point.lng+","+e.point.lat);
+		});
+		
+          
+        var infoWinOpts = {   
+         width : 200     
+         ,height : 60  
+        }   
+        var infoWin = new BMap.InfoWindow("<div style='text-align:left;margin-top:3px;font-size:17;color:#1A6DAF'>地址：地<br>电话：028-XXXXXX</div>",infoWinOpts); //点击显示文字   
+        marker.openInfoWindow(infoWin);   
+        map.enableScrollWheelZoom();                 //用鼠标滚轴   
+
+		var polyline = new BMap.Polyline([  
+	　　    new BMap.Point(117.31297, 31.854446),  
+	　　    new BMap.Point(117.31397, 31.856446),
+			new BMap.Point(117.31307, 31.855446)  
+	　　  ],    
+　　		{strokeColor:"blue", strokeWeight:6, strokeOpacity:0.5}  
+　　	);  
+		map.addOverlay(polyline); 
+      </SCRIPT>  

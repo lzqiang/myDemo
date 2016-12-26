@@ -1,0 +1,5 @@
+ var myIcon = new BMap.Icon("${ctx}/attendance/attendance/image/woman.png", new BMap.Size(50,70), {    //»ÀÕº∆¨
+	                                imageOffset:new BMap.Size(5,5)
+			});
+			carMk = new BMap.Marker(mypoint,{icon:myIcon});
+			map.addOverlay(carMk);

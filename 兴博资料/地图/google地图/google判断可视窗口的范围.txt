@@ -1,0 +1,6 @@
+   var mapLatLngBounds = map.getBounds();  
+   //将地图的边界传递给后台     
+var maxX = mapLatLngBounds.getNorthEast().lng();     
+var maxY = mapLatLngBounds.getNorthEast().lat();     
+var minX = mapLatLngBounds.getSouthWest().lng();     
+var minY = mapLatLngBounds.getSouthWest().lat();

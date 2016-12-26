@@ -1,0 +1,457 @@
+//******************google地图运输公司新页面开始**********************
+var mapOptions = {
+    zoom: 10,
+    center: new google.maps.LatLng(31.867204,117.289686),
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+    },
+    scrollwheel:false,
+    zoomControl: true,
+    scaleControl: true,
+    zoomControlOptions: {
+      style: google.maps.ZoomControlStyle.LARGE
+    },
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+}
+
+//定义需要的全局变量
+var map = null;
+//地图比例尺(米)
+var mapscale=500;
+//全局车辆数组
+var jcararr="";
+//车牌号展示标识,默认为0不显示
+var showflag=0;
+//定义覆盖物数组
+var covers=[];
+//页面位置坐标
+var oLeft=50;
+var oTop=50;
+//定时器初始化
+var comtimer="";
+//时间间隔1分钟
+var timelen=60000;
+//谷歌地图比例尺数组
+//var scalearr=[10000000,5000000,2000000,1000000,500000,200000,200000,100000,50000,
+//			20000,10000,5000,2000,1000,500,200,200,100,50,20,10,5,2,1,1,1,1];
+var scalearr=[5000000,2500000,1000000,500000,250000,100000,100000,50000,25000,
+			10000,5000,2500,1000,500,250,100,100,50,25,10,5,3,2,1,1,1,1];
+//缩放等级
+var zoomLevel=10;
+
+//初始化
+function init(){
+}
+var getCtx=$("#ctx").val();
+//左侧公司渣土车被选中
+function checkCompanyCarList(cararr){
+	//清除覆盖物
+	clearMyCovers();
+	if(comtimer!=""){
+		clearInterval(comtimer);
+	}
+	//全局变量赋值
+	jcararr=cararr;
+	if(cararr==""){
+		return false;
+	}
+	queryCarListOfCompany(cararr);
+	//定时器
+	comtimer=setInterval("queryCarListOfCompany("+cararr+")", timelen);
+}
+
+//查询车辆列表
+function queryCarListOfCompany(cararr){
+	
+	$.ajax({               
+        type: "POST",               
+        dataType: "json",               
+        url: getCtx+'/tbCar.do?reqCode=queryCarListInCompany', 
+        beforeSend:function(XMLHttpRequest){ 
+            var loadDiv = document.getElementById('tip');
+			loadDiv.style.display = "block";
+			loadDiv.style.top = (document.documentElement.clientHeight -20)/2+"px";
+			loadDiv.style.left = (document.documentElement.clientWidth -150)/2+"px";
+        },   
+        data: "cararr="+cararr,          
+        success: function(data) {
+            //清除覆盖物
+	         clearMyCovers();
+        	data = computeGroup(data);
+        	for(var i=0;i<data.length;i++){
+        		var obj=data[i];
+        		// 添加覆盖物,直接显示leader节点(只要leader属性没有值的均为leader节点)
+        		if(!obj.leader) {
+        			addMapCover(obj);
+        		}
+        	} 
+        	//判断是否显示车牌号码
+		   	if(showflag==1){
+		   		setTimeout(showCarNums,500);
+		   	} 
+        },
+        complete:function(XMLHttpRequest,textStatus){ 
+            document.getElementById('tip').style.display = "none";
+        }   
+    });
+}
+
+var dwimg="";
+//点击单车定位操作
+function locSingleCar(typeid,type){
+   map = new google.maps.Map(frames[0].document.getElementById("container"),mapOptions);
+	var url="";
+	var data="";
+	//报警定位
+	if(type==2){
+		url=getCtx+"/tbCar.do?reqCode=getCarBreakInfoToday";
+		data="carbreakid="+typeid;
+	}else{
+		url=getCtx+"/tbCar.do?reqCode=getSingleCarInfo";
+		data="carid="+typeid;
+	}
+	$.ajax({               
+        type: "POST",               
+        dataType: "json",               
+        url: url, 
+        data: data,          
+        success: function(data) {
+        	for(var i=0;i<data.length;i++){
+        		var obj=data[i];
+        		//清除倒计时器
+        		if(dwimg!=""){
+        			clearTimeout(dwimg);
+        		}
+        		//显示定位图片
+        		showLocImg(obj);
+        		addMapCover(obj);
+        		
+        		//倒计时3秒钟清除图片
+        		dwimg=setTimeout(clearDWImg,3000);
+        	}
+        }   
+    });  
+}
+
+var dwmarker="";
+//展示定位图片
+function showLocImg(obj){
+	if(dwmarker!=""&&dwmarker){
+		dwmarker.setMap(null);
+	}
+	/*var iconImg = {
+	    url: getCtx+'/images/mapicon/dw.gif',
+	    size: new google.maps.Size(45, 45)
+	};*/
+	var iconImg =getCtx+"/images/mapicon/lv3.png";
+	var mypoint=new google.maps.LatLng(obj.dimensionality_point,obj.longitude_point);
+	//添加覆盖物
+    dwmarker = new google.maps.Marker({
+        position: mypoint,
+        map: map,
+        icon: iconImg,
+        title: '定位'
+    });
+	//设置中心点
+	
+	map.setCenter(mypoint);
+}
+
+//清除定位图片
+function clearDWImg(){
+	if(dwmarker!=""){
+		dwmarker.setMap(null);
+	}
+}
+
+//添加覆盖物
+function addMapCover(obj){
+    var gc=new google.maps.Geocoder();
+    var mypoint=new google.maps.LatLng(obj.dimensionality_point,obj.longitude_point);
+    var direc=obj.direction;
+    var iconImg =getCtx+"/images/mapicon/currcar_0.gif";
+    if(obj.online_flag==1){//在线
+    	if(obj.speede==0){
+    		iconImg =getCtx+"/images/mapicon/currcarnos_b.gif";
+    	}else{
+    		if(direc==0){
+				//direction="正北方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_0.gif";
+			}else if(direc>0&&direc<90){
+				//direction="东北方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_45.gif";
+			}else if(direc==90){
+				//direction="正东方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_90.gif";
+			}else if(direc>90&&direc<180){
+				//direction="东南方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_135.gif";
+			}else if(direc==180){
+				//direction="正南方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_180.gif";
+			}else if(direc>180&&direc<270){
+				//direction="西南方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_225.gif";
+			}else if(direc==270){
+				//direction="正西方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_270.gif";
+			}else if(direc>270&&direc<360){
+				//direction="西北方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_315.gif";
+			}else if(direc==360){
+				//direction="正北方向";
+				iconImg =getCtx+"/img/map/ztt/currcar_b.gif";
+			}
+    	}
+    }else if(obj.online_flag==0){//离线
+    	if(obj.speede==0){
+    		iconImg =getCtx+"/images/mapicon/curroffcar_b.gif";
+    	}else{
+    		if(direc==0){
+				//direction="正北方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_0.gif";
+			}else if(direc>0&&direc<90){
+				//direction="东北方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_45.gif";
+			}else if(direc==90){
+				//direction="正东方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_90.gif";
+			}else if(direc>90&&direc<180){
+				//direction="东南方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_135.gif";
+			}else if(direc==180){
+				//direction="正南方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_180.gif";
+			}else if(direc>180&&direc<270){
+				//direction="西南方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_225.gif";
+			}else if(direc==270){
+				//direction="正西方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_270.gif";
+			}else if(direc>270&&direc<360){
+				//direction="西北方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_315.gif";
+			}else if(direc==360){
+				//direction="正北方向";
+				iconImg =getCtx+"/img/map/ztt/curroffcar_0.gif";
+			}
+    	}
+    }
+    //添加相应的覆盖物
+	if(!obj.count||obj.count==0) {	
+	    //自定义覆盖物dom 元素
+	    var labeltext="&nbsp;"+obj.car_num;
+    	var carnumlayer = new MyMarker(map,{latlng:mypoint,labelClass:'markerlabel',labelText:labeltext,image:iconImg});
+    	//添加覆盖物
+	    var marker = new google.maps.Marker({
+	        position: mypoint,
+	        map: map,
+	        icon: iconImg,
+	        title: obj.car_num
+	    });
+	    covers.push(carnumlayer);
+		covers.push(marker);
+	    //添加监听	
+		google.maps.event.addListener(marker, 'click', function(){
+			//获取地址信息
+			gc.geocode({location:mypoint},function(rs, state){ 
+				showLocationInfo(obj,rs,state);
+			});
+		});
+	}else if(obj.count&&obj.count>0) {// 如果子节点存在且数量大于1的显示数字
+		//自定义覆盖物dom 元素
+		var cjingdu=obj.cjingdu;
+		var cweidu=obj.cweidu;
+		//气泡中心点
+		var cmypoint=new google.maps.LatLng(cweidu,cjingdu);
+		var cids = obj.childrenIds;
+		var cidstr="(,"+cids+",)";
+		var labeltext="<b><a onclick='showCarListBubble(\""+cidstr+"\")' style='text-decoration: none' href='javascript:void(0)'><div style='text-align:center;line-height:32px;width:28px;white-space:nowrap;background:url(/muckcar/images/mapicon/carnum.png) left top no-repeat;' >"+(obj.count+1)+"</div></a></b>";
+    	var marker = new MyMarker(map,{latlng:cmypoint,labelClass:'',labelText:labeltext,image:"",clickFun:""});
+		covers.push(marker);
+		
+	}
+}
+
+//清除自己的覆盖物
+function clearMyCovers(){
+	for(var i=0;i<covers.length;i++){
+		var scover=covers[i];
+		scover.setMap(null);
+	}
+	//清空
+	covers=[];
+}
+
+//显示汽泡中的车辆列表
+function showCarListBubble(caridstr){
+	//关闭弹出对话框
+	art.dialog({id: 'carListInfo'}).close();
+	var carsinfo="";
+	carsinfo="<div style='overflow: scroll;width:200px;height: 180px'><table>";
+	$.ajax({               
+        type: "POST",               
+        dataType: "json",               
+        url: getCtx+'/tbCar.do?reqCode=queryCarListInCompany', 
+        data: "cararr="+caridstr,          
+        success: function(data) {
+        	for(var i=0;i<data.length;i++){
+        		var obj=data[i];
+        		//车辆图片
+        		var imgsrc=getCtx+"/img/car.png";
+        		if(obj.online_flag==1){
+        			if(obj.speede==0){//在线停止
+        				imgsrc=getCtx+"/img/carnos.png";
+        			}else{
+        				imgsrc=getCtx+"/img/car.png";
+        			}
+        		}else if(obj.online_flag==0){
+        			imgsrc=getCtx+"/img/carOffline.png";
+        		}
+        		var buildName="";
+        		if(typeof(obj.bulid_name)=='undefined'||obj.bulid_name==null){
+					buildName="";
+				}else{
+					buildName=obj.bulid_name;
+				}
+        		carsinfo+="<tr><td><img src="+imgsrc+"></img><a style='text-decoration: none' onclick='openCarListWin("+obj.car_id+")' href='javascript:void(0)'>"+obj.car_num+"</a>,"+obj.company_name+",<font color='red'>"+buildName+"</font></td></tr>";
+        	}
+			art.dialog({
+				id:"carListInfo",
+				padding: 0,
+		    	title: '车辆列表',
+		    	left: oLeft,
+		   	 	top: oTop,
+		   	 	height: 200,
+		   	 	resize: true,
+			    content: carsinfo
+			}); 
+        }  
+    });
+}
+
+//打开右上角窗口
+function openCarListWin(carid){
+    var gc=new google.maps.Geocoder();
+    $.ajax({               
+        type: "POST",               
+        dataType: "json",               
+        url: getCtx+'/tbCar.do?reqCode=getSingleCarInfo', 
+        data: "carid="+carid,          
+        success: function(data) {
+        	for(var i=0;i<data.length;i++){
+        		var obj=data[i];
+        		var mypoint=new google.maps.LatLng(obj.dimensionality_point,obj.longitude_point);
+			    //获取地址信息
+				gc.geocode({location:mypoint},function(rs, state){ 
+					showLocationInfo(obj,rs,state);
+				});
+        	} 
+        }   
+    });  
+    
+}
+
+// 计算分组,对数据进行分组处理，按组显示，组内count子节点数量>0附加到第一个元素后面显示列表(可链接触发弹框)
+function computeGroup(data){
+		//mapscale=map.getScale(map.getZoom())/10;
+		mapscale=scalearr[zoomLevel];
+		var _data = data;
+    	for(var i=0;i<_data.length;i=i+1) {
+    		_data[i].childrenIds = _data[i].car_id;
+    		_data[i].cjingdu=_data[i].longitude_point;
+			_data[i].cweidu=_data[i].dimensionality_point;
+      		// 已经是followers则不进行计算
+      		// 如果不是followers，则作为分组leaders,分组leader没有leader属性,对后面元素进行判断
+	      		if(!_data[i].leader) {
+		       		for(var j=i+1;j<_data.length;j=j+1) {
+		       				if(!_data[j].leader) {
+			        			var distance = getBDistanceByData(_data[i],_data[j]);
+			        			if (distance<=mapscale) {
+			        				_data[j].leader=_data[i].car_id;
+			        				// 子节点数量
+			        				if(!_data[i].count) {
+			        					_data[i].count = 1;
+			        				} else {
+			        					_data[i].count = _data[i].count+1;
+			        				}
+			        				_data[i].childrenIds = _data[i].childrenIds+","+_data[j].car_id;
+			        				//计算气泡中心点坐标
+			        				var cjingdu=(_data[i].cjingdu+_data[j].longitude_point)/2;
+			        				var cweidu=(_data[i].cweidu+_data[j].dimensionality_point)/2;
+			        				_data[i].cjingdu=cjingdu;
+			        				_data[i].cweidu=cweidu;
+		        				} 
+		       				}
+		       		}
+	      		}
+     	}
+     	return _data;
+}
+
+// 获取谷歌地图两点间距离
+function getGDistance(p1,p2) {
+	var meters = google.maps.geometry.spherical.computeDistanceBetween(p1,p2);
+	return meters;
+}
+
+// 根据获取的数据得到地图两点间距(obj1,obj2为json类型)
+function getBDistanceByData(obj1,obj2) {
+	return getGDistance(getGPoint(obj1),getGPoint(obj2));
+}
+
+// 根据获取的数据获取谷歌地图点对象
+function getGPoint(obj) {
+	return new google.maps.LatLng(obj.dimensionality_point,obj.longitude_point);
+}
+
+//显示车牌号码
+function showCarNums(){
+	showflag=1;
+	$(".markerlabel span").css("display","block");
+}
+
+//隐藏车牌号码
+function hideCarNums(){
+	showflag=0;
+	$(".markerlabel span").css("display","none");
+}
+
+//鼠标单击事件记录
+document.onclick=function(ev){
+	var oEvent=ev||event;
+	oLeft=oEvent.clientX;
+	oTop=oEvent.clientY;
+}
+
+//鼠标双击地图设置中心点的处理
+//初始化全局中心点
+var cpoint="";
+//双击开关
+var dblflag=0;
+google.maps.event.addListener(map,'zoom_changed',function(){
+    zoomLevel = map.getZoom(); 
+    changeBubble();
+    //判断是否是双击地图放大
+    if(cpoint!=""&&dblflag==1){
+    	//设置中心点
+    	map.setCenter(cpoint);
+    	//关闭开关
+    	dblflag=0;
+    }
+});
+
+google.maps.event.addDomListener(map,'dblclick',function(event){
+	//获取中心点
+	cpoint=map.getCenter();
+	//打开开关
+	dblflag=1;
+});
+
+
+//气泡动态变化函数
+function changeBubble() {
+	checkCompanyCarList(jcararr);
+}
+//******************google地图运输公司新页面结束**********************

@@ -1,0 +1,34 @@
+google.load("maps", "2.x");
+google.setOnLoadCallback(initialize);
+
+var map = null;
+function initialize() {
+	// 檢查瀏覽器是否可使用 Google Map API
+	if ( GBrowserIsCompatible() ) {
+        map = new google.maps.Map2(document.getElementById('map'));
+		// 設定地圖中心點
+		map.setCenter(new GLatLng(25.036772,121.520269), 12);
+		
+		var bounds = map.getBounds();
+		var southWest = bounds.getSouthWest(); // 返回矩形西南角的點
+		var northEast = bounds.getNorthEast(); // 返回矩形東北角的點
+		var lngSpan = northEast.lng() - southWest.lng();
+		var latSpan = northEast.lat() - southWest.lat();
+		var points = [];
+		// 亂數取點
+		for (var i = 0; i < 10; i++){
+		    var point = new GLatLng(
+		        southWest.lat() + latSpan * Math.random(),
+		        southWest.lng() + lngSpan * Math.random());
+		    points.push(point);
+		    map.addOverlay(new GMarker(point));
+		} // for
+		// 排序
+		points.sort(function(p1, p2) { return p1.lng() - p2.lng();});
+		// 畫線！
+		map.addOverlay(new GPolyline(points));
+	} // if
+	else {
+		alert('您的瀏覽器不支援Google Map');
+	} // else
+}

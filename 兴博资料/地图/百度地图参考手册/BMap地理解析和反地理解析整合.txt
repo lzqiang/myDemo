@@ -1,0 +1,33 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>地址解析+反地址解析</title>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.2"></script>
+</head>
+<body>
+<div style="width:520px;height:340px;border:1px solid gray" id="container"></div>
+<div style="margin:10px 0;"><input type="text" style="width:300px;margin-right:10px;" value="新华路" id="searchValue" /><input type="button" value="搜索" onclick="search()" /></div>
+
+</body>
+</html>
+<script type="text/javascript">
+var map = new BMap.Map("container");
+map.centerAndZoom(new BMap.Point(121.461165,31.234095), 11);
+function search(){
+var myAddress = document.getElementById('searchValue').value;
+
+var myGeo = new BMap.Geocoder();
+myGeo.getPoint(myAddress, function(point){ //我输入的是“知春路”，第一步getPoint是地址解析。
+if (point) {
+map.centerAndZoom(point, 16);
+map.addOverlay(new BMap.Marker(point));
+
+myGeo.getLocation(point, function(rs){ //这里弹出“知春路”的详细地址信息，第二步getLocation是反地址解析。
+var addComp = rs.addressComponents;
+alert(myAddress+'的具体位置是：'+addComp.province + ", " + addComp.city + ", " + addComp.district + ", " + addComp.street + ", " + addComp.streetNumber);
+});
+}
+}, "上海市"); //必须设置城市
+
+}
+</script>

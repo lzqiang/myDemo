@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>百度地图Demo</title>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.3"></script>
+</head>
+<body>
+<div style="width:520px;height:340px;border:1px solid gray" id="container"></div>
+</body>
+</html>
+
+<script type="text/javascript">
+var map = new BMap.Map("container"); //初始化地图
+
+var opts = {type: BMAP_NAVIGATION_CONTROL_LARGE}; //初始化地图控件
+map.addControl(new BMap.NavigationControl(opts));
+
+var point = new BMap.Point(32.060255,118.796877); //初始化地图中心点
+var marker = new BMap.Marker(point); //初始化地图标记
+marker.enableDragging(); //标记开启拖拽
+
+var gc = new BMap.Geocoder();
+//添加标记拖拽监听
+marker.addEventListener("dragend", function(e){
+//获取地址信息
+gc.getLocation(e.point, function(rs){
+showLocationInfo(e.point, rs);
+});
+});
+
+//添加标记点击监听
+marker.addEventListener("click", function(e){
+gc.getLocation(e.point, function(rs){
+showLocationInfo(e.point, rs);
+});
+});
+
+map.centerAndZoom(point, 15); //设置中心点坐标和地图级别
+map.addOverlay(marker); //将标记添加到地图中
+
+//显示地址信息窗口
+function showLocationInfo(pt, rs){
+var opts = {
+width : 250, //信息窗口宽度
+height: 100, //信息窗口高度
+title : "" //信息窗口标题
+}
+
+var addComp = rs.addressComponents;
+var addr = "当前位置：" + addComp.province + ", " + addComp.city + ", " + addComp.district + ", " + addComp.street + ", " + addComp.streetNumber + "<br />";
+addr += "纬度: " + pt.lat + ", " + "经度：" + pt.lng;
+//alert(addr);
+
+var infoWindow = new BMap.InfoWindow(addr, opts); //创建信息窗口对象
+marker.openInfoWindow(infoWindow);
+}
+</script>
+
+************************************************************************************************
+用getLocation()方法啊，很简单的                         var a ;                                            var i=0;                             var latList = new Array();		            var longList = new Array();                         latList[i]  = 115.68596;                                           longList[i] = 34.49083;                                           i++;                                       try {                                            var listMap = new BMap.Map("containerNone");                                             listMap.centerAndZoom(point,7);                                     		listMap.enableScrollWheelZoom();                                                var points = [];                                            for (i in latList) {                                                 var point = new BMap.Point(latList[i], longList[i]);                                                   points[i] = point;                                            };                                                                                             var listGeo = new BMap.Geocoder();for (i in points) {                                                listGeo.getLocation(points[i], function(result) {//从数组中取值，得到地理位置                                                    if (result){                                                        addrList.push(result.address);                                                        displayAddress();                                                    }                                                })                                            }                                        } catch(e) {                                        }

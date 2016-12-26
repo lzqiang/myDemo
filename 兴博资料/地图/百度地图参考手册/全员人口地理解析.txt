@@ -1,0 +1,23 @@
+	  var index=0;
+        	  var gc = new BMap.Geocoder(); 
+        	   begeo();//批量反地理解析
+        	   function begeo(){
+        		    var obj=data[index];
+        		    if(index!=data.length){//判断是否越界 并转成百度坐标
+        		        var point=new BMap.Point(obj.gpsla,obj.gpslu);
+        		    }
+        		    geocodeSearch(point);
+	        		index++;
+				}
+				function geocodeSearch(pt){//解析
+				    if(index < data.length){
+				       setTimeout(begeo,100);
+				    }
+				    gc.getLocation(pt, function(rs){
+				       if(rs){
+				          var addComp = rs.addressComponents;
+				          name=addComp.street+addComp.streetNumber;//获得街道和街道编号
+					      addressName.push(name); 
+				       }
+				    });
+              }

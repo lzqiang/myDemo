@@ -1,0 +1,2 @@
+map.setCenter(new google.maps.LatLng(obj.latitude,obj.longitude), zooms);
+	
