@@ -16,6 +16,11 @@ struts
 struts2
 hibernate
 
+数据库
+mysql读写分离插件 mycat 
+http://blog.itpub.net/29510932/viewspace-1664499/
+
+
 缓存
 Redis
 memcached
