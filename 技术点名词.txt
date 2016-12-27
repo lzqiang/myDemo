@@ -27,6 +27,9 @@ ectable(兴博.表格框架)
 BigPipe学习研究:
 http://www.cnblogs.com/mofish/archive/2011/11/03/2234858.html
 
+JsRender是一款基于jQuery的JavaScript模版引擎 12306WEB端使用
+
+
 前端样式框架
 bootstrap
 
