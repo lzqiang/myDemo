@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="zh_CN">
+<head>
+<meta name="renderer" content="webkit">
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="author" content="slmwp.com" />
+<title>Git分布式版本控制系统最佳实践 - 老男孩教育博客</title><meta name="description" content="Linux架构交流群：471443208" />
+<meta name="keywords" content="" />
+<link rel="stylesheet" href="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/css/bootstrap.css" type="text/css" />
+<link rel="stylesheet" href="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/style.css" type="text/css" />
+<link rel="stylesheet" href="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/css/font-awesome.min.css" type="text/css" />
+<link rel="stylesheet" href="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/css/animate.css" type="text/css" />
+
+<link rel="stylesheet" href="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/css/colors/B00C00.css" type="text/css" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<!--[if lte IE 8]><script>window.location.href='http://cdn.slmwp.com/slmwp/u/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+<!--[if lt IE 9]>
+    	<script src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/js/css3-mediaqueries.js"></script>
+    <![endif]-->
+<script type="text/javascript" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/js/jquery.js"></script>
+<script type="text/javascript" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/js/plugins.js"></script>
+<script>
+$(function() {
+        $("img").lazyload({
+            effect:"fadeIn"
+          });
+        });
+    paceOptions = {
+      elements: true
+    };
+  </script>
+<style></style>
+<link rel='prev' title='深入浅出linux三剑客之sed必杀技一例' href='http://blog.oldboyedu.com/swordsman-sed/' />
+<link rel='next' title='Docker容器的使用' href='http://blog.oldboyedu.com/docker-instruction/' />
+
+<link rel='canonical' href='http://blog.oldboyedu.com/git/' />
+<link rel='shortlink' href='http://blog.oldboyedu.com/?p=429' />
+	<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+</head>
+
+<body class="no-transition " >
+<div id="wrapper" class="clearfix">
+<div id="top-bar">
+  <div class="container clearfix">
+    <div class="col_half nobottommargin">
+      <div class="top-links">
+              </div>
+    </div>
+    <div class="col_half fright col_last nobottommargin">
+      <div id="top-social">
+        <ul>
+           
+		   
+		   
+		   
+		   
+		  <li><a data-toggle="modal" data-target=".bs-example-modal-sm" href="#" class="si-weixin"><span class="ts-icon"><i class="fa fa-weixin"></i></span><span class="ts-text">点击关注&quot;老男孩教育&quot;微信</span></a></li><div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true"><div class="modal-dialog modal-sm"><div class="modal-body"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel">扫描关注&quot;老男孩教育&quot;微信</h4></div><div class="modal-body"><p class="nobottommargin"><img src="http://cdn.oldboyedu.com/oldboyedu_weixinqun.png" alt="老男孩教育"></p></div></div></div></div></div> 
+		            <li><a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=e27e4567e379a7f4939e26caa641c61571f097acbac76be4ea5699b8470cffdd" class="si-group"><span class="ts-icon"><i class="fa fa-users"></i></span><span class="ts-text">老男孩培训交流群08</span></a></li> 
+          <li><a href="" class="si-rss"><span class="ts-icon"><i class="fa fa-rss"></i></span><span class="ts-text">RSS订阅</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+        <header id="header">
+  <div id="header-wrap">
+    <div class="container clearfix">
+      <div id="primary-menu-trigger"><i class="fa fa-reorder"></i></div>
+      <div id="logo"> <a href="http://blog.oldboyedu.com" class="standard-logo" data-dark-logo="http://cdn.oldboyedu.com/oldboyedu_logo.png"><img src="http://cdn.oldboyedu.com/oldboyedu_logo.png" alt="老男孩教育博客" /></a> <a href="http://blog.oldboyedu.com" class="retina-logo" data-dark-logo="http://cdn.oldboyedu.com/oldboyedu_logo.png"><img src="http://cdn.oldboyedu.com/oldboyedu_logo.png" alt="老男孩教育博客"></a> </div>
+      <nav id="primary-menu" class="style-2">
+        <ul id="menu-%e7%bd%91%e7%ab%99%e5%af%bc%e8%88%aa" class="nav navbar-nav"><li><a href="http://blog.oldboyedu.com/category/linux-strategy/">Linux攻略</a></li>
+<li><a href="http://blog.oldboyedu.com/category/linux-commands/">Linux命令</a></li>
+<li class="current-post-ancestor current-menu-parent"><a href="http://blog.oldboyedu.com/category/linux-service/">Linux服务</a>
+<ul class="sub-menu">
+	<li><a href="http://blog.oldboyedu.com/category/linux-service/web/">WEB服务</a></li>
+	<li><a href="http://blog.oldboyedu.com/category/linux-service/database/">数据库</a></li>
+	<li><a href="http://blog.oldboyedu.com/category/linux-service/secure/">安全</a></li>
+	<li><a href="http://blog.oldboyedu.com/category/linux-service/log/">日志</a></li>
+	<li><a href="http://blog.oldboyedu.com/category/linux-service/vpn/">VPN</a></li>
+	<li><a href="http://blog.oldboyedu.com/category/linux-service/monitor/">监控</a></li>
+</ul>
+</li>
+<li><a href="http://blog.oldboyedu.com/category/automatic-operation/">自动化运维</a>
+<ul class="sub-menu">
+	<li><a href="http://blog.oldboyedu.com/category/automatic-operation/automatic-installation/">自动化安装</a></li>
+	<li><a href="http://blog.oldboyedu.com/category/automatic-operation/automatic-deployment/">自动化部署</a></li>
+</ul>
+</li>
+<li><a href="http://blog.oldboyedu.com/category/cloud-computing/">云计算</a></li>
+<li><a href="http://blog.oldboyedu.com/category/open-class/">公开课</a></li>
+<li><a href="http://blog.oldboyedu.com/about-us/">关于我们</a></li>
+</ul>        <div id="top-search"> <a href="#" id="top-search-trigger"><i class="fa fa-search"></i><i class="fa fa-remove"></i></a>
+          <form action="http://blog.oldboyedu.com" method="get">
+            <input type="text" name="q" class="form-control" value="" placeholder="输入搜索词语，回车确认搜索..">
+          </form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+<section id="content">
+   <div class="content-wrap">
+        	<div class="section header-stick bottommargin-sm clearfix" style="padding: 20px 0;">
+      <div>
+        <div class="container clearfix"> <span class="label label-danger bnews-title"> 公告</span>
+        	
+          <div class="bnews-slider nobottommargin">
+            
+              <div class="slider-wrap">
+               
+        	<div id="code">如果你觉得下面的文章晦涩难懂，请猛戳==&gt;<a href="http://blog.oldboyedu.com/supporting-video/" target="_Blank">老男孩教育博客博文配套视频</a><img src="http://cdn.oldboyedu.com/015o.gif"></div>
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+<script type="text/javascript">
+$(function(){$("#code").typewriter();})
+var i = 0;
+function getColor(){
+	i++;
+	switch(i){ 
+		case 1:return "#1FAEFF";
+		case 2:return "#FF5E52";
+		case 3:return "#2CDB87";
+		case 4:return "#A12ABA";
+		case 5:return "#FD6639";
+		default:return "black";
+	}
+}
+function colorful(){
+	var o =document.getElementById('code');
+	o.style.color=getColor();
+	if(i==5)i=0;
+	setTimeout('colorful()',800);
+}
+colorful();
+</script>
+
+
+       <div class="container clearfix">
+      <div class="row">
+        <div class="col-md-8 bottommargin">
+                    
+          <div class="single-post nobottommargin">
+            <div class="entry clearfix">
+              <div class="entry-title">
+                <h2>Git分布式版本控制系统最佳实践</h2>
+              </div>
+              <ul class="entry-meta clearfix">
+                <li><i class="fa fa-calendar"></i> 6个月前 (06-24)</li>
+                <li><i class="fa fa-user"></i> <a href="http://blog.oldboyedu.com/author/oldboyoldboy/" title="由老男孩发布" rel="author">老男孩</a></li>                 <li><i class="fa fa-folder-open-o"></i><a href="http://blog.oldboyedu.com/category/linux-service/" rel="category tag">Linux服务</a>, <a href="http://blog.oldboyedu.com/category/student-style/" rel="category tag">学员风采</a></li>                 <li><i class="fa fa-comments-o"></i> <a href="http://blog.oldboyedu.com/git/#comments">0评论</a></li>                 <li><i class="fa fa-copyright"></i>来源：本站原创</li>                 	
+                <li><i class="fa fa-eye"></i> 377℃</li>
+                <li class="fontResizer">字体：<a href="javascript:doZoom(16)" class="btn-xs">小</a><a href="javascript:doZoom(20)" class="btn-xs">中</a><a href="javascript:doZoom(24)" class="btn-xs">大</a></li>
+                              </ul>
+              
+              <div id="primary" class="entry-content notopmargin">
+                                <p><span style="color: red; font-size: 12pt;"><strong>这篇文章来自于老男孩教育高级架构师班12期的徐亮偉同学。<span style="color: blue;"><br />
+</span></strong></span></p>
+<p><span style="color: blue;"><strong>首先感谢老男孩架构师班赵班长深入讲解Git,综合自己实践整理而来,特此在今天分享给大家。<br />
+</strong></span></p>
+<ol>
+<li>
+<div style="text-align: justify;">
+<h2>Git诞生历史</h2>
+</div>
+<p>我想大家还记得Linus torvalds在1991年时发布了Linux操作系统吧，从那以后Linux系统变不断发展壮大，因为Linux系统开源的特性，所以一直接受着来自全球Linux技术爱好者的贡献，志愿者们通过邮件向Linus发送着自己编写的源代码文件，然后由Linus本人通过手工的方式将代码合并，但这样不仅没有效率，而且真的是太痛苦了。<br />
+一直到2002年，Linux系统经过十余年的不断发展，代码库已经庞大到无法再让Linus通过手工的方式管理了，但是Linus真的很不喜欢CVS或者Subversion版本控制系统，于是商业公司BitMover决定将其公司的BitKeeper分布式版本控制系统授权给Linux开发社区来免费使用，当时的BitKeeper可以比较文件内容的不同，还能够将出错的文档还原到历史某个状态，Linus终于放下了心里的石头。</p>
+<p style="text-align: center; background: white;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git1.jpg" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /><span style="font-family: Times New Roman; font-size: 12pt;"><br />
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git1.jpg" alt="" /><span style="font-family: Times New Roman; font-size: 12pt;"><br /></noscript>
+</span></p>
+<p style="text-align: center;">分布式版本控制流程图</p>
+<p>CVS和Subversion属于传统的版本控制系统，而<span style="color: red; text-decoration: underline;">分布式版本控制系统最大的特点是不需要每次提交都把文件推送到版本控制服务器</span>，而是采用分布式版本库的机制，使得每个开发人员都够从服务器中克隆一份完整的版本库到自己计算机本地，不必再完全依赖于版本控制服务器，使得源代码的发布和合并更加方便，并且因为数据都在自己本地，不仅效率提高了，而且即便我们离开了网络依然可以执行提交文件、查看历史版本记录、创建分支等等操作，真的是开发者的福音啊。<span style="font-family: Batang; font-size: 9pt;"><br />
+</span></p>
+<p>就这样平静的度过了三年时间，但是Linux社区聚集着太多的黑客人物，2005年时，那位曾经开发Samba服务程序的Andrew因为试图破解BitKeeper软件协议而激怒了BitMover公司，当即决定不再向Linux社区提供免费的软件授权了，此时的Linus其实也早已有自己编写分布式版本控制系统的打算了，于是便用C语言花了2周创建了Git分布式版本控制系统，并上传了Linux系统的源代码。</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git2.jpg" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git2.jpg" alt="" /></p></noscript>
+<p style="text-align: center;">git_logo</p>
+<p>Git不仅是一款开源的分布式版本控制系统，而且有其独特的功能特性，例如大多数的分布式版本控制系统只会记录每次文件的变化，说白了就是只会关心文件的内容变化差异，而Git则是关注于文件数据整体的变化，直接会将文件提交时的数据保存成快照，而非仅记录差异内容，并且使用SHA-1加密算法保证数据的完整性。</p>
+<p>Git为了提高效率，对于没有被修改的文件，则不会重复存储，而是创建一个链接指向之前存储过的文件。</p>
+<p style="text-align: center; background: white;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git3.jpg" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /><span style="font-family: Batang; font-size: 9pt;"><br />
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git3.jpg" alt="" /><span style="font-family: Batang; font-size: 9pt;"><br /></noscript>
+</span></p>
+<p style="text-align: center;">git提交流程图</p>
+<p>在正式使用前，我们还需要弄清楚Git的三种重要模式，分别是<span style="color: red; text-decoration: underline;"><strong>已提交、已修改、已暂存</strong></span></p>
+<p>已提交(committed):表示数据文件已经顺利提交到Git数据库中。</p>
+<p>已修改(modified):表示数据文件已经被修改，但未被保存到Git数据库中。</p>
+<p>已暂存(staged):表示数据文件已经被修改，并会在下次提交时提交到Git数据库中。</p>
+<p>提交前的数据文件可能会被随意修改或丢失，但只要把文件快照顺利提交到Git数据库中，那就可以完全放心了，流程为：</p>
+<p>1.在工作目录中修改数据文件。</p>
+<p>2.将文件的快照放入暂存区域。</p>
+<p>3.将暂存区域的文件快照提交到Git仓库中。</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git4.jpg" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git4.jpg" alt="" /></p></noscript>
+<p style="text-align: center;">git工作模式</p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h2>Git环境准备</h2>
+</div>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# cat /etc/redhat-release <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">查看<span style="color: #0432ff;">系统版本</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">CentOS Linux release 7.1.1503 (Core)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# uname -r <span style="color: #0432ff;">#</span></span><span style="font-family: 宋体;">查看<span style="color: #0432ff;">内核版本</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">3.10.0-229.el7.x86_64<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# getenforce <span style="color: #0432ff;">#</span></span><span style="font-family: 宋体;">确认</span><span style="color: #0432ff;"><span style="font-family: Consolas;">Selinux</span><span style="font-family: 宋体;">关闭状态</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Disabled<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# systemctl stop firewalld <span style="color: #0432ff;">#</span></span><span style="font-family: 宋体;">关闭防火墙</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# ifconfig eth0|awk -F &#8216;[ ]+&#8217; &#8216;NR==2{print $3}&#8217; <span style="color: #0432ff;">#</span></span><span style="font-family: 宋体;">查看<span style="color: #0432ff;">当前主机</span></span><span style="font-family: Consolas;">IP</span><span style="color: #0432ff;"><span style="font-family: 宋体;">地址</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">192.168.56.115<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h2>Git安装部署</h2>
+</div>
+<p>Git是分布式的版本控制系统，我们只要有了一个原始Git版本仓库，就可以让其他主机克隆走这个原始版本仓库，从而使得一个Git版本仓库可以被同时分布到不同的主机之上，并且每台主机的版本库都是一样的，没有主次之分，极大的保证了数据安全性，并使得用户能够自主选择向那个Git服务器推送文件了，其实部署一个git服务器是非常简单的。</p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">yum install git <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">安装</span><span style="color: #0432ff; font-family: Consolas;">Git<span style="color: #333333;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">git config &#8211;global user.name &#8220;xubusi&#8221; <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">配置</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">使用用户</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]#<span style="color: red;"> git config &#8211;global user.email &#8220;xubusi@mail.com&#8221; <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">配置</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">使用邮箱</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[root@git-node1 ~]# <span style="color: red;">git config &#8211;global color.ui true<span style="color: #333333;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[root@git-node1 ~]# <span style="color: red;">git config &#8211;list<span style="color: #333333;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">user.name=xubusi<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">user.email=xubusi@mail.com<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">color.ui=true<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h2>Git常用命令</h2>
+</div>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> add <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">添加文件内容至索引</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> bisect <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">通过二分查找定位引入</span><span style="color: #0432ff;"><span style="font-family: Consolas;"> bug </span><span style="font-family: 宋体;">的变更</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> branch <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">列出、创建或删除分支</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> checkout<span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">检出一个分支或路径到工作区</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> clone <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">克隆一个版本库到一个新目录</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> commit <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">记录变更到版本库</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> diff <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">显示提交之间、提交和工作区之间等的差异</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> fetch <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">从另外一个版本库下载对象和引用</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> grep <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">输出和模式匹配的行</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> init <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">创建一个空的</span><span style="color: #0432ff;"><span style="font-family: Consolas;"> Git </span><span style="font-family: 宋体;">版本库或重新初始化一个已存在的版本库</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> log <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">显示提交日志</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> merge <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">合并两个或更多开发历史</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> mv <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">移动或重命名一个文件、目录或符号链接</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> pull <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">获取并合并另外的版本库或一个本地分支</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> push <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">更新远程引用和相关的对象</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> rebase <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">本地提交转移至更新后的上游分支中</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> reset <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">重置当前</span><span style="color: #0432ff;"><span style="font-family: Consolas;">HEAD</span><span style="font-family: 宋体;">到指定状态</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> rm <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">从工作区和索引中删除文件</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> show <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">显示各种类型的对象</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> status <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">显示工作区状态</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> tag <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">创建、列出、删除或校验一个</span><span style="color: #0432ff;"><span style="font-family: Consolas;">GPG</span><span style="font-family: 宋体;">签名的</span><span style="font-family: Consolas;"> tag </span><span style="font-family: 宋体;">对象</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h2>Git基本操作</h2>
+</div>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>Git提交数据</h3>
+</div>
+<p>我们可以简单的把工作目录理解成是一个被Git服务程序管理的目录，Git会时刻的追踪目录内文件的改动，另外在安装好了Git服务程序后，默认就会创建好了一个叫做master的分支，我们直接可以提交数据到了</p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">mkdir xubusi <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">创建<span style="color: #0432ff;">本地工作目录</span></span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">cd xubusi/ <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">进入<span style="color: #0432ff;">本地工作目录</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git init <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">初始<span style="color: #0432ff;">为</span></span><span style="font-family: Consolas;">git</span><span style="color: #0432ff;"><span style="font-family: 宋体;">工作目录</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Initialized empty Git repository in /root/xubusi/.git/<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# touch readme<span style="color: red;"><br />
+<span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">创建文件</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git status <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">查看</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">状态</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># Untracked files:<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># (use &#8220;git add &lt;file&gt;&#8230;&#8221; to include in what will be committed)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"># <span style="color: red;">readme.txt <strong><br />
+<span style="color: #0432ff; background-color: lime;">#</span></strong></span></span><strong><span style="font-family: 宋体; background-color: lime;">发现<span style="color: #0432ff;">新建的</span></span><span style="font-family: Consolas; background-color: lime;">readme.txt</span></strong><span style="color: #0432ff;"><span style="font-family: 宋体; background-color: lime;"><strong>文件</strong></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">…<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git add readme.txt <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#git</span></span></span></span><span style="font-family: 宋体;">添加<span style="color: #0432ff;">文件至暂存区</span></span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git status <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">再<span style="color: #0432ff;">次查看状态</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># Changes to be committed:<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># (use &#8220;git rm &#8211;cached &lt;file&gt;&#8230;&#8221; to unstage)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"># <span style="color: #ed7d31;">new file: readme.txt <span style="color: #0432ff; background-color: lime;"><strong>#</strong></span></span></span><strong><span style="font-family: 宋体; background-color: lime;">发现<span style="color: #0432ff;">新建立的文件</span></span><span style="font-family: Consolas; background-color: lime;">readme.txt</span></strong><span style="color: #0432ff;"><span style="font-family: 宋体; background-color: lime;"><strong>已经变绿</strong></span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">…<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git commit -m &#8220;the first commit&#8221; <span style="color: #0432ff;"> #git cmmit</span></span></span><span style="font-family: 宋体;">提交暂<span style="color: #0432ff;">存取文件至</span></span><span style="font-family: Consolas;">git</span><span style="color: #0432ff;"><span style="font-family: 宋体;">版本仓库</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[master (root-commit) dde9e40] the first commit<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 file changed, 1 insertion(+)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> create mode 100644 readme.txt<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>Git移除数据</h3>
+</div>
+<p>有些时候会向把已经添加到暂存区的文件移除，但仍然希望文件在工作目录中不丢失，换句话说，就是把文件从追踪清单中删除。<span style="font-family: Batang; font-size: 9pt;"><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">touch database <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">建立文件</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git add database <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">添加文件至暂存区</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> git status <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看当前</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">状态</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># On branch master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># Your branch is ahead of &#8216;origin/master&#8217; by 4 commits.<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># (use &#8220;git push&#8221; to publish your local commits)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">#<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># Changes to be committed:<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># (use &#8220;git reset HEAD &lt;file&gt;&#8230;&#8221; to unstage)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">#<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># new file: database<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git rm &#8211;cached database <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">将文件从</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">暂存区域的追踪列表移除</span><span style="font-family: Consolas;">(</span><span style="font-family: 宋体;">并不会删除当前工作目录内的数据文件</span><span style="font-family: Consolas;">)<br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">rm &#8216;database&#8217;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git status <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">此时文件已经是未追踪状态了</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># On branch master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># Untracked files:<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># (use &#8220;git add &lt;file&gt;&#8230;&#8221; to include in what will be committed)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">#<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># database<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">no changes added to commit (use &#8220;git add&#8221; and/or &#8220;git commit -a&#8221;)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: Consolas;">#</span><span style="font-family: 宋体;">如果想将文件数据从</span><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">暂存区和工作目录一起删除，可以做如下操作。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git add database<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">再将</span><span style="color: #0432ff;"><span style="font-family: Consolas;">database</span><span style="font-family: 宋体;">文件提交到</span><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">暂存区</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git rm -f database <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">但如果在删除之前数据文件已经被放入到暂存区域的话，</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">会担心你误删未提交的文件而报错信息，此时可追加强制删除</span><span style="font-family: Consolas;">-f</span><span style="font-family: 宋体;">参数。</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">rm &#8216;database&#8217;<span style="color: #0432ff;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">ls <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">查看工作区也没</span><span style="color: #0432ff;"><span style="font-family: Consolas;">database</span><span style="font-family: 宋体;">文件</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">LICENSE deploy help.md readme.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git status <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看当前状态</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># On branch master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">no changes added to commit (use &#8220;git add&#8221; and/or &#8220;git commit -a&#8221;)<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>Git移动数据</h3>
+</div>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git mv readme.txt test.txt <span style="color: #0432ff;"> #git</span></span></span><span style="font-family: 宋体;">如果要修改文件名称</span><span style="color: #0432ff;"><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">则使用</span><span style="font-family: Consolas;">git mv</span><span style="font-family: 宋体;">命令</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> git status <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">查看状态发现下次提交会有一个改名操作</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># On branch master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># Changes to be committed:<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># (use &#8220;git reset HEAD &lt;file&gt;&#8230;&#8221; to unstage)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">#<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"># renamed: readme.txt -&gt; test.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git commit -m &#8220;changed name&#8221; <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">提交到</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">版本仓库</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[master 88f3791] changed name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 2 files changed, 31 deletions(-)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> delete mode 100644 1<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: black; font-family: Consolas; font-size: 10pt;"><strong> rename readme.txt =&gt; test.txt (100%)<br />
+</strong></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: Consolas;">#</span><span style="font-family: 宋体;">其实可以如下方法改名</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> mv test.txt readme.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">先修改名称</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# git rm test.txt <span style="color: #0432ff;"> #</span></span><span style="font-family: 宋体;">然后删除</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">版本仓库内的文件快照</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">rm &#8216;test.txt&#8217;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git add readme.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">最后再将新的文件添加进入</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git commit -m &#8220;changed the file name&#8221; <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">提交至</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">版本仓库</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[master 2caa209] changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 file changed, 0 insertions(+), 0 deletions(-)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: black; font-family: Consolas; font-size: 10pt;"><strong> rename test.txt =&gt; readme.txt (100%)<br />
+</strong></span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>Git历史记录</h3>
+</div>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> git log <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看提交历史记录</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 2caa2090efa1aaf5c32524a13c500c1524e0a5ee<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 18:32:53 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 88f379175b5ead7e0d84e47bd6db6f5a3b072921<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 18:31:03 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 76c486fcf5d70b6a443ba9e7dad209c6722c8bee<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 18:22:39 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> tet<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git log -2 <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看最近几条记录</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 2caa2090efa1aaf5c32524a13c500c1524e0a5ee<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 18:32:53 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 88f379175b5ead7e0d84e47bd6db6f5a3b072921<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 18:31:03 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[root@git-node1 xubusi]#<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git log -p -1 <span style="color: #0432ff;">#-p</span></span></span><span style="font-family: 宋体;">显示每次提交的内容差异</span><span style="color: #0432ff;"><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">例如仅查看最近一次差异</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 2caa2090efa1aaf5c32524a13c500c1524e0a5ee<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 18:32:53 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">diff &#8211;git a/readme.txt b/readme.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">new file mode 100644<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">index 0000000..a9b574e<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">&#8212; /dev/null<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+++ b/readme.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">@@ -0,0 +1,3 @@<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+1 hehe<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+Create new mode two<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+Create new branch is linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">diff &#8211;git a/test.txt b/test.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">deleted file mode 100644<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">index a9b574e..0000000<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">&#8212; a/test.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+++ /dev/null<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">@@ -1,3 +0,0 @@<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">-1 hehe<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">-Create new mode two<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">-Create new branch is linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git log &#8211;stat -2<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#&#8211;stat</span></span></span></span><span style="font-family: 宋体;">简要显示数据增改行数，这样能够看到提交中修改过的内容，对文件添加或移动的行数，并在最后列出所有增减行的概要信息</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 2caa2090efa1aaf5c32524a13c500c1524e0a5ee<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 18:32:53 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> readme.txt | 3 +++<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> test.txt | 3 &#8212;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 2 files changed, 3 insertions(+), 3 deletions(-)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 88f379175b5ead7e0d84e47bd6db6f5a3b072921<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 18:31:03 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 | 31 &#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> readme.txt | 3 &#8212;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> test.txt | 3 +++<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 3 files changed, 3 insertions(+), 34 deletions(-)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git log &#8211;pretty=oneline <span style="color: #0432ff;">#&#8211;pretty</span></span></span><span style="font-family: 宋体;">根据不同的格式展示提交的历史信息</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">2caa2090efa1aaf5c32524a13c500c1524e0a5ee changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">88f379175b5ead7e0d84e47bd6db6f5a3b072921 changed name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">76c486fcf5d70b6a443ba9e7dad209c6722c8bee tet<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git log &#8211;pretty=fuller -2 <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">以更详细的模式输出提交的历史记录</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 2caa2090efa1aaf5c32524a13c500c1524e0a5ee<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">AuthorDate: Sat Jan 16 18:32:53 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Commit: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">CommitDate: Sat Jan 16 18:32:53 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 88f379175b5ead7e0d84e47bd6db6f5a3b072921<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">AuthorDate: Sat Jan 16 18:31:03 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Commit: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">CommitDate: Sat Jan 16 18:31:03 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> changed name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: 宋体;">还可以使用</span><span style="font-family: Consolas;">format</span><span style="font-family: 宋体;">参数来指定具体的输出格式，这样非常便于后期编程的提取分析哦，常用的格式有：</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%s    </span><span style="font-family: 宋体;">提交说明。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%cd    </span><span style="font-family: 宋体;">提交日期。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%an    </span><span style="font-family: 宋体;">作者的名字。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%cn    </span><span style="font-family: 宋体;">提交者的姓名。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%ce    </span><span style="font-family: 宋体;">提交者的电子邮件。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%H    </span><span style="font-family: 宋体;">提交对象的完整</span><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">哈希字串。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%h    </span><span style="font-family: 宋体;">提交对象的简短</span><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">哈希字串。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%T    </span><span style="font-family: 宋体;">树对象的完整</span><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">哈希字串。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%t    </span><span style="font-family: 宋体;">树对象的简短</span><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">哈希字串。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%P    </span><span style="font-family: 宋体;">父对象的完整</span><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">哈希字串。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%p    </span><span style="font-family: 宋体;">父对象的简短</span><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">哈希字串。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">%ad    </span><span style="font-family: 宋体;">作者的修订时间。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git log &#8211;pretty=fomat:&#8221;%h %cn&#8221;<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">查看当前所有提交记录的简短</span><span style="color: #0432ff;"><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">哈希字串与提交着的姓名</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">fomat:2caa209 xubusi<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">fomat:88f3791 xubusi<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">fomat:76c486f xubusi<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>Git还原数据</h3>
+</div>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">echo &#8220;Git is a version control system&#8221; &gt;&gt; readme.txt<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">追加一段话</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> git add readme.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">添加至暂存区</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git commit -m &#8220;introduction software&#8221; <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">提交至</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">版本仓库</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[master 4bf5b29] introduction software<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 file changed, 1 insertion(+)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: 宋体;">此时觉得写得不妥，想还原某一次提交的文件快照</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git log &#8211;pretty=oneline <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">提交<span style="color: #0432ff;">的历史信息</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">4bf5b296db9678f1851b896ed040fe37e6d7efb5 introduction software<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">2caa2090efa1aaf5c32524a13c500c1524e0a5ee changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">88f379175b5ead7e0d84e47bd6db6f5a3b072921 changed name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: Consolas;">Git</span><span style="font-family: 宋体;">服务程序中有一个叫做</span><span style="font-family: Consolas;">HEAD</span><span style="font-family: 宋体;">的版本指针，当用户申请还原数据时，其实就是将</span><span style="font-family: Consolas;">HEAD</span><span style="font-family: 宋体;">指针指向到某个特定的提交版本，但是因为</span><span style="font-family: Consolas;">Git</span><span style="font-family: 宋体;">是分布式版本控制系统，为了避免历史记录冲突，故使用了</span><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">计算出十六进制的哈希字串来区分每个提交版本，另外默认的</span><span style="font-family: Consolas;">HEAD</span><span style="font-family: 宋体;">版本指针会指向到最近的一次提交版本记录，而上一个提交版本会叫</span><span style="font-family: Consolas;">HEAD^</span><span style="font-family: 宋体;">，上上一个版本则会叫做</span><span style="font-family: Consolas;">HEAD^^</span><span style="font-family: 宋体;">，当然一般会用</span><span style="font-family: Consolas;">HEAD~5</span><span style="font-family: 宋体;">来表示往上数第五个提交版本。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git reset &#8211;hard HEAD^ <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">还原历史提交版本上一次</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">HEAD is now at 2caa209 changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;"> cat readme.txt <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">查看文件内容</span><span style="color: #0432ff;"><span style="font-family: Consolas;">(</span><span style="font-family: 宋体;">已经还原</span><span style="font-family: Consolas;">)<span style="color: #333333;"><br />
+</span></span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Create new branch is linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: 宋体;">刚刚的操作实际上就是改变了一下</span><span style="font-family: Consolas;">HEAD</span><span style="font-family: 宋体;">版本指针的位置，就是你将</span><span style="font-family: Consolas;">HEAD</span><span style="font-family: 宋体;">指针放在那里，那么你的当前工作版本就会定位在那里，要想把内容再还原到最新提交的版本，先看查看下提交版本号</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[root@git-node1 xubusi]# <span style="color: red;">git log &#8211;pretty=oneline<span style="color: #333333;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">2caa2090efa1aaf5c32524a13c500c1524e0a5ee changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">88f379175b5ead7e0d84e47bd6db6f5a3b072921 changed name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: 宋体;">怎么搞得？竟然没有了</span><span style="font-family: Consolas;">Introduction software</span><span style="font-family: 宋体;">这个提交版本记录？</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: 宋体;">原因很简单，因为我们当前的工作版本是历史的一个提交点，这个历史提交点还没有发生过</span><span style="font-family: Consolas;">Introduction software</span><span style="font-family: 宋体;">更新记录，所以当然就看不到了，要是想&#8221;还原到未来&#8221;的历史更新点，可以用</span><span style="font-family: Consolas;">git reflog</span><span style="font-family: 宋体;">命令来查看所有的历史记录：</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git reflog <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看未来<span style="color: #0432ff;">历史更新点</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">2caa209 HEAD@{0}: reset: moving to HEAD^<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #00b050; font-family: Consolas; font-size: 10pt;"><strong>4bf5b29 HEAD@{1}: commit: introduction software<br />
+</strong></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">2caa209 HEAD@{2}: commit: changed the file name<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git reset &#8211;hard 4bf5b29 <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">找到历史还原点的</span><span style="color: #0432ff;"><span style="font-family: Consolas;">SHA-1</span><span style="font-family: 宋体;">值后，就可以还原</span><span style="font-family: Consolas;">(</span><span style="font-family: 宋体;">值不写全</span><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">系统会自动匹配</span><span style="font-family: Consolas;">)<br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">HEAD is now at 4bf5b29 introduction software<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> cat readme.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看文件内容</span><span style="color: #0432ff;"><span style="font-family: Consolas;">(</span><span style="font-family: 宋体;">已经还原</span><span style="font-family: Consolas;">)<span style="color: #333333;"><br />
+</span></span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Create new branch is linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Git is a version control system<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: 宋体;">如是只是想把某个文件内容还原，就不必这么麻烦，直接用</span><span style="font-family: Consolas;">git checkout</span><span style="font-family: 宋体;">命令就可以的，先写一段话</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[root@git-node1 xubusi]# <span style="color: red;">echo &#8220;Some mistkes words&#8221; &gt;&gt; readme.txt<br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> cat readme.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看内容</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Git is a version control system<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Some mistkes words<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: 宋体;">我们突然发现不应该写一句话的</span><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">可以手工删除（当内容比较多的时候会很麻烦）</span><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">还可以将文件内容从暂存区中恢复</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[root@git-node1 xubusi]# <span style="color: red;">git checkout &#8212; readme.txt<span style="color: #333333;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[root@git-node1 xubusi]#<span style="color: red;"> cat readme.txt <span style="color: #333333;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Git is a version control system<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: 宋体;">这其中是有一套规则，如果暂存区中有该文件，则直接从暂存区恢复，如果暂存区没有该文件，则将还原成最近一次文件提交时的快照。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h2>Git管理分支结构</h2>
+</div>
+<p>分支即是平行空间，假设你在为某个手机系统研发拍照功能，代码已经完成了80%，但如果将这不完整的代码直接提交到git仓库中，又有可能影响到其他人的工作，此时我们便可以在该软件的项目之上创建一个名叫&#8221;拍照功能&#8221;的分支，这种分支只会属于你自己，而其他人看不到，等代码编写完成后再与原来的项目主分支合并下即可，这样即能保证代码不丢失，又不影响其他人的工作。</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git5.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git5.png" alt="" /></p></noscript>
+<p>一般在实际的项目开发中，我们要尽量保证master分支是非常稳定的，仅用于发布新版本，平时不要随便直接修改里面的数据文件，而工作的时候则可以新建不同的工作分支，等到工作完成后在合并到master分支上面，所以团队的合作分支看起来会像上面图那样。</p>
+<p style="text-align: center; background: white;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git6.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /><span style="font-family: Batang; font-size: 9pt;"><br />
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git6.png" alt="" /><span style="font-family: Batang; font-size: 9pt;"><br /></noscript>
+</span></p>
+<p style="text-align: center;">生产代码提交方式</p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>Git创建分支</h3>
+</div>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git branch linux<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">创建分支</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git checkout linux <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">切换分支</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Switched to branch &#8216;linux&#8217;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git branch <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">查看当前分支情况</span><span style="color: #0432ff;"><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">当前分支前有</span><span style="font-family: Consolas;">*</span><span style="font-family: 宋体;">号</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #92d050; font-family: Consolas; font-size: 10pt;">* linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">echo &#8220;Create new branch is linux&#8221; &gt;&gt; readme.txt<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">我们对文件追加一行字符串</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git add readme.txt <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">提交到暂存区</span><span style="color: #0432ff; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git commit -m &#8220;new branch&#8221; <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">提交到</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">版本仓库</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[linux 8bf5757] new branch<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 file changed, 1 insertion(+)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git checkout master <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">我们在提交文件后再切回</span><span style="color: #0432ff;"><span style="font-family: Consolas;">master</span><span style="font-family: 宋体;">分支</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Switched to branch &#8216;master&#8217;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">cat readme.txt <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">查看文件内容</span><span style="color: #0432ff;"><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">发现并没有新追加的字符串</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">1 hehe<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>Git合并分支</h3>
+</div>
+<p>现在，我们想把linux的工作成果合并到master分支上了，则可以使用&#8221;git merge&#8221;命令来将指定的的分支与当前分支合并</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git7.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git7.png" alt="" /></p></noscript>
+<p style="text-align: center;">git合并分之示意图</p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> git branch <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">查看是否在</span><span style="color: #0432ff;"><span style="font-family: Consolas;">master</span><span style="font-family: 宋体;">分支</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">* master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git merge linux <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">合并</span><span style="color: #0432ff;"><span style="font-family: Consolas;">Linux</span><span style="font-family: 宋体;">分支至</span><span style="font-family: Consolas;">master<span style="color: #333333;"><br />
+</span></span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Updating 185d668..8bf5757<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Fast-forward<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> readme.txt | 1 +<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 file changed, 1 insertion(+)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">cat readme.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看合并后的</span><span style="color: #0432ff;"><span style="font-family: Consolas;">readme</span><span style="font-family: 宋体;">文件</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">1 hehe<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Create new branch is linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git branch -d linux <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">确认合并完成后，可以放心地删除</span><span style="color: #0432ff;"><span style="font-family: Consolas;">Linux</span><span style="font-family: 宋体;">分支</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Deleted branch linux (was 8bf5757).<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git branch <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">删除后，查看</span><span style="color: #0432ff;"><span style="font-family: Consolas;">branch,</span><span style="font-family: 宋体;">只剩下</span><span style="font-family: Consolas;">master</span><span style="font-family: 宋体;">分支了</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">* master<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>Git分支冲突</h3>
+</div>
+<p style="text-align: center; background: white;"><span style="font-size: 10pt;"><span style="font-family: 宋体;">但是</span><span style="font-family: Consolas;">Git</span><span style="font-family: 宋体;">并不能每次都为我们自动的合并分支，当遇到了内容冲突比较复杂的情况，则必须手工将差异内容处理点，比如这样的情况：</span></span><span style="font-family: Batang; font-size: 9pt;"><br />
+<img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git8.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></span><span style="font-family: Consolas; font-size: 10pt;"><br />
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git8.png" alt="" /></span><span style="font-family: Consolas; font-size: 10pt;"><br /></noscript>
+</span></p>
+<p style="text-align: center; background: white;"><span style="font-size: 10pt;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">分支冲突示意图</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git checkout -b linux <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">创建分支并切换到该分支</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git branch <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看分支</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #ed7d31; font-family: Consolas; font-size: 10pt;">* linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">vim readme.txt <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">编辑</span><span style="color: #0432ff;"><span style="font-family: Consolas;">readme</span><span style="font-family: 宋体;">文件</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git add readme.txt <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">在</span><span style="color: #0432ff;"><span style="font-family: Consolas;">Linux</span><span style="font-family: 宋体;">分支添加</span><span style="font-family: Consolas;">readme</span><span style="font-family: 宋体;">至暂存区</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git commit -m &#8220;create two&#8221; <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">在</span><span style="color: #0432ff;"><span style="font-family: Consolas;">Linux</span><span style="font-family: 宋体;">分支提交</span><span style="font-family: Consolas;">readme<span style="color: #333333;"><br />
+</span></span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[linux 13a42ad] create two<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 file changed, 1 insertion(+), 2 deletions(-)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git checkout master <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">切换到</span><span style="color: #0432ff;"><span style="font-family: Consolas;">master</span><span style="font-family: 宋体;">分支</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Switched to branch &#8216;master&#8217;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git branch <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">查看是否切换至</span><span style="color: #0432ff;"><span style="font-family: Consolas;">master</span><span style="font-family: 宋体;">分支</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #ed7d31; font-family: Consolas; font-size: 10pt;">* master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">vim readme.txt <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">编在</span><span style="color: #0432ff;"><span style="font-family: Consolas;">master</span><span style="font-family: 宋体;">分支上修改</span><span style="font-family: Consolas;">readme</span><span style="font-family: 宋体;">文件同一行的内容</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git add readme.txt<span style="color: #333333;"><br />
+<span style="color: #0432ff;"> #</span></span></span></span><span style="font-family: 宋体;">添加至暂存区</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git commit -m &#8216;create to master&#8217; <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">提交至</span><span style="color: #0432ff;"><span style="font-family: Consolas;">Git</span><span style="font-family: 宋体;">版本仓库</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[master 75bd55c] create to master<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 file changed, 1 insertion(+)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git merge linux <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">合并</span><span style="color: #0432ff;"><span style="font-family: Consolas;">Linux</span><span style="font-family: 宋体;">分支</span><span style="font-family: Consolas;">(</span><span style="font-family: 宋体;">冲突</span><span style="font-family: Consolas;">)<span style="color: #333333;"><br />
+</span></span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Auto-merging readme.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">CONFLICT (content): Merge conflict in readme.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Automatic merge failed; fix conflicts and then commit the result.<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: Consolas;">#</span><span style="font-family: 宋体;">那么此时，我们在</span><span style="font-family: Consolas;">master</span><span style="font-family: 宋体;">与</span><span style="font-family: Consolas;">linux</span><span style="font-family: 宋体;">分支上都分别对中</span><span style="font-family: Consolas;">readme</span><span style="font-family: 宋体;">文件进行了修改并提交了，那这种情况下</span><span style="font-family: Consolas;">Git</span><span style="font-family: 宋体;">就没法再为我们自动的快速合并了，它只能告诉我们</span><span style="font-family: Consolas;">readme</span><span style="font-family: 宋体;">文件的内容有冲突，需要手工处理冲突的内容后才能继续合并</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> cat readme.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">冲突内容如下</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: Consolas;">#Git</span><span style="font-family: 宋体;">用</span><span style="font-family: Consolas;">&lt; &lt;&lt;&lt;&lt;&lt;&lt;</span><span style="font-family: 宋体;">，</span><span style="font-family: Consolas;">=======</span><span style="font-family: 宋体;">，</span><span style="font-family: Consolas;">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span><span style="font-family: 宋体;">分割开了各个分支冲突的内容，我们需要手工的删除这些符号，并将内容修改</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">1 hehe<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">=======<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">&gt;&gt;&gt;&gt;&gt;&gt;&gt; linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Create new branch is linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git add readme.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">再次<span style="color: #0432ff;">添加至暂存区</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git commit -m &#8216;config&#8217; <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">提交至</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">版本仓库</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">[master eb9bb83] config<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git branch -d linux <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">最后删除</span><span style="color: #0432ff;"><span style="font-family: Consolas;">Linux</span><span style="font-family: 宋体;">分支结束</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Deleted branch linux (was 13a42ad).<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git branch <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">检查是否删除完毕</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #ed7d31; font-family: Consolas; font-size: 10pt;">* master<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h2>Git管理标签</h2>
+</div>
+<p>当版本仓库内的数据有个大的改善或者功能更新，我们经常会打一个类似于软件版本号的标签，这样通过标签就可以将版本库中的某个历史版本给记录下来，方便我们随时将特定历史时期的数据取出来用，另外打标签其实只是像某个历史版本做了一个指针，所以一般都是瞬间完成的。</p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">cd xubusi/ <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">进入</span><span style="color: #0432ff;"><span style="font-family: Consolas;">git</span><span style="font-family: 宋体;">版本控制系统</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git tag v1.0 <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">当前<span style="color: #0432ff;">提交内容打一个标签</span></span><span style="font-family: Consolas;">(</span><span style="color: #0432ff;"><span style="font-family: 宋体;">方便快速回滚</span><span style="font-family: Consolas;">)<span style="color: #333333;"><br />
+</span></span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git tag <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看<span style="color: #0432ff;">当前所有的标签</span></span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">v1.0<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git show v1.0 <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看<span style="color: #0432ff;">当前</span></span><span style="font-family: Consolas;">1.0</span><span style="color: #0432ff;"><span style="font-family: 宋体;">版本的详细信息</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">commit 4bf5b296db9678f1851b896ed040fe37e6d7efb5<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Author: xubusi &lt;xubusi@mail.com&gt;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Date: Sat Jan 16 19:02:14 2016 +0800<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> introduction software<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">diff &#8211;git a/readme.txt b/readme.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">index a9b574e..412b267 100644<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">&#8212; a/readme.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+++ b/readme.txt<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">@@ -1,3 +1,4 @@<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> 1 hehe<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> Create new mode two<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"> Create new branch is linux<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+Git is a version control system<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git tag v1.2 -m &#8220;version 1.2 release is test&#8221; <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">创建带有说明的标签</span><span style="color: #0432ff;"><span style="font-family: Consolas;">,-a</span><span style="font-family: 宋体;">指定标签名字，</span><span style="font-family: Consolas;">-m</span><span style="font-family: 宋体;">指定说明文字</span><span style="font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git tag -d v1.0 <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">我们<span style="color: #0432ff;">为同一个提交版本设置了两次标签</span></span><span style="font-family: Consolas;">,</span><span style="color: #0432ff;"><span style="font-family: 宋体;">删除之前的</span><span style="font-family: Consolas;">v1.0<span style="color: #333333;"><br />
+</span></span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Deleted tag &#8216;v1.0&#8217; (was 4bf5b29)<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">git tag <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">再次<span style="color: #0432ff;">查看</span></span><span style="font-family: Consolas;">,<span style="color: #0432ff;">v1.0</span></span><span style="font-family: 宋体;">已经<span style="color: #0432ff;">被删除</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">v1.2<br />
+</span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h2>GitLab安装部署</h2>
+</div>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">1. </span><span style="font-family: 宋体;">安装和配置必要的依赖关系</span><span style="font-family: Consolas;">Install and configure the necessary dependencies<br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: 宋体;">如果你安装</span><span style="font-family: Consolas;">postfix</span><span style="font-family: 宋体;">发送邮件，请选择&#8221;网站设置&#8221;中。而不是使用后缀也可以用邮件或</span><span style="font-family: Consolas;"> </span><span style="font-family: 宋体;">配置自定义</span><span style="font-family: Consolas;">SMTP</span><span style="font-family: 宋体;">服务器。如果你想使用的进出口，请</span><span style="font-family: Consolas;"> </span><span style="font-family: 宋体;">配置为</span><span style="font-family: Consolas;">SMTP</span><span style="font-family: 宋体;">服务器。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: 宋体;">在</span><span style="font-family: Consolas;">CentOS7</span><span style="font-family: 宋体;">，下面的命令将在系统防火墙打开</span><span style="font-family: Consolas;">HTTP</span><span style="font-family: 宋体;">和</span><span style="font-family: Consolas;">SSH</span><span style="font-family: 宋体;">访问。</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Arial; font-size: 10pt;">yum install curl openssh-server postfix<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Arial; font-size: 10pt;">systemctl enable sshd postfix<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Arial; font-size: 10pt;">systemctl start sshd postfix<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Arial; font-size: 10pt;">firewall-cmd &#8211;permanent &#8211;add-service=http<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Arial; font-size: 10pt;">systemctl reload firewalld<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">2. </span><span style="font-family: 宋体;">添加</span><span style="font-family: Consolas;">gitlab</span><span style="font-family: 宋体;">包服务器安装包</span><span style="font-family: Consolas;">Add the GitLab package server and install the package<br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | sudo bash<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">yum install gitlab-ce<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">3. </span><span style="font-family: 宋体;">配置并启动</span><span style="font-family: Consolas;">gitlab Configure and start GitLab<br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">gitlab-ctl reconfigure<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">gitlab-ctl status<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">gitlab-ctl stop<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">gitlab-ctl start<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">4. </span><span style="font-family: 宋体;">浏览到主机名和登录</span><span style="font-family: Consolas;">Browse to the hostname and login<br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333;"><span style="font-family: Consolas; font-size: 10pt;">Username:</span><span style="color: #e3dcf7;"><span style="font-family: Helvetica; font-size: 10pt;"> </span><span style="color: #c7254e;"><span style="font-family: Arial; font-size: 9pt; background-color: #f9f2f4;">root</span><span style="color: #e3dcf7;"><span style="font-family: Helvetica; font-size: 10pt;"> </span><span style="color: #333333;"><span style="font-family: Consolas; font-size: 10pt;"><br />
+Password:</span><span style="color: #e3dcf7;"><span style="font-family: Helvetica; font-size: 10pt;"> </span><span style="color: #c7254e; font-family: Arial; font-size: 9pt; background-color: #f9f2f4;">5iveL!fe<br />
+</span></span></span></span></span></span></span></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h3>GitLab配置ssh</h3>
+</div>
+<p>gitlab搭配ssh默认端口引发的血战</p>
+<p>问题如下：</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git9.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git9.png" alt="" /></p></noscript>
+<p style="text-align: center;">仔细发现故障情况</p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">sed -i &#8216;s/#Port 22/Port 52113/g&#8217; /etc/ssh/sshd_config<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">如<span style="color: #0432ff;">果是默认的</span></span><span style="font-family: Consolas;">22,</span><span style="color: #0432ff;"><span style="font-family: 宋体;">就必须修改</span><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">否则不生效</span><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">我这里改为了</span><span style="font-family: Consolas;">52113<br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">systemctl restart sshd <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">重启</span><span style="color: #0432ff;"><span style="font-family: Consolas;">sshd</span><span style="font-family: 宋体;">服务</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]# <span style="color: red;">grep &#8220;ssh_port&#8221; /etc/gitlab/gitlab.rb <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">修改</span><span style="color: #0432ff;"><span style="font-family: Consolas;">gitlab</span><span style="font-family: 宋体;">里面的</span><span style="font-family: Consolas;">ssh_prot</span><span style="font-family: 宋体;">端口为自己服务器的</span><span style="font-family: Consolas;">sshd</span><span style="font-family: 宋体;">端口</span><span style="font-family: Consolas;">,</span><span style="font-family: 宋体;">声明</span><span style="font-family: Consolas;">gitlab.yml</span><span style="font-family: 宋体;">中的配置会被这个给覆盖</span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">gitlab_rails[&#8216;gitlab_shell_ssh_port&#8217;] = 52113<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 xubusi]#<span style="color: red;"> gitlab-ctl reconfigure <span style="color: #0432ff;"> #gitlab</span></span></span><span style="font-family: 宋体;">重新加载配置文件即可</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git10.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /><span style="font-size: 18pt;"><strong><br />
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git10.png" alt="" /><span style="font-size: 18pt;"><strong><br /></noscript>
+</strong></span></p>
+<p style="text-align: center;">解决后效果,做一个对比，细心的朋友肯定能发现</p>
+<p>gitlab和github其实pull和push是一样的,所以我会在下面介绍如何用github来pull和push</li>
+<li>
+<div style="text-align: justify;">
+<h2>GitHub托管服务</h2>
+</div>
+<p>Github顾名思义是一个Git版本库的托管服务，是目前全球最大的软件仓库，拥有上百万的开发者用户，也是软件开发和寻找资源的最佳途径，Github不仅可以托管各种Git版本仓库，还拥有了更美观的Web界面，您的代码文件可以被任何人克隆，使得开发者为开源项贡献代码变得更加容易，当然也可以付费购买私有库，这样高性价比的私有库真的是帮助到了很多团队和企业。<br />
+大多数用户都是为了寻找资源而爱上Github的，首先进入网站，点击注册(Sign up)：</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git11.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git11.png" alt="" /></p></noscript>
+<p style="text-align: center;">如果没有注册的朋友点击注册</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git12.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git12.png" alt="" /></p></noscript>
+<p style="text-align: center;">填写注册信息<br />
+<img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git13.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git13.png" alt="" /></p></noscript>
+<p style="text-align: center;">选择仓库类型,默认免费,点击底下finish sign up注册<span style="font-family: Batang; font-size: 9pt;"><br />
+</span></p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git14.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /><span style="font-family: Batang; font-size: 9pt;"><br />
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git14.png" alt="" /><span style="font-family: Batang; font-size: 9pt;"><br /></noscript>
+</span></p>
+<p style="text-align: center;"><span style="font-family: Batang; font-size: 9pt;">我们的GitHub账号注册完成<br />
+</span></p>
+<p>我们在向Github推送文件时,可以选择SSH协议模式，在本机生成密钥</p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">ssh-keygen <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">生成<span style="color: #0432ff;">密钥命令</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Generating public/private rsa key pair.<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Enter file in which to save the key (/root/.ssh/id_rsa):<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Enter passphrase (empty for no passphrase):<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Enter same passphrase again:<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Your identification has been saved in /root/.ssh/id_rsa.<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Your public key has been saved in /root/.ssh/id_rsa.pub.<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">The key fingerprint is:<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">00:93:62:97:fd:a8:7a:7b:33:0f:2d:81:e1:11:17:b2 root@git-node1.com<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">The key&#8217;s randomart image is:<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+&#8211;[ RSA 2048]&#8212;-+<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| =+o. |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| o +B. |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| . oE .o |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| . +&#8230; |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| o.. S |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| . o |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| . o . |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| . . +o |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">| ..o +. |<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">+&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;+<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;"> [root@git-node1 ~]# <span style="color: red;">cat ~/.ssh/id_rsa.pub <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">查看<span style="color: #0432ff;">公钥</span></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCXv4xsa4l9fvKCDTWMvG0meoMveklG/beOvkw9xVnmFVhTg4qOCVhLXaaQtR1PJnKVhMok1vtYZu+ldAMHsSmHMuUCK2KMNFrZZaEloMeCNRkFY2vhY5XHuUBK2NjwgLjDXCYtIU40UmlFCU974ybWZJaCteIoHstLLQPoG/5PF5gqBOCeNLxkpq35jJTO9JvexeBMr2hG7NSzg9uZEDyRPUwEVY2yYZkq7hlAnR5H4f1X6HPePc64ZWLT3ZyddlK/9EXDLPu2VLMC7lj5mTGrJlQ54TU3dqSYQXzIV88GsdqxfZj8xbb9JOUZJK4KjAvqUkVmtaVFTTM77zCPUJSN root@git-node1.com<br />
+</span></p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git15.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git15.png" alt="" /></p></noscript>
+<p style="text-align: center;">点击setting账户配置</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git16.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git16.png" alt="" /></p></noscript>
+<p style="text-align: center;">点击SSH keys</p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git17.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /><span style="font-family: Batang; font-size: 9pt;"><br />
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git17.png" alt="" /><span style="font-family: Batang; font-size: 9pt;"><br /></noscript>
+</span></p>
+<p style="text-align: center;"><span style="font-family: Batang; font-size: 9pt;">添加git服务器上生成的公钥</span>id_rsa.pub<span style="font-family: Batang; font-size: 9pt;">点击Add key添加<br />
+</span></p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git18.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git18.png" alt="" /></p></noscript>
+<p style="text-align: center;"><strong>查看ssh公钥信息</strong></p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git19.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git19.png" alt="" /></p></noscript>
+<p style="text-align: center;">准备工作已经完毕,右上角点击创建一个新的仓库<br />
+<img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git20.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git20.png" alt="" /></p></noscript>
+<p style="text-align: center;">填写仓库的信息<br />
+<img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git21.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git21.png" alt="" /></p></noscript>
+<p style="text-align: center;">创建成功后会跳转到该仓库,选择ssh模式,复制版本仓库克隆地址</p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">git clone git@github.com:xubusi3/demo.git<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">手动克隆测试</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Cloning into &#8216;demo&#8217;&#8230;<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">remote: Counting objects: 3, done.<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;">Receiving objects: 100% (3/3), done.<br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><strong><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">cat demo/README.md <span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">查看<span style="color: #0432ff;">详细信息</span></span></strong><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong># demo</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><strong><span style="font-family: 宋体;">描述信息</span><span style="font-family: Consolas;">&#8212;</span><span style="font-family: 宋体;">可以不写</span></strong><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><strong><span style="font-family: Consolas;">[root@git-node1 ~]# <span style="color: red;">cd demo/ <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">进入</span></strong><span style="color: #0432ff;"><strong><span style="font-family: Consolas;">github clone</span><span style="font-family: 宋体;">下来的仓库</span></strong><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><strong><span style="font-family: Consolas;">[root@git-node1 demo]# <span style="color: red;">echo &#8220;test is git&#8221; &gt;&gt;test.txt <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">添加<span style="color: #0432ff;">新文件</span></span></strong><span style="color: red; font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><strong><span style="font-family: Consolas;">[root@git-node1 demo]# <span style="color: red;">git add test.txt<span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">添加<span style="color: #0432ff;">到</span></span><span style="font-family: Consolas;">git</span></strong><span style="color: #0432ff;"><span style="font-family: 宋体;"><strong>暂存区</strong></span><span style="color: red; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><strong><span style="font-family: Consolas;">[root@git-node1 demo]# <span style="color: red;">git commit -m &#8220;add test file&#8221; <span style="color: #0432ff;">#</span></span></span><span style="font-family: 宋体;">提交<span style="color: #0432ff;">到</span></span><span style="font-family: Consolas;">git</span></strong><span style="color: #0432ff;"><span style="font-family: 宋体;"><strong>版本仓库</strong></span><span style="color: #333333; font-family: Consolas;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong>[master 66cace0] add test file</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong> 1 file changed, 1 insertion(+)</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong> create mode 100644 test.txt</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-size: 10pt;"><strong><span style="font-family: Consolas;">[root@git-node1 demo]#<span style="color: red;"> git remote <span style="color: #0432ff;"> #</span></span></span><span style="font-family: 宋体;">查看本机列表</span></strong><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong>origin</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333;"><span style="font-size: 10pt;"><strong><span style="font-family: Consolas;">[root@git-node1 demo]# <span style="color: red;">git push -u origin master<span style="color: #333333;"><br />
+<span style="color: #0432ff;">#</span></span></span></span><span style="font-family: 宋体;">然后将本地的</span></strong></span><span style="color: #0432ff;"><span style="font-size: 10pt;"><strong><span style="font-family: Consolas;">Git</span><span style="font-family: 宋体;">仓库同步到远程</span><span style="font-family: Consolas;">Github</span><span style="font-family: 宋体;">服务器上</span><span style="font-family: Consolas;">(</span><span style="font-family: 宋体;">第一次请加上参数</span><span style="font-family: Consolas;">-u</span><span style="font-family: 宋体;">，代表关联本地与远程</span><span style="font-family: Consolas;">)</span></strong></span><span style="font-family: Batang; font-size: 9pt;"><br />
+</span></span></span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong>Counting objects: 4, done.</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong>Compressing objects: 100% (2/2), done.</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong>Writing objects: 100% (3/3), 281 bytes | 0 bytes/s, done.</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong>Total 3 (delta 0), reused 0 (delta 0)</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong>To git@github.com:xubusi3/demo.git</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong> 1b836ba..66cace0 master -&gt; master</strong><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><strong>Branch master set up to track remote branch master from origin.</strong><br />
+</span></p>
+<p style="text-align: center;"><img data-original="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git22.png" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/loading.gif" alt="" /></p>
+<noscript><img src="http://cdn.oldboyedu.com/wp-content/uploads/2016/06/062416_0251_Git22.png" alt="" /></p></noscript>
+<p style="text-align: center;"><strong>刷新一下web,果然看到版本仓库已经同步了</strong></p>
+</li>
+<li>
+<div style="text-align: justify;">
+<h2>Git客户端工具</h2>
+</div>
+<p style="background: white; margin-left: 11pt;"><a href="https://www.sourcetreeapp.com/"><span style="font-family: Consolas; font-size: 10pt;">https://www.sourcetreeapp.com/</span></a><span style="color: #333333; font-family: Consolas; font-size: 10pt;"><br />
+</span></p>
+<p style="background: white; margin-left: 11pt;"><span style="color: #0432ff; font-size: 10pt;"><span style="font-family: Consolas;">Git</span><span style="font-family: 宋体;">和</span><span style="font-family: Consolas;">Mercurial</span><span style="font-family: 宋体;">的</span><span style="font-family: Consolas;">Windows</span><span style="font-family: 宋体;">或</span><span style="font-family: Consolas;">Mac</span><span style="font-family: 宋体;">的客户端</span><span style="font-family: Consolas;"><br />
+</span></span></p>
+<p>原文链接：<a href="http://www.xuliangwei.com/xubusi/385.html">http://www.xuliangwei.com/xubusi/385.html</a></p>
+<p><span style="color: red; font-size: 12pt;"><strong><span style="font-family: 宋体;">笔者</span><span style="font-family: Times New Roman;">QQ</span><span style="font-family: 宋体;">：</span><span style="font-family: Times New Roman;">572891887</span></strong><span style="color: #3f3e3c; font-family: 宋体;"><br />
+</span></span></p>
+<p><span style="color: red; font-size: 12pt;"><strong><span style="font-family: Times New Roman;">Linux</span><span style="font-family: 宋体;">架构交流群：</span><span style="font-family: Times New Roman;">471443208</span></strong></span></li>
+</ol>
+                     
+                                   
+                                
+                                                <p class="asb-post-footer"><b>AD：</b><strong><a href="http://oldboy.blog.51cto.com/" target="_blank">官方群:运维交流08群384467551 架构师交流QQ群390642196</a></strong></p>
+                                <div class="tagcloud clearfix bottommargin-mini">
+                                  </div>
+                <div class="post-like"><a href="javascript:;" data-action="ding" data-id="429" class="specsZan"><i class="fa fa-thumbs-up"></i> 赞<span class="count">2</span></a></div>                <div class="style-msg2 sigle_copy" style="background-color: #d9edf7;"><div class="msgtitle">如无特殊说明，文章均为本站原创，转载请注明出处</div><div class="sb-msg"><ul> <li>转载请注明来源：<a title="Git分布式版本控制系统最佳实践" data-toggle="tooltip" data-placement="top" data-hover="Git分布式版本控制系统最佳实践" href="http://blog.oldboyedu.com/git/">Git分布式版本控制系统最佳实践</a></li><li>本文永久链接地址：http://blog.oldboyedu.com/git/</li></ul></div></div>
+                        <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">该文章由 <span>
+                  <a href="http://blog.oldboyedu.com/author/oldboyoldboy/" title="由老男孩发布" rel="author">老男孩</a>                  </span>发布<div class="share noborder clearfix"> <div class="bdsharebuttonbox"><a class="bds_more" data-cmd="more"><span><i class="fa fa-share-square-o"></i></span></a> <a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a><a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a><a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a><a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"></a><a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a><a href="#" class="bds_bdhome" data-cmd="bdhome" title="分享到百度新首页"></a><a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"></a></a><a href="#" class="bds_kaixin001" data-cmd="kaixin001" title="分享到开心网"></a><a href="#" class="bds_taobao" data-cmd="taobao" title="分享到我的淘宝"></a><a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a><a href="#" class="bds_mail" data-cmd="mail" title="分享到邮件分享"></a><a href="#" class="bds_copy" data-cmd="copy" title="分享到复制网址"></a></div></div>
+</h3>
+                  
+              </div>
+              <div class="panel-body">
+                <div class="author-image"> <img src="https://secure.gravatar.com/avatar/7f101ae914d37b141a308983ce6189a5?s=168" class="avatar avatar-168" height="168" width="168"> </div>
+                这货来去如风，什么鬼都没留下！！！              </div>
+            </div>
+                          </div>
+            </div>
+
+             
+            <div class="single_nav">
+            <div class="divider divider-short divider-center"><i class="fa fa-exchange"></i></div>
+              <div class="col_half bottommargin-mini btn next">
+                   <i class="fa fa-angle-double-left"></i> <a href="http://blog.oldboyedu.com/swordsman-sed/" rel="prev">深入浅出linux三剑客之sed必杀技一例</a></div>
+              <div class="col_half col_last bottommargin-mini btn next">
+                        <a href="http://blog.oldboyedu.com/docker-instruction/" rel="next">Docker容器的使用</a> <i class="fa fa-angle-double-right"></i></div></div>
+                        
+                                    <div class="comments_bg"><script type="text/javascript" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/js/comments-ajax.js"></script>
+<div id="respond" class="no_webshot">
+		<form action="http://blog.oldboyedu.com/wp-comments-post.php" method="post" id="commentform">
+		
+		<div class="comt-title">
+			<div class="comt-avatar pull-left">
+				<img src="https://secure.gravatar.com/avatar/?s=108" class="avatar avatar-108" height="108" width="108">			</div>
+			<div class="comt-author pull-left">
+			发表我的评论									<div>
+						<h3>Hi，请填写昵称和邮箱！</h3>
+
+							<div class="col_one_third"><label class="hide" for="author">昵称</label><input class="ipt" type="text" name="author" id="author" value="" tabindex="2" placeholder="昵称"></span></div>
+							<div class="col_one_third"><label class="hide" for="email">邮箱</label><input class="ipt" type="text" name="email" id="email" value="" tabindex="3" placeholder="邮箱"></div>
+							<div class="col_one_third col_last"><label class="hide" for="url">网址</label><input class="ipt" type="text" name="url" id="url" value="" tabindex="4" placeholder="网址"></div>
+
+					</div>
+										</div>
+			<a id="cancel-comment-reply-link" class="pull-right" href="javascript:;">取消评论</a>
+		</div>
+		
+		<div class="comt">
+			<div class="comt-box">
+				<textarea placeholder="客官、确定不来一发嘛..." class="sm-form-control" name="comment" id="comment" cols="100%" rows="4" tabindex="1" onkeydown="if(event.ctrlKey&amp;&amp;event.keyCode==13){document.getElementById('submit').click();return false};"></textarea>
+
+<div id="smilelink"><a href="#commentform" title="icon_mrgreen.gif" onclick="document.getElementById('comment').value += ' :mrgreen: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_mrgreen.gif" alt="icon_mrgreen.gif" /></a>&nbsp;<a href="#commentform" title="icon_neutral.gif" onclick="document.getElementById('comment').value += ' :neutral: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_neutral.gif" alt="icon_neutral.gif" /></a>&nbsp;<a href="#commentform" title="icon_twisted.gif" onclick="document.getElementById('comment').value += ' :twisted: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_twisted.gif" alt="icon_twisted.gif" /></a>&nbsp;<a href="#commentform" title="icon_arrow.gif" onclick="document.getElementById('comment').value += ' :arrow: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_arrow.gif" alt="icon_arrow.gif" /></a>&nbsp;<a href="#commentform" title="icon_eek.gif" onclick="document.getElementById('comment').value += ' :shock: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_eek.gif" alt="icon_eek.gif" /></a>&nbsp;<a href="#commentform" title="icon_smile.gif" onclick="document.getElementById('comment').value += ' :smile: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_smile.gif" alt="icon_smile.gif" /></a>&nbsp;<a href="#commentform" title="icon_confused.gif" onclick="document.getElementById('comment').value += ' :???: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_confused.gif" alt="icon_confused.gif" /></a>&nbsp;<a href="#commentform" title="icon_cool.gif" onclick="document.getElementById('comment').value += ' :cool: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_cool.gif" alt="icon_cool.gif" /></a>&nbsp;<a href="#commentform" title="icon_evil.gif" onclick="document.getElementById('comment').value += ' :evil: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_evil.gif" alt="icon_evil.gif" /></a>&nbsp;<a href="#commentform" title="icon_biggrin.gif" onclick="document.getElementById('comment').value += ' :grin: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_biggrin.gif" alt="icon_biggrin.gif" /></a>&nbsp;<a href="#commentform" title="icon_idea.gif" onclick="document.getElementById('comment').value += ' :idea: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_idea.gif" alt="icon_idea.gif" /></a>&nbsp;<a href="#commentform" title="icon_redface.gif" onclick="document.getElementById('comment').value += ' :oops: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_redface.gif" alt="icon_redface.gif" /></a>&nbsp;<a href="#commentform" title="icon_razz.gif" onclick="document.getElementById('comment').value += ' :razz: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_razz.gif" alt="icon_razz.gif" /></a>&nbsp;<a href="#commentform" title="icon_rolleyes.gif" onclick="document.getElementById('comment').value += ' :roll: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_rolleyes.gif" alt="icon_rolleyes.gif" /></a>&nbsp;<a href="#commentform" title="icon_wink.gif" onclick="document.getElementById('comment').value += ' :wink: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_wink.gif" alt="icon_wink.gif" /></a>&nbsp;<a href="#commentform" title="icon_cry.gif" onclick="document.getElementById('comment').value += ' :cry: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_cry.gif" alt="icon_cry.gif" /></a>&nbsp;<a href="#commentform" title="icon_surprised.gif" onclick="document.getElementById('comment').value += ' :eek: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_surprised.gif" alt="icon_surprised.gif" /></a>&nbsp;<a href="#commentform" title="icon_lol.gif" onclick="document.getElementById('comment').value += ' :lol: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_lol.gif" alt="icon_lol.gif" /></a>&nbsp;<a href="#commentform" title="icon_mad.gif" onclick="document.getElementById('comment').value += ' :mad: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_mad.gif" alt="icon_mad.gif" /></a>&nbsp;<a href="#commentform" title="icon_sad.gif" onclick="document.getElementById('comment').value += ' :sad: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_sad.gif" alt="icon_sad.gif" /></a>&nbsp;<a href="#commentform" title="icon_exclaim.gif" onclick="document.getElementById('comment').value += ' :!: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_exclaim.gif" alt="icon_exclaim.gif" /></a>&nbsp;<a href="#commentform" title="icon_question.gif" onclick="document.getElementById('comment').value += ' :?: '"><img src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/images/smilies/icon_question.gif" alt="icon_question.gif" /></a>&nbsp;</div>				<div class="comt-ctrl">
+					<button class="button button-3d button-small button-rounded button-blue pull-right" type="submit" name="submit" id="submit" tabindex="5" title="（Ctrl+Enter）也可以射的哟！！！"><i class="fa fa-rocket"></i> 发射...</button>
+					
+					
+					<span class="muted ml5 comt-code"><i class="fa fa-code"></i><a href="javascript:SIMPALED.Editor.code()" style="color:#999999"> 代码</a></span>
+					<span class="muted ml5 comt-img"><i class="fa fa-picture-o"></i><a href="javascript:SIMPALED.Editor.img()" style="color:#999999"> 贴图</a></span>
+					<span class="muted ml5 comt-strong"><i class="fa fa-bold"></i><a href="javascript:SIMPALED.Editor.strong()" style="color:#999999"> 加粗</a></span>
+					<span class="muted ml5 comt-ahref"><i class="fa fa-globe"></i><a href="javascript:SIMPALED.Editor.ahref()" style="color:#999999"> 链接</a></span>
+					<span class="muted ml5 comt-del"><i class="icon-remove icon12"></i><a href="javascript:SIMPALED.Editor.del()" style="color:#999999"> 删除线</a></span>
+					<span class="muted ml5 comt-sign"><i class="fa fa-gift"></i><a href="javascript:SIMPALED.Editor.daka()" style="color:#999999"> 签到</a></span>
+					<span class="muted comt-mailme"></span>
+                    <div class="comt-tips pull-left"><input type='hidden' name='comment_post_ID' value='429' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+<input type="checkbox" name="comment_mail_notify" id="comment_mail_notify" value="comment_mail_notify" checked="checked" style="margin-left:20px;" /><label for="comment_mail_notify">有人回复时邮件通知我</label></div>
+				</div>
+			</div>
+
+			
+		</div>
+
+		
+	</form>
+	</div>
+            </div>
+             </div>
+        </div>
+        <div class="col-md-4">
+  
+  
+  <div id="sidebar" class="sidebar-widgets-wrap clearfix">
+    
+    <div class="widget clearfix widget_search"><form role="search" method="get" id="searchform" class="searchform" action="http://blog.oldboyedu.com/">
+				<div>
+					<label class="screen-reader-text" for="s">搜索：</label>
+					<input type="text" value="" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="搜索" />
+				</div>
+			</form></div>		<div class="widget clearfix widget_recent_entries">		<div class="fancy-title title-dotted-border"><h3>近期文章</h3></div>		<ul>
+					<li>
+				<a href="http://blog.oldboyedu.com/pptp-l2tp/">通俗的语言解释 VPN 中 PPTP 与 L2TP 协议的联系与区别</a>
+						</li>
+					<li>
+				<a href="http://blog.oldboyedu.com/autodeploy-rpm/">自动化部署必备技能&#8212;定制化RPM包</a>
+						</li>
+					<li>
+				<a href="http://blog.oldboyedu.com/computer-produced-drawing/">IT从业者的绘图指南(Processon版)</a>
+						</li>
+					<li>
+				<a href="http://blog.oldboyedu.com/custom-iso/">定制专属于你的系统安装镜像</a>
+						</li>
+					<li>
+				<a href="http://blog.oldboyedu.com/docker-instruction/">Docker容器的使用</a>
+						</li>
+				</ul>
+		</div><div class="widget clearfix widget_recent_comments"><div class="fancy-title title-dotted-border"><h3>近期评论</h3></div><ul id="recentcomments"><li class="recentcomments"><span class="comment-author-link">gajun</span>发表在《<a href="http://blog.oldboyedu.com/elk/#comment-105">最好用的日志分析工具ELK</a>》</li><li class="recentcomments"><span class="comment-author-link">shigozsr</span>发表在《<a href="http://blog.oldboyedu.com/autoinstall-kickstart/#comment-104">Kickstart无人值守安装</a>》</li><li class="recentcomments"><span class="comment-author-link">水电费</span>发表在《<a href="http://blog.oldboyedu.com/openstack/#comment-90">chuck手把手带你搞定openstack</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href='http://blog.oldboyedu.com/autoinstall-cobbler/#commentform' rel='external nofollow' class='url'>redhat</a></span>发表在《<a href="http://blog.oldboyedu.com/autoinstall-cobbler/#comment-88">Cobbler无人值守安装</a>》</li><li class="recentcomments"><span class="comment-author-link">leizhangsky</span>发表在《<a href="http://blog.oldboyedu.com/autoinstall-kickstart/#comment-87">Kickstart无人值守安装</a>》</li></ul></div><div class="widget clearfix widget_archive"><div class="fancy-title title-dotted-border"><h3>文章归档</h3></div>		<ul>
+	<li><a href='http://blog.oldboyedu.com/2016/10/'>2016年十月</a></li>
+	<li><a href='http://blog.oldboyedu.com/2016/09/'>2016年九月</a></li>
+	<li><a href='http://blog.oldboyedu.com/2016/08/'>2016年八月</a></li>
+	<li><a href='http://blog.oldboyedu.com/2016/06/'>2016年六月</a></li>
+	<li><a href='http://blog.oldboyedu.com/2016/03/'>2016年三月</a></li>
+	<li><a href='http://blog.oldboyedu.com/2016/02/'>2016年二月</a></li>
+	<li><a href='http://blog.oldboyedu.com/2016/01/'>2016年一月</a></li>
+	<li><a href='http://blog.oldboyedu.com/2015/12/'>2015年十二月</a></li>
+		</ul>
+</div><div class="widget clearfix widget_categories"><div class="fancy-title title-dotted-border"><h3>分类目录</h3></div>		<ul>
+	<li class="cat-item cat-item-22"><a href="http://blog.oldboyedu.com/category/linux-commands/" >Linux命令</a> (3)
+</li>
+	<li class="cat-item cat-item-10"><a href="http://blog.oldboyedu.com/category/linux-strategy/" >Linux攻略</a> (5)
+</li>
+	<li class="cat-item cat-item-11"><a href="http://blog.oldboyedu.com/category/linux-service/" >Linux服务</a> (14)
+<ul class='children'>
+	<li class="cat-item cat-item-20"><a href="http://blog.oldboyedu.com/category/linux-service/vpn/" >VPN</a> (2)
+</li>
+	<li class="cat-item cat-item-18"><a href="http://blog.oldboyedu.com/category/linux-service/web/" >WEB服务</a> (3)
+</li>
+	<li class="cat-item cat-item-17"><a href="http://blog.oldboyedu.com/category/linux-service/secure/" >安全</a> (1)
+</li>
+	<li class="cat-item cat-item-19"><a href="http://blog.oldboyedu.com/category/linux-service/database/" >数据库</a> (3)
+</li>
+	<li class="cat-item cat-item-16"><a href="http://blog.oldboyedu.com/category/linux-service/log/" >日志</a> (1)
+</li>
+	<li class="cat-item cat-item-21"><a href="http://blog.oldboyedu.com/category/linux-service/monitor/" >监控</a> (1)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-15"><a href="http://blog.oldboyedu.com/category/cloud-computing/" >云计算</a> (4)
+</li>
+	<li class="cat-item cat-item-23"><a href="http://blog.oldboyedu.com/category/open-class/" >公开课</a> (2)
+</li>
+	<li class="cat-item cat-item-3"><a href="http://blog.oldboyedu.com/category/inner-teaching/" >内部教学</a> (12)
+</li>
+	<li class="cat-item cat-item-2"><a href="http://blog.oldboyedu.com/category/student-style/" >学员风采</a> (12)
+</li>
+	<li class="cat-item cat-item-12"><a href="http://blog.oldboyedu.com/category/automatic-operation/" >自动化运维</a> (5)
+<ul class='children'>
+	<li class="cat-item cat-item-13"><a href="http://blog.oldboyedu.com/category/automatic-operation/automatic-installation/" >自动化安装</a> (3)
+</li>
+	<li class="cat-item cat-item-14"><a href="http://blog.oldboyedu.com/category/automatic-operation/automatic-deployment/" >自动化部署</a> (2)
+</li>
+</ul>
+</li>
+		</ul>
+</div><div class="widget clearfix widget_nav_menu"><div class="fancy-title title-dotted-border"><h3>友情链接</h3></div><div class="menu-%e5%8f%8b%e6%83%85%e9%93%be%e6%8e%a5-container"><ul id="menu-%e5%8f%8b%e6%83%85%e9%93%be%e6%8e%a5" class="menu"><li><a href="http://oldboy.blog.51cto.com/">老男孩linux培训</a></li>
+<li><a href="http://www.unixhot.com/">运维社区-赵班长</a></li>
+<li><a href="http://www.zyops.com/">张耀的博客</a></li>
+<li><a href="http://www.xuliangwei.com/">徐亮偉架构师之路~</a></li>
+<li><a href="http://www.chuck-blog.com/">马亮的博客</a></li>
+<li><a href="http://www.trnux.com/">二麻的网站</a></li>
+<li><a href="http://www.jixuege.com/">架构师之路-谢迪</a></li>
+<li><a href="http://www.90root.com/">90root</a></li>
+</ul></div></div>  </div>
+</div>
+      </div>
+    </div>
+  </div>
+</section>
+<footer id="footer" class="dark">
+  <div id="copyrights">
+    <div class="container clearfix">
+      <div class="col_half"> Copyright &copy; 2016 <a href="http://blog.oldboyedu.com">
+        老男孩教育博客        </a> All rights reserved.&nbsp;|&nbsp;基于 <a href="https://cn.wordpress.org/" target="_blank" rel="nofollow">WordPress</a> &amp; <a href="http://www.aliyun.com/" target="_blank" rel="nofollow" title="运行在阿里云">阿里云</a></div>
+      <div class="col_half col_last tright">
+        <div class="fright clearfix"> 京ICP备13038099号-3 &nbsp;|&nbsp; <!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//tongji.oldboyedu.com/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 2]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Piwik Code --> &nbsp;|&nbsp;
+          Theme BY <a href="http://www.slmwp.com" target="_blank">水冷眸</a>        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+</div>
+<div id="gotoTop" class="fa fa-arrow-up"></div>
+<script type="text/javascript" src="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/js/functions.js"></script> 
+<script type="text/javascript">
+window._bd_share_config = {
+        common: {
+            "bdText": "",
+            "bdMini": "2",
+            "bdMiniList": false,
+            "bdPic": "",
+            "bdStyle": "0"
+        },
+        share: [{
+            bdCustomStyle: 'http://cdn.oldboyedu.com/wp-content/themes/Play-LM/css/share.css'
+        }]
+    }
+    with(document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion=' + ~(-new Date() / 36e5)];
+function doZoom(size) {   
+        var zoom = document.all ? document.all['primary'] : document.getElementById('primary');   
+        zoom.style.fontSize = size + 'px';   
+    } 
+</script>
+<link rel="stylesheet" href="http://cdn.oldboyedu.com/wp-content/themes/Play-LM/css/magnific-popup.css" type="text/css" />
+<script type="text/javascript">
+jQuery(document).ready(function(a){var c=1,d=2;(e=a("#sidebar").width(),f=a("#sidebar .widget"),g=f.length,g>=(c>0)&&g>=(d>0)&&a(window).scroll(function(){var b=document.documentElement.scrollTop+document.body.scrollTop;b>f.eq(g-1).offset().top+f.eq(g-1).height()?0==a(".roller").length?(f.parent().append('<div class="roller"></div>'),f.eq(c-1).clone().appendTo(".roller"),c!==d&&f.eq(d-1).clone().appendTo(".roller"),a(".roller").css({position:"fixed",top: 62,zIndex:0,width:360}),a(".roller").width(e)):a(".roller").fadeIn(300):a(".roller").fadeOut(300)}))});</script></body></html>
+<!-- Dynamic page generated in 0.220 seconds. -->
+<!-- Cached page generated by WP-Super-Cache on 2016-12-27 10:01:39 -->
+
+<!-- super cache -->
