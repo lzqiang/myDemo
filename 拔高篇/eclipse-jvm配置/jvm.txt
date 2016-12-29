@@ -1,0 +1,8 @@
+eclipse.ini 19行配置如下内容
+
+-Xms512m
+-Xmx512m
+-XX:PermSize=128M
+-XX:MaxPermSize=128M
+-XX:+UseParallelGC
+-Xverify:none
