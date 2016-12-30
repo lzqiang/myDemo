@@ -26,6 +26,9 @@ Redis
 memcached
 
 前端js框架
+BABEL:es6语法 转成 老版本的语法
+http://babeljs.cn/
+
 jquery
 jsx  erb ejs php jade 模板
 ectable(兴博.表格框架)
