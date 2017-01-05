@@ -1,0 +1,10 @@
+ÍøÖ·£ºhttp://www.mindrot.org/projects/jBCrypt/
+
+String hashed = BCrypt.hashpw("123456", BCrypt.gensalt());
+String hashed2 = BCrypt.hashpw("123456", BCrypt.gensalt(12));
+if (BCrypt.checkpw("123456", hashed2)){
+	System.out.println("It matches");
+}else{
+	System.out.println("It does not match");
+}
+	
