@@ -1,0 +1,16 @@
+在Eclipse里查看Java字节码 
+
+直接使用 Update manager 安装插件，非常简单：
+
+Help -> Install new Software... -> Work with:
+
+输入 url：http://andrei.gmxhome.de/eclipse/
+
+然后在弹框中选择合适的版本即可。
+
+
+使用
+
+在 Eclipse 中添加相应的查看窗口：
+
+Window -> Show View -> Other -> Java -> Bytecode
