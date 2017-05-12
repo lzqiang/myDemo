@@ -1,23 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <templates>
-<template autoinsert="false" context="filecomment_context" deleted="false" description="Comment for created Java files" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.filecomment" name="filecomment">
-/**  
-* Project Name:${project_name}  
-* File Name:${file_name}  
-* Package Name:${package_name}  
-* Date:${date}
-* Copyright (c) ${year}, zwsafety All Rights Reserved.  
-*/
-</template>	
-
 <template autoinsert="false" context="typecomment_context" deleted="false" description="Comment for created types" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.typecomment" name="typecomment">
 /**  
-* @ClassName:${type_name} 
 * @Description:${todo}(用一句话描述该文件做什么) 
-* @date:${date} 
-* @author  ${user}  
-* @version   1.0
-* @since  JDK 1.7  
+* @date:${date}${time} 
+* @author  刘赵强
+* @company www.ttpai.cn
 */
 </template>
 
@@ -38,12 +26,9 @@
 /**  
 * @Title:${enclosing_method}
 * @Description ${todo}(这里用一句话描述这个方法的作用). 
-* ${todo}(这里描述这个方法适用条件 – 可选).
-* ${todo}(这里描述这个方法的执行流程 – 可选).
-* ${todo}(这里描述这个方法的使用方法 – 可选).
-* ${todo}(这里描述这个方法的注意事项 – 可选).
-* @date  ${date} 
-* @author ${user}  
+* @date  ${date}${time} 
+* @author 刘赵强  
+* @company www.ttpai.cn
 * ${tags} 
 */
 </template>
@@ -52,10 +37,10 @@
 /**  
 * @Title  ${enclosing_method}   
 * @Description  ${todo} 简单描述重写方法的实现功能（可选）.
-* @date  ${date}
-* @author  ${user}
+* @date  ${date}${time}
+* @author  刘赵强
+* @company www.ttpai.cn
 * ${tags}  
-* ${see_to_overridden} 
 */
 </template>
 	 
@@ -63,10 +48,10 @@
 /** 
 * @Title  ${enclosing_method}   
 * @Description  ${todo} 简单描述代理方法的实现功能（可选）.
-* @date  ${date}
-* @author  ${user}   
+* @date  ${date}${time}
+* @author  刘赵强  
+* @company www.ttpai.cn 
 * ${tags}  
-* ${see_to_target}  
 */
 </template>
 
@@ -87,22 +72,10 @@
 
 <template autoinsert="false" context="newtype_context" deleted="false" description="Newly created files" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.newtype" name="newtype">
 /**  
-* Project Name:${project_name}  
-* File Name:${file_name}  
-* Package Name:${package_name}  
-* Date:${date}
-* Copyright (c) ${year},zwsafety All Rights Reserved.   
-*/  
-${filecomment}  
-
-${package_declaration}  
-/**  
 * @ClassName:${type_name}
 * @Description:${todo}(用一句话描述该文件做什么) 
-* @date:${date} 
-* @author  ${user}  
-* @version  1.0 
-* @since: JDK 1.7        
+* @date:${date}${time} 
+* @author  刘赵强       
 */  
 ${typecomment}  
 ${type_declaration}  
