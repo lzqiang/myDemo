@@ -71,3 +71,9 @@ twaver3D 三维GIS
 
 git
 http://www.liaoxuefeng.com/wiki 小白入门文档
+
+
+测试
+压力测试：
+jMeter入门实例
+http://blog.chinaunix.net/uid-26884465-id-3416869.html
