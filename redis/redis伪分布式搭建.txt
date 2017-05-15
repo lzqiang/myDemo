@@ -1,0 +1,95 @@
+redis集群
+1.投票容错机制  如果一个节点超过半数投票说它挂了，那么集群
+  就认为它挂了
+所以集群一般放 奇数 个节点 至少是3台
+但是 要达到高可用 还要配置主从
+所以至少 需要6台服务器
+
+redis内置了 0-16383个哈希槽
+redis先对key进行crc16进行计算 得到一个值 与16384取余
+这样得到的值就会在0-16383之间
+会根据节点数量大致均匀的将槽点分配到各个主机
+
+所以说 redis集群 最多只能有16384台主机
+
+1.使用ruby脚本搭建集群，需要ruby的环境
+安装ruby
+yum -y install ruby
+yum -y install rubygems
+
+2.在redis同级目录下 建立一个 redis-culster
+mkdir redis-cluster
+4.将redis/bin中内容拷贝到 redis-cluster/redis01
+5.删除 redis01里面的dump.rdb 需要一个干净的redis
+6.修改端口号 现在端口使用 (7001-7006)
+vim redis.conf
+将port改成 7001
+注意：搭建集群 还要将：cluster-enabled yes 打开注释
+搜索： /cluster-enabled 加回车
+
+7复制6份节点 将各个节点的端口修改了
+
+
+批量启动脚本
+touch start-all.sh
+
+cd redis01
+./redis-server redis.conf
+cd ..
+cd redis02
+./redis-server redis.conf
+cd ..
+cd redis03
+./redis-server redis.conf
+cd ..
+cd redis04
+./redis-server redis.conf
+cd ..
+cd redis05
+./redis-server redis.conf
+cd ..
+cd redis06
+./redis-server redis.conf
+cd ..
+
+赋权限
+# chmod +x start-all.sh
+
+查看 是否启动成功
+ps -aux|grep redis
+
+8.将6台redis集群在一起
+
+安装 ruby的脚本 redis-3.0.0.gem
+# gem install redis-3.0.0.gem
+
+9.将redis源码包中的redis-trib.rb 复制到 redis-culster中
+进入 redis源码包中的 src目录
+[root@localhost src]# ll *.rb
+-rwxrwxr-x. 1 root root 48141 Apr  1  2015 redis-trib.rb
+
+[root@localhost src]# cp *.rb /usr/local/redis-culster/
+
+10.使用这个脚本 执行一个命令
+--replicas 每个节点有几个备份机 
+--replicas 1 说明是每个节点有1个备份机
+# ./redis-trib.rb create --replicas 1 192.168.88.204:7001 192.168.88.204:7002 192.168.88.204:7003 192.168.88.204:7004 192.168.88.204:7005 192.168.88.204:7006
+
+在输入yes
+
+从节点和主节点一直 ，从节点没有哈希槽
+
+11.导致 redis集群搭建完成
+
+
+测试集群
+没加-h 默认就是当前ip：127.0.0.01
+redis01/redis-cli -p 7001 -c （-c说明是集群版的）
+
+
+keys * 返回所有的key
+
+
+
+
+

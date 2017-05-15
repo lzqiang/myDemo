@@ -1,0 +1,96 @@
+Redis是C语言开发的，
+安装redis需要C语言的编译环境，如果没有gcc需要在线安装
+yum install gcc
+yum install gcc-c++
+
+0.监测gcc环境是否已存在
+[root@localhost redis-3.0.0]# gcc
+gcc: no input files
+说明已经有gcc环境
+
+1.建立目录 
+  mkdir /usr/local/redis
+2.解压redis源码
+3.在redis跟目录下进行编译  c语言编译一定要有 Makefile文件
+  如果有 直接敲 make 就可以进行编译了
+4.还是在redis跟目录下 进行 安装
+  # make install PREFIX=/usr/local/redis
+  ps:prefix指定redis的安装目录
+5.安装好之后在 /usr/local/redis多一个 bin目录(其实只用一个bin目录)
+6.进入bin目录  启动服务
+7> # ./redis-server
+8.关闭 ctrl+c
+
+这样启动会占用一个终端窗口
+改用后端启动
+
+1.讲redis源码中的redis.conf文件拷贝过来(安装好的目录 /usr/local/redis/bin中)
+ # cp /home/soft/redis-3.0.0/redis.conf .  （.是当前目录）
+
+2.vim redis.conf 
+   将 daemonize no 改成 daemonize yes
+3.启动redis
+  ./redis-server redis.conf
+查看redis 是否启动
+4.ps aux|grep redis
+5 关闭
+redis-cli shutdown
+
+
+连接redis
+[root@localhost bin]# ./redis-cli
+127.0.0.1:6379> ping
+PONG
+127.0.0.1:6379> 
+
+连接远程的redis
+[root@localhost bin]# ./redis-cli -h 192.168.88.204 -p 6379
+如果不加-p 则是默认的 6379端口
+
+
+
+redis的数据类型
+1.redis提供了5中数据类型 
+  String，Hash,list,set,sort set（String和Hash用的最多 比较适合做缓存 是key-value类型的）
+2.
+192.168.88.204:6379> set str1 123456
+OK
+192.168.88.204:6379> get str1
+"123456"
+
+192.168.88.204:6379> incr str1
+(integer) 123457
+192.168.88.204:6379> incr str1
+(integer) 123458
+192.168.88.204:6379> incr str1
+(integer) 123459
+
+192.168.88.204:6379> decr str1
+(integer) 123458
+192.168.88.204:6379> decr str1
+(integer) 123457
+192.168.88.204:6379> decr str1
+(integer) 123456
+192.168.88.204:6379> 
+
+
+192.168.88.204:6379> hset hash1 filed1 abc
+(integer) 1
+192.168.88.204:6379> hget hash1 filed1
+"abc"
+
+查看key的有效期
+192.168.88.204:6379> ttl str1 
+(integer) -1
+如果是-1  那么就是永久保存
+
+192.168.88.204:6379> ttl str2
+(integer) -2
+如果是-2  那么说明 这个key不存在
+
+设置key的有效期
+192.168.88.204:6379> expire str1 100 （秒)
+(integer) 1
+192.168.88.204:6379> ttl str1
+(integer) 96
+再次查看有效期是一个正数  是一个倒计时的时间
