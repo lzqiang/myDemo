@@ -1,2 +1,5 @@
 JS将汉字转拼音
 https://github.com/liuxianan/pinyinjs
+
+微信小程序 Sports News(体育新闻) 
+https://github.com/havenxie/weapp-sportsnews
