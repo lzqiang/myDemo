@@ -1,0 +1,10 @@
+centos安装是是使用linux text 模式安装没有安装xwindows界面。现在要使用，使用yum安装。
+ 
+登录系统，使用yum 安装
+ 
+
+yum groupinstall "Desktop"
+yum groupinstall "X Window System"
+yum groupinstall "Chinese Support"
+
+startx

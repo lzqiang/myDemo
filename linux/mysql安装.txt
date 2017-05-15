@@ -1,0 +1,21 @@
+yum install -y mysql-server mysql mysql-deve
+启动
+[root@xiaoluo ~]# service mysqld start
+重启
+[root@xiaoluo ~]# service mysqld restart
+修改登录密码
+[root@xiaoluo ~]# mysqladmin -u root password 'root'　　// 通过该命令给root账号设置密码为 root
+
+设置远程连接
+Mysql>GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
+刷新
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION
+
+
+远程连接
+mysql -h 192.168.88.203 -u root -p --port=3306
+
+
+查找mysql的安装目录
+
+# whereis mysql

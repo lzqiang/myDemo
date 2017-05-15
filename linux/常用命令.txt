@@ -1,2 +1,16 @@
 1.查看隐藏文件
 ls -al
+
+查找
+sudo find / -name my.cnf
+
+
+杀进程
+
+killall redis
+
+killall +进程名称
+
+kill -9 进程号  （强制杀进程）
+
+kill 进程号 关闭该进程

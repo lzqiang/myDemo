@@ -1,0 +1,6 @@
+1.解压  tar -xvf apache-tomcat-7.0.29.tar.gz
+
+2.查看启动日志
+
+3将bin中sh文件变成可执行文件
+ chmod a+x *.sh
