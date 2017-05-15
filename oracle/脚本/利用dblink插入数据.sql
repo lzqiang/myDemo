@@ -1,4 +1,10 @@
 --建dblink
+create public database link dmz63
+connect to zwsafe identified by "zwsafe2016"
+using '192.168.88.13:1521/wtqsafe';
+
+说明：都是目标库的用户名 密码 和数据库地址 密码用双引号 是因为会自动变成大写 可能在使用dblink的时候 登录不上
+
 INSERT INTO sys_xqxxb VALUE SELECT * FROM sys_xqxxb@yd2lt
 
 INSERT INTO sys_ldwhb VALUE SELECT * FROM sys_ldwhb@yd2lt
