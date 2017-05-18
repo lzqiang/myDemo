@@ -1,0 +1,7 @@
+1.切换到develop（temp中的switch to 到develop中）
+2.temp中的 merge 选择要合并的分支  如果找不到你要合并的分支  在pull一下就可以了
+3.如果有冲突  在用小乌龟进行 解决冲突
+  到工作空间中  reslove
+  如果没有红色的冲突 直接  ctrl+w 就可以了
+  
+4.解决完冲突后 刷新一下  在commit，在push到服务器  
