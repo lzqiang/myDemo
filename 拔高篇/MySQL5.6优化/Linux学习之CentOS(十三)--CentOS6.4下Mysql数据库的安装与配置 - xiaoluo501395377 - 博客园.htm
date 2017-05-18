@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Linux学习之CentOS(十三)--CentOS6.4下Mysql数据库的安装与配置 - xiaoluo501395377 - 博客园</title>
+<link type="text/css" rel="stylesheet" href="/bundles/blog-common.css?v=03KQeESEmpLfzDqUo0NiWUg5Zd5aRam3JHBZTK05Wug1"/>
+<link id="MainCss" type="text/css" rel="stylesheet" href="/skins/darkgreentrip/bundle-darkgreentrip.css?v=xPXJVC4GCITs1yYYgSeLkcicCxapqseaPVQLFGMO1wc1"/>
+<link id="mobile-style" media="only screen and (max-width: 768px)" type="text/css" rel="stylesheet" href="/skins/darkgreentrip/bundle-darkgreentrip-mobile.css?v=Dqkl0vQK0F6DoWU0YX1XCCm2GnYpl8EWb8iHcIYGO681"/>
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/xiaoluo501395377/rss"/>
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/xiaoluo501395377/rsd.xml"/>
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/xiaoluo501395377/wlwmanifest.xml"/>
+<script src="//common.cnblogs.com/script/jquery.js" type="text/javascript"></script>  
+<script type="text/javascript">var currentBlogApp = 'xiaoluo501395377', cb_enable_mathjax=false;var isLogined=false;</script>
+<script src="/bundles/blog-common.js?v=Wi_UnAyY55yQKWjwwwuDISxc6t0j3z6Pn8OHCG0udOA1" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+<div id="page_begin_html"></div><script>load_page_begin_html();</script>
+
+<!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+	<a id="lnkBlogLogo" href="http://www.cnblogs.com/xiaoluo501395377/"><img id="blogLogo" src="/Skins/custom/images/logo.gif" alt="返回主页" /></a>			
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/xiaoluo501395377/">xiaoluo501395377</a></h1>
+<h2></h2>
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="http://www.cnblogs.com/">博客园</a></li>
+<li><a id="blog_nav_myhome" class="menu" href="http://www.cnblogs.com/xiaoluo501395377/">首页</a></li>
+<li><a id="blog_nav_newpost" class="menu" rel="nofollow" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a></li>
+<li><a id="blog_nav_contact" class="menu" rel="nofollow" href="https://msg.cnblogs.com/send/xiaoluo501395377">联系</a></li>
+<li><a id="blog_nav_rss" class="menu" href="http://www.cnblogs.com/xiaoluo501395377/rss">订阅</a>
+<!--<a id="blog_nav_rss_image" class="aHeaderXML" href="http://www.cnblogs.com/xiaoluo501395377/rss"><img src="//www.cnblogs.com/images/xml.gif" alt="订阅" /></a>--></li>
+<li><a id="blog_nav_admin" class="menu" rel="nofollow" href="https://i.cnblogs.com/">管理</a></li>
+</ul>
+		<div class="blogStats">
+			
+			<div id="blog_stats">
+<span id="stats_post_count">随笔 - 97&nbsp; </span>
+<span id="stats_article_count">文章 - 0&nbsp; </span>
+<span id="stats-comment_count">评论 - 434</span>
+</div>
+			
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		
+<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class = "post">
+		<h1 class = "postTitle">
+			<a id="cb_post_title_url" class="postTitle2" href="http://www.cnblogs.com/xiaoluo501395377/archive/2013/04/07/3003278.html">Linux学习之CentOS(十三)--CentOS6.4下Mysql数据库的安装与配置</a>
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			<div id="cnblogs_post_body"><p>如果要在Linux上做j2ee开发，首先得搭建好j2ee的开发环境，包括了jdk、tomcat、eclipse的安装(这个在之前的一篇随笔中已经有详细讲解了<a id="cb_post_title_url" class="postTitle2" title="Linux学习之CentOS(七)--CentOS下j2ee环境搭建" href="http://www.cnblogs.com/xiaoluo501395377/archive/2013/04/01/2994485.html" target="_blank"><span class="postTitle2">Linux学习之CentOS(七)--CentOS下j2ee环境搭建</span></a>),如果要开发web项目，我们当然可以安装一个myeclipse到Linux系统上去，这个安装方法和安装eclipse完全相同，就没有记录下来了，有了jdk、tomcat、eclipse我们就已经能进行我们的程序开发了，但是如果要做一个项目，哪怕是小的不能再小的项目都离不开数据的存储呀！！！没错，咱们还差一个最重要的软件没有装，也就是数据库！！！如果没有了数据库，咱们做项目简直是空想，所以呢，对于数据库安装这块，专门为安装mysql数据库写了这篇随笔。。。。。。</p>
+<p><span style="font-size: 18px;"><strong>一、mysql简介</strong></span></p>
+<p>说到数据库，我们大多想到的是关系型数据库，比如mysql、oracle、sqlserver等等，这些数据库软件在windows上安装都非常的方便，在Linux上如果要安装数据库，咱不得不首先推荐的是mysql数据库了，而且Mysql数据库的第一个版本就是发行在Linux系统上的。</p>
+<p>MySQL是一个关系型数据库管理系统，由瑞典MySQL AB公司开发，目前属于Oracle公司。MySQL是一种关联数据库管理系统，关联数据库将数据保存在不同的表中，而不是将所有数据放在一个大仓库内，这样就增加了速度并提高了灵活性。MySQL的SQL语言是用于访问数据库的最常用标准化语言。MySQL软件采用了双授权政策（本词条&ldquo;授权政策&rdquo;），它分为社区版和商业版，由于其体积小、速度快、总体拥有成本低，尤其是开放源码这一特点，一般中小型网站的开发都选择MySQL作为网站数据库。由于其社区版的性能卓越，搭配PHP和Apache可组成良好的开发环境。</p>
+<p>在Linux上安装mysql数据库，我们可以去其官网上下载mysql数据库的rpm包，<a href="http://dev.mysql.com/downloads/mysql/5.6.html#downloads" target="_blank">http://dev.mysql.com/downloads/mysql/5.6.html#downloads</a>，大家可以根据自己的操作系统去下载对应的数据库文件，目前最新的版本是5.6.10了。</p>
+<p>在这里我是通过yum来进行mysql数据库的安装的，通过这种方式进行安装，可以将跟mysql相关的一些服务、jar包都给我们安装好，所以省去了很多不必要的麻烦！！！</p>
+<p><span style="font-size: 18px;"><strong>二、卸载掉原有mysql</strong></span></p>
+<p>因为mysql数据库在Linux上实在是太流行了，所以目前下载的主流Linux系统版本基本上都集成了mysql数据库在里面，我们可以通过如下命令来查看我们的操作系统上是否已经安装了mysql数据库</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~]# rpm -qa | <span style="color: #0000ff;">grep</span> mysql　　// 这个命令就会查看该操作系统上是否已经安装了mysql数据库</pre>
+</div>
+<p>有的话，我们就通过 rpm -e 命令 或者 rpm -e --nodeps 命令来卸载掉</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~]# rpm -<span style="color: #000000;">e mysql　　// <span style="color: #0000ff;">普通删除模式</span>
+[root@xiaoluo </span>~]# rpm -e --nodeps mysql　　// <span style="color: #0000ff;">强力删除模式，如果使用上面命令删除时，提示有依赖的其它文件，则用该命令可以对其进行强力删除</span></pre>
+</div>
+<p>在删除完以后我们可以通过 rpm -qa | grep mysql 命令来查看mysql是否已经卸载成功！！</p>
+<p><span style="font-size: 18px;"><strong>三、通过yum来进行mysql的安装</strong></span></p>
+<p>我是通过yum的方式来进行mysql的数据库安装，首先我们可以输入 yum list | grep mysql 命令来查看yum上提供的mysql数据库可下载的版本：</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~]# <span style="color: #0000ff;">yum</span> list | <span style="color: #0000ff;">grep</span> mysql</pre>
+</div>
+<p>就可以得到yum服务器上mysql数据库的可下载版本信息：</p>
+<p>&nbsp;</p>
+<p><img src="http://images.cnitblog.com/blog/432441/201304/06234702-6db80283f59c4ad1a649f814d9cbd861.jpg" alt="" /></p>
+<p>&nbsp;</p>
+<p>然后我们可以通过输入<span style="color: #0000ff;">&nbsp;yum install -y mysql-server mysql mysql-devel</span> 命令将mysql mysql-server mysql-devel都安装好(<strong>注意:安装mysql时我们并不是安装了mysql客户端就相当于安装好了mysql数据库了，我们还需要安装mysql-server服务端才行</strong>)</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~]# <span style="color: #0000ff;">yum</span> <span style="color: #0000ff;">install</span> -y mysql-server mysql mysql-deve</pre>
+</div>
+<p>&nbsp;</p>
+<p>在等待了一番时间后，yum会帮我们选择好安装mysql数据库所需要的软件以及其它附属的一些软件</p>
+<p>&nbsp;</p>
+<p><img src="http://images.cnitblog.com/blog/432441/201304/06235302-218eb7ac0ae045319426b230c8bd4c1a.jpg" alt="" /></p>
+<p>&nbsp;</p>
+<p>我们发现，通过yum方式安装mysql数据库省去了很多没必要的麻烦，当出现下面的结果时，就代表mysql数据库安装成功了</p>
+<p>&nbsp;</p>
+<p><img src="http://images.cnitblog.com/blog/432441/201304/06235745-91b403a8bb32407696f2a007c6a854a3.jpg" alt="" /></p>
+<p>&nbsp;</p>
+<p>此时我们可以通过如下命令，查看刚安装好的mysql-server的版本</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~]# rpm -qi mysql-server</pre>
+</div>
+<p>&nbsp;</p>
+<p>我们安装的mysql-server并不是最新版本，如果你想尝试最新版本，那就去mysql官网下载rpm包安装就行了，至此我们的mysql数据库已经安装完成了。</p>
+<p><strong><span style="font-size: 18px;">四、mysql数据库的初始化及相关配置</span></strong></p>
+<p>我们在安装完mysql数据库以后，会发现会多出一个mysqld的服务，这个就是咱们的数据库服务，我们通过输入 <span style="color: #0000ff;">service mysqld start</span> 命令就可以启动我们的mysql服务。</p>
+<p><strong>注意</strong>：如果我们是第一次启动mysql服务，mysql服务器首先会进行初始化的配置，如：</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~<span style="color: #000000;">]# <span style="color: #0000ff;"><strong>service mysqld start</strong></span>
+
+初始化 MySQL 数据库： WARNING: The host </span><span style="color: #800000;">'</span><span style="color: #800000;">xiaoluo</span><span style="color: #800000;">'</span><span style="color: #000000;"> could not be looked up with resolveip.
+This probably means that your libc libraries are not </span><span style="color: #800080;">100</span> %<span style="color: #000000;"> compatible
+with this binary MySQL version. The MySQL daemon, mysqld, should work
+normally with the exception that host name resolving will not work.
+This means that you should use IP addresses instead of hostnames
+when specifying MySQL privileges </span>!<span style="color: #000000;">
+Installing MySQL system tables...
+OK
+Filling help tables...
+OK
+
+To start mysqld at boot </span><span style="color: #0000ff;">time</span><span style="color: #000000;"> you have to copy
+support</span>-files/mysql.server to the right place <span style="color: #0000ff;">for</span><span style="color: #000000;"> your system
+
+PLEASE REMEMBER TO SET A PASSWORD FOR THE MySQL root USER </span>!<span style="color: #000000;">
+To </span><span style="color: #0000ff;">do</span> so, start the server, <span style="color: #0000ff;">then</span><span style="color: #000000;"> issue the following commands:
+
+</span>/usr/bin/mysqladmin -u root password <span style="color: #800000;">'</span><span style="color: #800000;">new-password</span><span style="color: #800000;">'</span>
+/usr/bin/mysqladmin -u root -h xiaoluo password <span style="color: #800000;">'</span><span style="color: #800000;">new-password</span><span style="color: #800000;">'</span><span style="color: #000000;">
+
+Alternatively you can run:
+</span>/usr/bin/<span style="color: #000000;">mysql_secure_installation
+
+</span><span style="color: #0000ff;">which</span><span style="color: #000000;"> will also give you the option of removing the test
+databases and anonymous user created by default.  This is
+strongly recommended </span><span style="color: #0000ff;">for</span><span style="color: #000000;"> production servers.
+
+See the manual </span><span style="color: #0000ff;">for</span> <span style="color: #0000ff;">more</span><span style="color: #000000;"> instructions.
+
+You can start the MySQL daemon with:
+cd </span>/usr ; /usr/bin/mysqld_safe &amp;<span style="color: #000000;">
+
+You can test the MySQL daemon with mysql</span>-test-<span style="color: #000000;">run.pl
+cd </span>/usr/mysql-test ; <span style="color: #0000ff;">perl</span> mysql-test-<span style="color: #000000;">run.pl
+
+Please report any problems with the </span>/usr/bin/mysqlbug script!<span style="color: #000000;">
+
+                                                           [确定]
+正在启动 mysqld：                                            [确定]</span></pre>
+</div>
+<p>&nbsp;</p>
+<p>这时我们会看到第一次启动mysql服务器以后会提示非常多的信息，目的就是对mysql数据库进行初始化操作，当我们再次重新启动mysql服务时，就不会提示这么多信息了，如：</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~<span style="color: #000000;">]# <span style="color: #0000ff;"><strong>service mysqld restart</strong></span>
+停止 mysqld：                                             [确定]
+正在启动 mysqld：                                          [确定]</span></pre>
+</div>
+<p>&nbsp;</p>
+<p>我们在使用mysql数据库时，都得首先启动mysqld服务，我们可以 通过&nbsp; <span style="color: #0000ff;">chkconfig --list | grep mysqld</span> 命令来查看mysql服务是不是开机自动启动，如：</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~]# chkconfig --list | <span style="color: #0000ff;">grep</span><span style="color: #000000;"> mysqld
+mysqld             </span><span style="color: #800080;">0</span>:关闭    <span style="color: #800080;">1</span>:关闭    <span style="color: #800080;">2</span>:关闭    <span style="color: #800080;">3</span>:关闭    <span style="color: #800080;">4</span>:关闭    <span style="color: #800080;">5</span>:关闭    <span style="color: #800080;">6</span>:关闭</pre>
+</div>
+<p>&nbsp;</p>
+<p>我们发现mysqld服务并没有开机自动启动，我们当然可以通过 <span style="color: #0000ff;">chkconfig mysqld on</span> 命令来将其设置成开机启动，这样就不用每次都去手动启动了</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~<span style="color: #000000;">]# chkconfig mysqld on
+[root@xiaoluo </span>~]# chkconfig --list | <span style="color: #0000ff;">grep</span><span style="color: #000000;"> mysql
+mysqld             </span><span style="color: #800080;">0</span>:关闭    <span style="color: #800080;">1</span>:关闭    <span style="color: #800080;">2</span>:启用    <span style="color: #800080;">3</span>:启用    <span style="color: #800080;">4</span>:启用    <span style="color: #800080;">5</span>:启用    <span style="color: #800080;">6</span>:关闭</pre>
+</div>
+<p>&nbsp;</p>
+<p>mysql数据库安装完以后只会有一个root管理员账号，但是此时的root账号还并没有为其设置密码，在第一次启动mysql服务时，会进行数据库的一些初始化工作，在输出的一大串信息中，我们看到有这样一行信息 ：</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">/usr/bin/mysqladmin -u root password 'new-password</span><span style="color: #800000;"><span style="color: #0000ff;">'</span>　　// 为root账号设置密码</span>
+</pre>
+</div>
+<p>&nbsp;</p>
+<p>所以我们可以通过 该命令来给我们的root账号设置密码(<strong>注意</strong>：<span style="color: #0000ff;">这个root账号是mysql的root账号，非Linux的root账号</span>)</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~]# <span style="color: #0000ff;"><strong>mysqladmin -u root password</strong> </span><span style="color: #800000;">'</span><span style="color: #800000;">root</span><span style="color: #800000;">'　　// 通过该命令给root账号设置密码为 root</span></pre>
+</div>
+<p>&nbsp;</p>
+<p>此时我们就可以通过<span style="color: #0000ff;"> mysql -u root -p</span> 命令来登录我们的mysql数据库了</p>
+<p>&nbsp;</p>
+<p><img src="http://images.cnitblog.com/blog/432441/201304/07003612-b31a56759e64417c84d85be6dfca5fbb.jpg" alt="" /></p>
+<p><strong><span style="font-size: 18px;">五、mysql数据库的主要配置文件</span></strong></p>
+<p>1.<strong><span style="color: #0000ff;">/etc/my.cnf</span></strong> 这是mysql的主配置文件</p>
+<p>我们可以查看一下这个文件的一些信息</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo etc]# <span style="color: #0000ff;">ls</span><span style="color: #000000;"> my.cnf 
+my.cnf<br />
+[root@xiaoluo etc]# </span><span style="color: #0000ff;">cat</span><span style="color: #000000;"> my.cnf 
+[mysqld]
+datadir</span>=/var/lib/<span style="color: #000000;">mysql
+socket</span>=/var/lib/mysql/<span style="color: #000000;">mysql.sock
+user</span>=<span style="color: #000000;">mysql
+# Disabling symbolic</span>-<span style="color: #000000;">links is recommended to prevent assorted security risks
+symbolic</span>-links=<span style="color: #800080;">0</span><span style="color: #000000;">
+
+[mysqld_safe]
+log</span>-error=/var/log/<span style="color: #000000;">mysqld.log
+pid</span>-<span style="color: #0000ff;">file</span>=/var/run/mysqld/mysqld.pid</pre>
+</div>
+<p>2.<span style="color: #0000ff;"><strong>/var/lib/mysql</strong></span>&nbsp;&nbsp; mysql数据库的数据库文件存放位置</p>
+<p>我们的mysql数据库的数据库文件通常是存放在了/ver/lib/mysql这个目录下</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>[root@xiaoluo ~]# cd /var/lib/mysql/<span style="color: #000000;">
+[root@xiaoluo mysql]# </span><span style="color: #0000ff;">ls</span> -<span style="color: #000000;">l
+总用量 </span><span style="color: #800080;">20488</span>
+-rw-rw----. <span style="color: #800080;">1</span> mysql mysql <span style="color: #800080;">10485760</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">22</span>:<span style="color: #800080;">01</span><span style="color: #000000;"> ibdata1
+</span>-rw-rw----. <span style="color: #800080;">1</span> mysql mysql  <span style="color: #800080;">5242880</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">22</span>:<span style="color: #800080;">01</span><span style="color: #000000;"> ib_logfile0
+</span>-rw-rw----. <span style="color: #800080;">1</span> mysql mysql  <span style="color: #800080;">5242880</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">21</span>:<span style="color: #800080;">59</span><span style="color: #000000;"> ib_logfile1
+drwx</span>------. <span style="color: #800080;">2</span> mysql mysql     <span style="color: #800080;">4096</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">21</span>:<span style="color: #800080;">59</span><span style="color: #000000;"><span style="color: #0000ff;"> mysql　　// 这两个是mysql数据库安装时默认的两个数据库文件</span>
+srwxrwxrwx. </span><span style="color: #800080;">1</span> mysql mysql        <span style="color: #800080;">0</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">22</span>:<span style="color: #800080;">01</span><span style="color: #000000;"> mysql.sock
+drwx</span>------. <span style="color: #800080;">2</span> mysql mysql     <span style="color: #800080;">4096</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">21</span>:<span style="color: #800080;">59</span> <span style="color: #0000ff;">test　　<span style="color: #000000;"><span style="color: #0000ff;">// 这两个是mysql数据库安装时默认的两个数据库文件</span></span></span></pre>
+</div>
+<p>&nbsp;</p>
+<p>我们可以自己创建一个数据库，来验证一下该数据库文件的存放位置</p>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre><span style="color: #000000;"><span style="color: #0000ff;">创建一个我们自己的数据库：</span>
+mysql</span>&gt;<span style="color: #000000;"> create database xiaoluo;
+Query OK, </span><span style="color: #800080;">1</span> row affected (<span style="color: #800080;">0.00</span><span style="color: #000000;"> sec)
+
+[root@xiaoluo mysql]# </span><span style="color: #0000ff;">ls</span> -<span style="color: #000000;">l
+总用量 </span><span style="color: #800080;">20492</span>
+-rw-rw----. <span style="color: #800080;">1</span> mysql mysql <span style="color: #800080;">10485760</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">22</span>:<span style="color: #800080;">01</span><span style="color: #000000;"> ibdata1
+</span>-rw-rw----. <span style="color: #800080;">1</span> mysql mysql  <span style="color: #800080;">5242880</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">22</span>:<span style="color: #800080;">01</span><span style="color: #000000;"> ib_logfile0
+</span>-rw-rw----. <span style="color: #800080;">1</span> mysql mysql  <span style="color: #800080;">5242880</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">21</span>:<span style="color: #800080;">59</span><span style="color: #000000;"> ib_logfile1
+drwx</span>------. <span style="color: #800080;">2</span> mysql mysql     <span style="color: #800080;">4096</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">21</span>:<span style="color: #800080;">59</span><span style="color: #000000;"> mysql
+srwxrwxrwx. </span><span style="color: #800080;">1</span> mysql mysql        <span style="color: #800080;">0</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">22</span>:<span style="color: #800080;">01</span><span style="color: #000000;"> mysql.sock
+drwx</span>------. <span style="color: #800080;">2</span> mysql mysql     <span style="color: #800080;">4096</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">21</span>:<span style="color: #800080;">59</span><span style="color: #000000;"> test
+drwx</span>------. <span style="color: #800080;">2</span> mysql mysql     <span style="color: #800080;">4096</span> 4月   <span style="color: #800080;">6</span> <span style="color: #800080;">22</span>:<span style="color: #800080;">15</span><span style="color: #000000;"><span style="color: #0000ff;"> xiaoluo　　// 这个就是我们刚自己创建的xiaoluo数据库</span>
+[root@xiaoluo mysql]# cd xiaoluo</span>/<span style="color: #000000;">
+[root@xiaoluo xiaoluo]# </span><span style="color: #0000ff;">ls</span><span style="color: #000000;">
+db.opt</span></pre>
+</div>
+<p>3.<span style="color: #0000ff;"><strong>/var/log</strong></span> mysql数据库的日志输出存放位置</p>
+<p>我们的mysql数据库的一些日志输出存放位置都是在/var/log这个目录下</p>
+<div class="cnblogs_code">
+<pre><span style="color: #000000;">[root@xiaoluo xiaoluo]# cd 
+[root@xiaoluo </span>~]# cd /var/<span style="color: #000000;">log
+[root@xiaoluo log]# </span><span style="color: #0000ff;">ls</span><span style="color: #000000;">
+amanda                cron           maillog</span>-<span style="color: #800080;">20130331</span>   spice-<span style="color: #000000;">vdagent.log
+anaconda.ifcfg.log    cron</span>-<span style="color: #800080;">20130331</span><span style="color: #000000;">  mcelog             spooler
+anaconda.log          cups           messages           spooler</span>-<span style="color: #800080;">20130331</span><span style="color: #000000;">
+anaconda.program.log  dirsrv         messages</span>-<span style="color: #800080;">20130331</span><span style="color: #000000;">  sssd
+anaconda.storage.log  dmesg          <span style="color: #0000ff;"><strong>mysqld.log</strong></span>         tallylog
+anaconda.syslog       dmesg.old      ntpstats           tomcat6
+anaconda.xlog         dracut.log     piranha            wpa_supplicant.log
+anaconda.</span><span style="color: #0000ff;">yum</span>.log      gdm            pm-<span style="color: #000000;">powersave.log   wtmp
+audit                 httpd          ppp                Xorg.</span><span style="color: #800080;">0</span><span style="color: #000000;">.log
+boot.log              ibacm.log      prelink            Xorg.</span><span style="color: #800080;">0</span><span style="color: #000000;">.log.old
+btmp                  lastlog        sa                 Xorg.</span><span style="color: #800080;">1</span><span style="color: #000000;">.log
+btmp</span>-<span style="color: #800080;">20130401</span>         libvirt        samba              Xorg.<span style="color: #800080;">2</span><span style="color: #000000;">.log
+cluster               luci           secure             Xorg.</span><span style="color: #800080;">9</span><span style="color: #000000;">.log
+ConsoleKit            maillog        secure</span>-<span style="color: #800080;">20130331</span>    <span style="color: #0000ff;">yum</span>.log</pre>
+</div>
+<p>&nbsp;</p>
+<p>其中mysqld.log 这个文件就是我们存放我们跟mysql数据库进行操作而产生的一些日志信息，通过查看该日志文件，我们可以从中获得很多信息</p>
+<p>&nbsp;</p>
+<p>因为我们的mysql数据库是可以通过网络访问的，并不是一个单机版数据库，其中使用的协议是 tcp/ip 协议，我们都知道mysql数据库绑定的端口号是 3306 ，所以我们可以通过 <span style="color: #0000ff;">netstat -anp</span> 命令来查看一下，Linux系统是否在监听 3306 这个端口号：</p>
+<p><img src="http://images.cnitblog.com/blog/432441/201304/07004518-a8b1e585e3e546c1a068d2a38d37b535.jpg" alt="" /></p>
+<p>结果如上所示，Linux系统监听的3306端口号就是我们的mysql数据库！！！！</p>
+<p>&nbsp;</p>
+<p>本篇随笔详细记录了在CentOS6.4下通过yum安装mysql数据库以及对数据库进行基本配置，在后续的Linux学习中将会坚持记录自己的心得以及体会！！！！</p>
+<p><span style="color: #0000ff; font-size: 16px;"><strong>坚持就是胜利！！！！！！！！！！</strong></span></p>
+<p>&nbsp;</p></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory"></div>
+<div id="EntryTag"></div>
+<div id="blog_post_info">
+</div>
+<div class="clear"></div>
+<div id="post_next_prev"></div>
+</div>
+
+
+		</div>
+		<div class = "postDesc">posted @ <span id="post-date">2013-04-07 00:51</span> <a href='http://www.cnblogs.com/xiaoluo501395377/'>xiaoluo501395377</a> 阅读(<span id="post_view_count">...</span>) 评论(<span id="post_comment_count">...</span>)  <a href ="https://i.cnblogs.com/EditPosts.aspx?postid=3003278" rel="nofollow">编辑</a> <a href="#" onclick="AddToWz(3003278);return false;">收藏</a></div>
+	</div>
+	<script type="text/javascript">var allowComments=true,cb_blogId=130528,cb_entryId=3003278,cb_blogApp=currentBlogApp,cb_blogUserGuid='4892b22a-9cd9-e111-aa3f-842b2b196315',cb_entryCreatedDate='2013/4/7 0:51:00';loadViewCount(cb_entryId);</script>
+	
+</div><!--end: topics 文章、评论容器-->
+</div><a name="!comments"></a><div id="blog-comments-placeholder"></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id='comment_form' class='commentform'>
+<a name='commentform'></a>
+<div id='divCommentShow'></div>
+<div id='comment_nav'><span id='span_refresh_tips'></span><a href='javascript:void(0);' onclick='return RefreshCommentList();' id='lnk_RefreshComments' runat='server' clientidmode='Static'>刷新评论</a><a href='#' onclick='return RefreshPage();'>刷新页面</a><a href='#top'>返回顶部</a></div>
+<div id='comment_form_container'></div>
+<div class='ad_text_commentbox' id='ad_text_under_commentbox'></div>
+<div id='ad_t2'></div>
+<div id='opt_under_post'></div>
+<div id='ad_c1' class='c_ad_block'></div>
+<div id='under_post_news'></div>
+<div id='ad_c2' class='c_ad_block'></div>
+<div id='under_post_kb'></div>
+<div id='HistoryToday' class='c_ad_block'></div>
+<script type='text/javascript'>
+    fixPostBody();
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);   
+</script>
+</div>
+
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<!--done-->
+<div class="newsItem">
+<h3 class="catListTitle">公告</h3>
+	<div id="blog-news"></div><script type="text/javascript">loadBlogNews();</script>
+</div>
+
+			<div id="blog-calendar" style="display:none"></div><script type="text/javascript">loadBlogDefaultCalendar();</script>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div><script type="text/javascript">loadBlogSideColumn();</script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		
+<!--done-->
+Copyright &copy;2017 xiaoluo501395377
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+</body>
+</html>
