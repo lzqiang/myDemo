@@ -32,6 +32,13 @@ https://pan.baidu.com/s/1kVoHo7X
 Redis
 memcached
 
+消息中间件：
+rabbitMQ
+http://jzhihui.iteye.com/blog/1642324
+activeMQ
+kafka
+
+
 前端js框架
 BABEL:es6语法 转成 老版本的语法
 http://babeljs.cn/
