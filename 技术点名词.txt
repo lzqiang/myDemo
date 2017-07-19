@@ -32,6 +32,18 @@ https://pan.baidu.com/s/1kVoHo7X
 Redis
 memcached
 
+
+RediSearch-Redis强大的搜索引擎
+CRUG 2017-07-05 01:15
+作者/翻译：张冬洪，Redis中国用户组主席
+RediSearch简介
+RediSearch是一个高性能的全文搜索引擎，可作为一个Redis Module 运行在Redis上，是由RedisLabs团队开发的。
+特点是：Faster, in-memory, highly available full text search （英文看着才有感觉）
+项目地址：https://github.com/RedisLabsModules/RediSearch
+官网：http://redisearch.io
+
+
+
 消息中间件：
 rabbitMQ
 http://jzhihui.iteye.com/blog/1642324
