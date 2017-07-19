@@ -1,0 +1,1 @@
+ + " #if(:approved.licenseNumberNew!=null){ AND hca.LICENSE_NUMBER_NEW LIKE concat('%',:approved.licenseNumberNew,'%')}"
