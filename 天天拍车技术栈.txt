@@ -1,0 +1,20 @@
+1.rose框架
+2.spring框架
+
+---缓存-----
+1.redis
+2.EhCache 是一个纯Java的进程内缓存框架，具有快速、精干等特点，是Hibernate中默认的CacheProvider
+
+----WWW官网项目和M站
+1.Couchbase 分布式存储
+
+------------搜索
+solor 搜索引擎
+
+-----JMS
+1.rabbitMQ
+
+容器：
+1.docker
+2.resin
+
