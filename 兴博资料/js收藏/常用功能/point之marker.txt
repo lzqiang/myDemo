@@ -1,0 +1,13 @@
+function createMarker(point,html) {
+var marker = new GMarker(point);GEvent.addListener(marker, "click", functi() {
+marker.openInfoWindowHtml(html);
+});
+return marker;
+}//创建地图实例，并且地图缩放控件和显示地图类型控件
+var map = new GMap2(document.getElementById("map"));
+
+map.addControl(new GLargeMapControl());
+map.addControl(new GMapTypeControl());
+map.setCenter(new GLatLng(43.707787,-79.859741),8);//创建具有信息提示窗口的标记
+var point = new GLatLng(43.65654,-79.90138);
+var marker = createMarker(point,'<div style="width:240px">Link to <a href="http://www.broadview.com.cn/ ">BroadView</a> </div>')map.addOverlay(marker);

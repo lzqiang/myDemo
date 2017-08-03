@@ -1,0 +1,13 @@
+var image = 'beachflag.png';  
+
+11   var myLatLng = new google.maps.LatLng(-33.890542, 151.274856);  
+
+12   var beachMarker = new google.maps.Marker({  
+
+13       position: myLatLng,  
+
+14       map: map,  
+
+15       icon: image  
+
+16   });  

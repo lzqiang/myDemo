@@ -1,0 +1,3 @@
+<buttons>
+	<button name="back" extends="${back.button.default}" position="title"></button>
+</buttons>

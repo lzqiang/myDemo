@@ -1,0 +1,12 @@
+<buttons>
+				<button name="back" position="title" label="·µ»Ø">
+					<imports>
+						<import></import>
+					</imports>
+					<dynevent>
+					<![CDATA[
+						return rrequest.forwardPageWithBack("/WabacusDemo/ShowReport.wx?PAGEID=addCarRecord");
+					]]>
+					</dynevent>
+				</button>
+			</buttons>

@@ -1,0 +1,44 @@
+我讲到了使用typeof和constructor两种方法来进行对象类型的判断。其中，typeof可以说是js设计上的一个缺陷，因为几乎不可能从它那里得到想要的结果，它唯一的使用场景就是判断一个变量是否已经定义，如typeof para==='undefined'，因此，一般情况下不要用它来进行对象类型的检查。
+         而constructor是一个很有用处的属性，它能够正确的得到我们期望的结果，但是，它返回的是一个对象。
+
+         今天，介绍另外一个方法来实现对象类型的判断。这是javascript标准文档中给出的方法，就是使用Object.property.toString.call。首先来看一下这个方法返回的结果：  
+
+
+[html] view plaincopyprint?
+01.Object.prototype.toString.call([]);//[Object Array]  
+02.  
+03.Object.prototype.toString.call({});//[Object Object]  
+04.  
+05.Object.prototype.toString.call(2);//[Object Number]  
+06.  
+07.Object.prototype.toString.call("2");//[Object String]  
+08.  
+09.Object.prototype.toString.call(function (){});//[Object Function]  
+Object.prototype.toString.call([]);//[Object Array]
+
+Object.prototype.toString.call({});//[Object Object]
+
+Object.prototype.toString.call(2);//[Object Number]
+
+Object.prototype.toString.call("2");//[Object String]
+
+Object.prototype.toString.call(function (){});//[Object Function]
+       可见，它确实能正确地返回我们所期望的结果，但是在我们写代码的时候，如果拿这个返回值去做判断的话，会很麻烦（因为它太长了，并且我们只需要后面一部分）。如果才能得到该结果中我们所需要的那部分呢？用下面的函数可以实现：
+
+
+ function is(type, obj) {  
+
+var clas = Object.prototype.toString.call(obj).slice(8, -1);  
+
+return obj !== undefined && obj !== null && clas === type;
+
+}
+
+
+其中,type是我们所期望的类型，而obj是我们所要判断类型的对象。。
+
+
+is("Array",[1,2]);//true
+
+
+

@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" >
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Untitled Document</title>
+  <script src=
+   "http://ditu.google.cn/maps?file=api&amp;v=2&amp;key=ABQIAAAAsZavA6gil9BBDR-Oaa19jhTsbArW69NGP7cInH2ka-kAI1M4zxRWbsqjalO4Ohwde3yaWLdldiJKPw&sensor=true"
+   type="text/javascript"></script>
+   <script type="text/javascript">
+            GMarker.prototype.setIndex=function(index)
+      {
+       this.index=index;
+      }
+      var map;
+      var polyline;
+      var markers=[];
+      var myIcon=new GIcon(G_DEFAULT_ICON,"http://www.google.com/mapfiles/marker.png");
+      function createMarker(point){
+        var marker=new GMarker(point,{icon:myIcon,draggable:true,bouncy:true});
+     var index=markers.length;
+    
+     GEvent.addListener(marker,'dblclick',function()
+     {
+      deleteMarker(marker);
+     } );
+     GEvent.addListener(marker,'dragstart',function()
+     {
+        marker.setImage("http://www.google.com/mapfiles/dd-start.png");
+     } );
+     GEvent.addListener(marker,'dragend',function()
+     {
+      marker.setImage("http://www.google.com/mapfiles/marker.png");
+     });
+     GEvent.addListener(marker,'click',function(){
+      marker.openInfoWindowHtml("What are you doing?");
+     });
+     GEvent.addListener(marker,'drag',function(){
+      redrawPolyline();
+     });
+     marker.setIndex(index);
+     markers[index]=marker;
+     map.addOverlay(marker);
+    
+     redrawPolyline();
+      }
+      function deleteMarker(marker){
+       if(!confirm("Would you like to remove the point?"))return;
+    var index=marker.index;
+    map.removeOverlay(marker);
+    for(var i=index;i<markers.length-1;i++){
+     markers[i+1].setIndex(i);
+     markers[i]=markers[i+1];
+    }
+    markers.length=markers.length-1;
+    redrawPolyline();
+      }
+      function load(){
+       if(GBrowserIsCompatible()){
+     map=new GMap2(document.getElementByIdx("map"));
+     map.addControl(new GSmallMapControl());
+     map.addControl(new GMapTypeControl());
+     
+     var centerPoint=new GLatLng(39.92,116.46);
+     map.setCenter(centerPoint,4);
+     GEvent.addListener(map,'click',function(overlay,point){
+      if(point)createMarker(point);
+     });
+    }
+      }
+      function addPolyline()
+      {
+       var points=[];
+    for(var i=0;i<markers.length;i++){
+     points[i]=markers[i].getPoint();
+    }
+    polyline=new GPolyline(
+    points,
+    "#FF0000",
+    10,
+    0.5
+    );
+    map.addOverlay(polyline);
+      }
+      function removePolyline()
+      {
+       polyline.remove();
+    polyline=null;
+      }
+      function redrawPolyline()
+      {
+       if(polyline){
+     removePolyline();
+    }
+    addPolyline();
+      }
+   </script>
+ </head>
+ <body onload="load()">
+  <div id="map" style="width: 600px;height: 500px"></div>
+ </body>
+</html>

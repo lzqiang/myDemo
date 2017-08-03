@@ -1,0 +1,139 @@
+此文章主要向大家描述的是Java连接MYSQL 数据库(以MySQL为例)的实际操作步骤，我们是以相关实例的方式来引出Java连接MYSQL 数据库的实际操作流程，以下就是文章的主要内容描述。
+
+当然，首先要安装有JDK(一般是JDK1.5.X)。然后安装MySQL，这些都比较简单，具体过程就不说了。配置好这两个环境后，下载JDBC驱动mysql-connector-java-5.0.5.zip（这个是最新版的）。然后将其解压缩到任一目录。我是解压到D盘，然后将其目录下的mysql-connector-java-5.0.5-bin.jar加到classpath里，
+
+具体如下：“我的电脑”-> “属性” -> “高级” -> “环境变量”，在系统变量那里编辑classpath，将D:\mysql-connector-java-5.0.5\mysql-connector-java-5.0.5-bin.jar加到最后，在加这个字符串前要加“;”，以与前一个classpath区分开。然后确定。
+
+环境配置好了，很简单。现在，先配置Java连接MySQL，设其用户名为“root”，密码为“root”。在命令行或用一个SQL的前端软件创建Database。
+
+我是用SQLyog的前端软件来创建Database的。
+
+先创建数据库：
+
+CREATE DATABASE SCUTCS; 接着，创建表：
+
+CREATE TABLE STUDENT  (  SNO CHAR(7) NOT NULL,  SNAME VARCHAR(8) NOT NULL,  SEX CHAR(2) NOT NULL,  BDATE DATE NOT NULL,  HEIGHT DEC(5,2) DEFAULT 000.00,  PRIMARY KEY(SNO)  );  然后插入数据，可以用SQL语句insert into <表名> values (value1, value2, ...);
+
+也可以用SQLyog来操作
+
+好了，创建好了。
+
+下面，我们来编写.java文件来演示一下如何访问Java连接MySQL数据库。
+
+import java.sql.*;   public class JDBCTest {   public static void main(String[] args){  驱动程序名
+
+String driver = "com.mysql.jdbc.Driver";
+
+
+// URL指向要访问的数据库名scutcs
+
+String url = "jdbc:mysql://127.0.0.1:3306/scutcs";
+
+
+// MySQL配置时的用户名
+
+String user = "root";
+
+
+
+// Java连接MySQL配置时的密码
+
+
+String password = "root";
+
+
+try {
+
+// 加载驱动程序
+
+
+Class.forName(driver);
+
+
+// 连续数据库
+
+Connection conn = DriverManager.getConnection(url, user, password);
+
+
+if(!conn.isClosed())
+
+System.out.println("Succeeded connecting to the Database!");
+
+
+// statement用来执行SQL语句
+
+Statement statement = conn.createStatement();
+
+
+// 要执行的SQL语句
+
+String sql = "select * from student";
+
+
+结果集
+
+ResultSet rs = statement.executeQuery(sql);  System.out.println("-----------------");  System.out.println("执行结果如下所示:");  System.out.println("-----------------");  System.out.println(" 学号" + "\t" + " 姓名");  System.out.println("-----------------");  String name = null;  while(rs.next()) {  选择sname这列数据
+
+name = rs.getString("sname");
+
+
+
+// 首先使用ISO-8859-1字符集将name解码为字节序列并将结果存储新的字节数组中。
+
+
+// 然后使用GB2312字符集解码指定的字节数组
+
+
+name = new String(name.getBytes("ISO-8859-1"),"GB2312");
+
+
+// 输出结果
+
+System.out.println(rs.getString("sno") + "\t" + name);  }  rs.close();  conn.close();   } catch(ClassNotFoundException e) {   System.out.println("Sorry,can`t find the Driver!");   e.printStackTrace();   } catch(SQLException e) {   e.printStackTrace();   } catch(Exception e) {   e.printStackTrace();   }   }   }  
+接下来我们运行一下看下效果：
+
+
+D:\testjdbc>javac JDBCTest.java
+
+D:\testjdbc>java JDBCTest
+
+Succeeded connecting to the Database!
+
+
+-----------------------
+
+
+执行结果如下所示:
+
+
+-----------------------
+
+
+学号 姓名
+
+
+-----------------------
+
+
+0104421 周远行
+
+
+0208123 王义平
+
+
+0209120 王大力
+
+
+0309119 李 维
+
+
+0309203 欧阳美林
+
+
+完事。
+
+
+原文标题：java连接MYSQL
+
+连接：http://www.cnblogs.com/soplayer/archive/2007/06/26/796565.html
+

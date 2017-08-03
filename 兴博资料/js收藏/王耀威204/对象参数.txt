@@ -1,0 +1,40 @@
+function initAjax() { 
+var httprequest=null; 
+try { 
+httprequest=new ActiveXObject("Msxml2.XMLHTTP"); 
+} 
+catch (e) { 
+try { 
+httprequest=new ActiveXObject("Microsoft.XMLHTTP"); 
+} 
+catch (e) { 
+try { 
+httprequest=new XMLHttpRequest(); 
+} 
+catch (e) { 
+httprequest=null; 
+} 
+} 
+} 
+return httprequest; 
+} 
+function doAjax( msg, obj ) { 
+var obj=obj; //主要是这一行 
+alert( obj.value); 
+var he="he="+msg; 
+var ajaxrequest=initAjax(); 
+ajaxrequest.open("POST", "abc.jsp", true); 
+ajaxrequest.setRequestHeader( "Content-Type", "application/x-www-form-urlencoded;charset=utf-8"); 
+ajaxrequest.send(he); 
+ajaxrequest.onreadystatechange=function() { 
+if (ajaxrequest.readyState==4) { 
+if (ajaxrequest.status==200) { 
+document.getElementById("showpane").innerHTML=ajaxrequest.responseText; 
+} 
+else { 
+doAjax( msg ); 
+} 
+} 
+} 
+setTimeout("doAjax(document.sform.txtara.value,document.all["+obj.sourceIndex+"])", 100);//还有这一行 
+} 

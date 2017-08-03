@@ -1,0 +1,17 @@
+$(function(){//设置公司车辆超速报表默认时间
+  	var mydate= new Date();
+	var str=mydate.getYear()+1900;
+	if((mydate.getMonth()+1)>=10){
+	   str=str+"-"+(mydate.getMonth()+1);
+	}else{
+	 str=str+"-0"+(mydate.getMonth()+1);
+	}
+	if(mydate.getDate()>=10){
+	   str=str+"-"+mydate.getDate();
+	}else{
+	   str=str+"-0"+mydate.getDate();
+	}
+	$('#carSpeedOverPage_guid_carSpeedOverReport_condition_txtstart').val(str);
+	$('#carSpeedOverPage_guid_carSpeedOverReport_condition_txtend').val(str);
+    
+})

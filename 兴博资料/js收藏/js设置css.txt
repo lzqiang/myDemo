@@ -1,0 +1,29 @@
+
+function changeSelect(){//触发查询事件
+     var strtitle1=$('#certificateStatisticPage_guid_report1_condition_ORG_NAME').val();
+      var strtitle2=$('#certificateStatisticPage_guid_report1_condition_BUILD_SITE_NAME').val();
+       var strtitle3=$('#certificateStatisticPage_guid_report1_condition_realDate').val();
+       if(strtitle3){
+           strtitle3="("+strtitle3+")";
+       }
+     $('.cls-title').html("<center><font size=6><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+strtitle1+strtitle2+strtitle3 +"单车办证统计报表</b></font></center>");
+     $('.cls-title').parent().css({"width":"100%"});
+}
+//function CertitficateTitle(){
+     //$('.cls-title').html("<center><b>单车办证统计报表</b></center>");
+  //   $('.cls-title').parent().css({"width":"100%"});
+  //   $('.cls-title').parent().css({"text-align":"center"});
+     //changeSelect();  
+//}
+//function totalNumTitle(){
+     //$('.cls-title').html("<center><b>工地车辆号码统计报表</b></center>");
+ //    $('.cls-title').parent().css({"width":"100%"});
+//     $('.cls-title').parent().css({"display":"none"});
+     //changeSelect();  
+//}
+//function AlarmTitle(){
+     //$('.cls-title').html("<center><b>车辆报警计报表</b></center>");
+ //    $('.cls-title').parent().css({"width":"100%"});
+ //    $('.cls-title').parent().css({"text-align":"center"});
+     //changeSelect();  
+//}

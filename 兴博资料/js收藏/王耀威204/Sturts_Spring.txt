@@ -1,0 +1,217 @@
+Spring通过DAO模式，提供了对iBATIS的良好支持。SqlMapClient对象是iBATIS中的主要对象，我们可以通过配置让spring来管理SqlMapClient对象的创建。
+
+与hibernate类似，Spring 提供了SqlMapClientDaoSupport对象，我们的DAO可以继承这个类，通过它所提供的SqlMapClientTemplate对象来操纵数据库。看起来这些概念都与hibernate类似。
+
+通过SqlMapClientTemplate来操纵数据库的CRUD是没有问题的，这里面关键的问题是事务处理。Spring提供了强大的声明式事务处理的功能，我们已经清楚hibernate中如何配置声明式的事务，那么在iBATIS中如何获得声明式事务的能力呢？
+
+第一，我们需要了解的是spring通过AOP来拦截方法的调用，从而在这些方法上面添加声明式事务处理的能力。典型配置如下：applicationContext-common.xml
+
+    <!-- 配置事务特性 -->
+
+    <tx:advice id="txAdvice" transaction-manager="事务管理器名称">
+
+        <tx:attributes>
+
+           <tx:method name="add*" propagation="REQUIRED"/>
+
+           <tx:method name="del*" propagation="REQUIRED"/>
+
+           <tx:method name="update*" propagation="REQUIRED"/>
+
+           <tx:method name="*" read-only="true"/>
+
+       </tx:attributes>
+
+    </tx:advice>
+
+    
+
+    <!-- 配置哪些类的方法需要进行事务管理 -->
+
+    <aop:config>
+
+       <aop:pointcut id="allManagerMethod" expression="execution(* com.ibatis.manager.*.*(..))"/>
+
+       <aop:advisor advice-ref="txAdvice" pointcut-ref="allManagerMethod"/>
+
+    </aop:config>
+ 
+
+这些事务都是声明在业务逻辑层的对象上的。
+
+第二，我们需要一个事务管理器，对事务进行管理。
+
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+
+    <property name="dataSource" ref="dataSource"/>
+
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+
+        <property name="url" value="jdbc:mysql://127.0.0.1/ibatis"/>
+
+        <property name="username" value="root"/>
+
+        <property name="password" value="mysql"/>
+
+    </bean>
+ 
+
+此后，我们需要让spring来管理SqlMapClient对象：
+
+    <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+
+       <property name="configLocation"><value>classpath:sqlMapConfig.xml</value></property>
+
+    </bean>
+ 
+
+我们的sqlMapConfig.xml就可以简写为：
+
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig      
+
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+    <settings 
+
+       lazyLoadingEnabled="true"
+
+        useStatementNamespaces="true" />
+
+    <!-- 使用spring之后，数据源的配置移植到了spring上，所以iBATIS本身的配置可以取消 -->
+
+  <sqlMap resource="com/ibatis/dao/impl/ibatis/User.xml"/>
+
+</sqlMapConfig>
+
+User.xml:如下
+
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="User">
+
+ <!-- Use type aliases to avoid typing the full classname every time. -->
+
+ <typeAlias alias="User" type="com.ibatis.User"/>
+
+ <!-- Select with no parameters using the result map for Account class. -->
+
+ <select id="selectAllUsers" resultClass="User">
+
+    select * from t_user
+
+ </select>
+
+ 
+
+ <select id="selectUser" resultClass="User" parameterClass="int">
+
+  select * from t_user where id=#id#
+
+ </select>
+
+ 
+
+ <insert id="insertUser" parameterClass="User">
+
+  insert into t_user values (
+
+       null,#username#,#password#
+
+  )
+
+ </insert>
+
+ 
+
+ <update id="updateUser" parameterClass="User">
+
+  update t_user set username = #username#,password=#password#
+
+  where id=#id#
+
+  </update>
+
+ 
+
+ <delete id="deleteUser" parameterClass="int">
+
+  delete from t_user where id=#id#
+
+ </delete>
+
+</sqlMap>
+
+我们的DAO的编写：
+
+package com.iabtis.dao.impl.ibatis;
+
+import java.util.List;
+
+import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
+
+import com.ibatis.dao.UserDAO;
+
+import com.ibatis.crm.model.User;
+
+public class UserDAOImpl extends SqlMapClientDaoSupport implements UserDAO {
+
+    public void select(User user) {
+
+              getSqlMapClientTemplate().delete("selectUser ",user.getId());
+
+       }
+
+   public List findAll() {
+
+              return getSqlMapClientTemplate().queryForList("selectAllUsers ");
+
+       }
+
+       public void delete(User user) {
+
+              getSqlMapClientTemplate().delete("deleteUser ",user.getId());
+
+       }
+
+       public void save(User user) {
+
+              getSqlMapClientTemplate().insert("insertUser ",user);
+
+       }
+
+       public void update(User user) {
+
+              getSqlMapClientTemplate().update("updateUser ",user);
+
+       }
+
+}
+ 
+
+继承SqlMapClientDaoSupport，要求我们注入SqlMapClient对象，因此，需要有如下的DAO配置：
+
+<bean id="userDAO" class="com.ibatils.dao.impl.ibatis.UserDAOImpl">
+
+     <property name=”sqlMapClient” ref=”sqlMapClient”/>
+
+</bean>
+ 
+
+这就是所有需要注意的问题了，此后就可以在业务逻辑层调用DAO对象了！
+

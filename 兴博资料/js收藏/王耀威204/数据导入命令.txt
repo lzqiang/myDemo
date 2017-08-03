@@ -1,0 +1,9 @@
+我给你一些数据库常用的导入导出命令吧:该命令在“开始菜单>>运行>>CMD”中执行一、数据导出（exp.exe）
+1、将数据库orcl完全导出，用户名system，密码accp，导出到d:\daochu.dmp文件中exp system/accp@orcl file=d:\daochu.dmp full=y
+2、将数据库orcl中scott用户的对象导出exp scott/accp@orcl file=d:\daochu.dmp owner=(scott)
+3、将数据库orcl中的scott用户的表emp、dept导出exp scott/accp@orcl file= d:\daochu.dmp tables=(emp,dept)
+4、将数据库orcl中的表空间testSpace导出exp system/accp@orcl file=d:\daochu.dmp tablespaces=(testSpace)
+二、数据导入（imp.exe）1、将d:\daochu.dmp 中的数据导入 orcl数据库中。
+imp system/accp@orcl file=d:\daochu.dmp full=y2、如果导入时，数据表已经存在，将报错，对该表不会进行导入；
+加上ignore=y即可，表示忽略现有表，在现有表上追加记录。
+imp scott/accp@orcl file=d:\daochu.dmp full=y ignore=y3、将d:\daochu.dmp中的表emp导入imp scott/accp@orcl file=d:\daochu.dmp tables=(emp)

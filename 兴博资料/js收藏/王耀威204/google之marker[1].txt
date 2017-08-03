@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <script src="http://ditu.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSosDVG8KKPE1-m51RBrvYughuyMxQ-i1QfUnH94QxWIa6N4U6MouMmBA&hl=zh-CN" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            function load()
+            {
+                //检查浏览器的兼容性.是否支持google地图
+                if (GBrowserIsCompatible())
+                {
+                    //加载地图  //创建GMap类的实例
+
+                    var map = new GMap2(document.getElementById("map_canvas"));
+                    //添加一个控制条
+                    map.addControl(new GSmallMapControl());
+                    //设置显示模式为卫星影像
+                    map.addControl(new GMapTypeControl());
+                     //设置中心点经纬度（）和缩放系数，并显示
+                    map.setCenter(new GLatLng(39.9493, 116.3975), 13);
+  
+  // Create a base icon for all of our markers that specifies the
+  // shadow, icon dimensions, etc.
+                    google.maps.LabelMarker = function(latlng, options)
+                     {
+                          this.latlng = latlng;
+                          this.labelText = options.labelText || '';
+                         this.labelClass = options.labelClass || 'writeb';
+                        this.labelOffset = options.labelOffset || new google.maps.Size(8, -33);
+                        options.icon = options.icon || getTextIcon();
+                        google.maps.Marker.apply(this, arguments);
+                    }
+ 
+                    google.maps.LabelMarker.prototype = new google.maps.Marker(new google.maps.LatLng(0, 0));
+ 
+                    google.maps.LabelMarker.prototype.initialize = function(map)
+                    {
+                        google.maps.Marker.prototype.initialize.call(this, map);
+         
+                         var label = document.createElement('div');
+                         label.className = this.labelClass;
+                         label.innerHTML = this.labelText;
+                        label.style.position = 'absolute';
+                           label.style.width = '48px';
+                         map.getPane(G_MAP_MARKER_PANE).appendChild(label);
+     
+                         this.map = map;
+                         this.label = label;
+                     }
+                     google.maps.LabelMarker.prototype.redraw = function(force)
+                    {
+                        google.maps.Marker.prototype.redraw.call(this, map);
+     
+                         if(!force)
+                         {
+                             return;
+                         }
+                         var point = this.map.fromLatLngToDivPixel(this.latlng);
+                        var z = google.maps.Overlay.getZIndex(this.latlng.lat());
+     
+                        this.label.style.left = (point.x + this.labelOffset.width) + 'px';
+                         this.label.style.top = (point.y + this.labelOffset.height) + 'px';
+                         this.label.style.zIndex = z + 1;
+                     }
+ 
+                    google.maps.LabelMarker.prototype.remove = function()
+                    {
+                        this.label.parentNode.removeChild(this.label);
+                           this.label = null;
+                        google.maps.Marker.prototype.remove.call(this);
+                     }
+                     var n= 21;//在这里接收要显示的信息，文字要用双引号""
+                    function getTextIcon()
+                     {
+                        var icon = new google.maps.Icon();
+//    icon.image = "http:labs.google.com/ridefinder/images/mm_20_red.png";  
+                        icon.image = "http://labs.google.com/ridefinder/images/mm_20_yellow.png";
+                        icon.iconSize = new GSize(37,37 );
+                         icon.iconAnchor = new GPoint(0, 40);
+                          icon.infoWindowAnchor = new GPoint(5, 1);
+                         return icon;
+                    }
+                     var marker = new google.maps.LabelMarker(map.getCenter(), { labelText:n});//在这加入n
+         
+                     map.addOverlay(marker);
+                }
+            }                
+    </script>
+    </head>
+    <body onLoad="load()" onUnload="GUnload()">
+        <!-- 地图画板 -->
+        <div id="map_canvas" style="width:640px; height:480px"></div>
+    </body>
+</html>
+

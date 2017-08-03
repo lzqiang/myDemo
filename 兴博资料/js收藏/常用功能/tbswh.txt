@@ -1,0 +1,26 @@
+果id="tabs"的div未设置宽度和高度，easyUI默认的宽度和高度是auto，这样在google浏览器下显示正常，但是在IE下默认不显示任何内容，并且和dialog还有冲突（dialog无法弹出窗口）。 
+
+无奈去google搜索，找到一个解决方法如下： 
+1. 去掉div里的class="easyui-tabs" 
+2. 加上一段JS 
+复制代码 代码如下:
+<script type="text/javascript"> 
+$(function(){ 
+　　$("#tabs").tabs({ 
+　　　　width:$("#tabs").parent().width(), 
+　　　　height:$("#tabs").parent().height() 
+　　}); 
+}); 
+</script> 
+
+加上这段代码后，发现容器会很高，因为他获得是父容器的height 
+解决方法： 
+JS修改为 
+复制代码 代码如下:
+$('#tabs').tabs({ 
+　　width: $("#tabs").parent().width(), 
+　　height: "auto" 
+}); 
+
+
+详细出处参考：http://www.jb51.net/article/25125.htm

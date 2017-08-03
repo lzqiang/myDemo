@@ -1,0 +1,23 @@
+现在我们编程创建 Tabs，我们同时捕捉 'onSelect' 事件。
+
+1.$('#tt').tabs({   
+2.    border:false,   
+3.    onSelect:function(title){   
+4.        alert(title+' is selected');   
+5.    }   
+6.});  
+增加新的tab panel
+
+1. // 增加一个新的 tab panel   
+2.$('#tt').tabs('add',{   
+3.    title:'New Tab',   
+4.    content:'Tab Body',   
+5.    closable:true  
+6.});  
+获取选中的 Tab
+
+1. // 获取选中的 tab panel 和它的 tab 对象   
+2.var pp = $('#tt').tabs('getSelected');   
+3.var tab = pp.panel('options').tab;    // 相应的 tab 对象     
+ 
+

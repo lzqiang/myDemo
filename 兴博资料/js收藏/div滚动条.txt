@@ -1,0 +1,29 @@
+function hasScrollbarV(obj){
+if(obj.style.overflow){
+return new Boolean((new Number(obj.scrollWidth))>(new Number(obj.style.pixelWidth)));
+}
+return false;
+}
+function hasScrollbarH(obj){
+if(obj.style.overflow){
+return new Boolean((new Number(obj.scrollHeight))>(new Number(obj.style.pixelHeight)));
+}
+return false;
+}
+
+alert("is d1 has horizontal scrollbar :"+hasScrollbarH(d1));
+alert("is d1 has vertical scrollbar :"+hasScrollbarV(d1));
+
+//--------------------------------------------------
+·½·¨¶þ
+<div id="showDiv">
+  <script type="text/javascript">   
+      window.onload=function(){   
+var obj=document.getElementById("showDiv");   
+if(obj.scrollHeight>obj.clientHeight||obj.offsetHeight>obj.clientHeight){
+document.getElementById("hiddenDiv").style.height="15pt";
+  }
+  }   
+  </script>
+  <div id="hiddenDiv" style="height:"></div>
+</div

@@ -1,0 +1,30 @@
+必填选项：
+name：名称
+enabled：为选中状态
+type：选择项目类型 这里选择pl/sqlblock
+action：执行动作
+begin
+update tb_car c
+       set c.black_status=0
+     where exists (select 1
+               from tb_car a, tb_black_car b
+               where c.car_id = a.car_id
+               and a.black_status = 1
+               and a.car_id = b.car_id
+               and b.black_ed_date < trunc(sysdate)
+               and (a.black_status=1 or a.black_status is null));
+
+    update tb_black_car t
+       set t.status = 1
+     where t.black_ed_date < trunc(sysdate)
+       and (t.status = 0 or t.status is null);  
+     commit;
+  end;
+Start date：起始时间
+frequency：多久执行，一天，一周。
+interval ：执行次数
+by hour：时
+by minute：分
+by second：秒
+job class：默认jobclass 
+comment：注释

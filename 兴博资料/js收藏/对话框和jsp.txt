@@ -1,0 +1,25 @@
+function excel(){
+  
+	//关闭所有对话框
+	art.dialog({
+    content: "<iframe src='./jsp/pathName.jsp' id='path_id' height='100%' width='100%' frameborder='0'></iframe>",
+    ok: function () {
+         invokeServerActionForReportData('certificateStatisticPage','report1',
+					'com.xingbo.muckcar.callback.ToExcel',
+					{name:'SELECTEDROW',value:false},
+					{   
+					   ORG_ID:$('#certificateStatisticPage_guid_report1_condition_ORG_NAME').val(),
+					   BUILD_SITE_NAME:$('#certificateStatisticPage_guid_report1_condition_BUILD_SITE_NAME').val(),
+					   OPT_DATE:$('#certificateStatisticPage_guid_report1_condition_realDate').val(),
+					   ORG_NAME:$('#certificateStatisticPage_guid_report1_condition_ORG_NAME option:selected').text(),
+					   PAGE_SIZE:$('.cls-navigate-info option:selected').text(),
+					   PAGE_NUM:$('.cls-navigate-info').text().substring($('.cls-navigate-info').text().indexOf('第')+1,$('.cls-navigate-info').text().indexOf('\/'))
+					}
+					,true,testBeforeInokeCallBackMethod22,testInvokeCallbackMethod22);
+    	this.close();
+    },
+    cancelVal: '关闭',
+    cancel: true //为true等价于function(){}
+});
+
+}

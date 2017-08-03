@@ -1,0 +1,294 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="http://ditu.google.cn/maps?file=api&v=2">
+    </script>
+    <script type="text/javascript">
+        function load() {
+            if (GBrowserIsCompatible()) {
+                var px = 30.6562;
+                var py = 104.0639;
+                var cx = px;
+                var cy = py;
+                var zoom = 12;
+                var map = new GMap2(document.getElementById("map"));
+                var point = new GLatLng(px, py);
+                map.setCenter(point,zoom);
+            }
+            /**//*
+            获得当前点击的地理坐标
+            */
+            GEvent.addListener(map, "click", function(marker, point) {
+            if (point) {
+            px = point.lat();
+            py = point.lng();
+            zoom = map.getZoom();
+            document.getElementById("lat").value = px;
+            document.getElementById("lng").value = py;           
+            }
+            });
+            /**//*
+            zoomend地图到达新的缩放级别时会触发此事件。事件处理程序接收先前的缩放级别和新缩放级别作为参数。
+            */
+            GEvent.addListener(map, "zoomend", function() {
+                zoom = map.getZoom();
+                //document.getElementById("zoom").value = zoom;
+            });
+            /**//*
+            moveend结束地图视图的更改时会触发此事件。拖动或放大/缩小都会触发此事件
+            */
+            GEvent.addListener(map, "moveend", function() {
+                var center = map.getCenter();
+                cx = center.lat();
+                cy = center.lng();
+                document.getElementById("lat").value = cx;
+                document.getElementById("lng").value = cy;
+                document.getElementById("centerLat").value = cx;
+                document.getElementById("centerLng").value = cy;
+                document.getElementById("zoom").value = zoom;
+            });
+            document.getElementById("lat").value = px;
+            document.getElementById("lng").value = py;
+            document.getElementById("centerLat").value = cx;
+            document.getElementById("centerLng").value = cy;
+            document.getElementById("zoom").value = zoom;
+        }
+        window.onload = load;
+    </script>
+</head>
+<body>
+    <div>
+    当前经度：<input type="text" id="lat"/><br />
+    当前纬度：<input type="text" id="lng"/><br />
+    中心经度：<input type="text" id="centerLat"/><br />
+    中心纬度：<input type="text" id="centerLng"/><br />
+    当前倍率：<input type="text" id="zoom"/>
+    </div>
+    <div style="width:500px; height:500px;" id="map"></div>
+</body>
+</html>
+
+(如果在IE下出现GMap2未定义的错误，请刷新一遍，火狐下是正常的)
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="http://ditu.google.cn/maps?file=api&v=2&key=ABQIAAAA35MvS7AnL0cjW_AmAJjW7BQQxUWGaJxgL6MJAQ51I1vKwWJYtxROqcWbldYkZFdMcEwKzaganeiujA">
+</script>
+<script type="text/javascript">
+function load() {
+if (GBrowserIsCompatible()) {
+var px = 30.6562;
+var py = 104.0639;
+var cx = px;
+var cy = py;
+var zoom = 12;
+var map = new GMap2(document.getElementById("map"));
+var point = new GLatLng(px, py);
+map.setCenter(point,zoom);
+}
+/*
+获得当前点击的地理坐标
+*/
+GEvent.addListener(map, "click", function(marker, point) {
+if (point) {
+px = point.lat();
+py = point.lng();
+zoom = map.getZoom();
+document.getElementById("lat").value = px;
+document.getElementById("lng").value = py;
+}
+});
+/*
+zoomend地图到达新的缩放级别时会触发此事件。事件处理程序接收先前的缩放级别和新缩放级别作为参数。
+*/
+GEvent.addListener(map, "zoomend", function() {
+zoom = map.getZoom();
+//document.getElementById("zoom").value = zoom;
+});
+/*
+moveend结束地图视图的更改时会触发此事件。拖动或放大/缩小都会触发此事件
+*/
+GEvent.addListener(map, "moveend", function() {
+var center = map.getCenter();
+cx = center.lat();
+cy = center.lng();
+document.getElementById("lat").value = cx;
+document.getElementById("lng").value = cy;
+document.getElementById("centerLat").value = cx;
+document.getElementById("centerLng").value = cy;
+document.getElementById("zoom").value = zoom;
+});
+document.getElementById("lat").value = px;
+document.getElementById("lng").value = py;
+document.getElementById("centerLat").value = cx;
+document.getElementById("centerLng").value = cy;
+document.getElementById("zoom").value = zoom;
+}
+window.onload = load;
+</script>
+</head>
+<body>
+<div>
+当前经度：<input type="text" id="lat"/><br />
+当前纬度：<input type="text" id="lng"/><br />
+中心经度：<input type="text" id="centerLat"/><br />
+中心纬度：<input type="text" id="centerLng"/><br />
+当前倍率：<input type="text" id="zoom"/>
+</div>
+<div style="width:500px; height:500px;" id="map"></div>
+</body>
+</html>
+ 
+
+
+
+将事件绑定到对象方法
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <script type="text/javascript" src="http://ditu.google.cn/maps?file=api&v=2">
+    </script>
+
+    <script type="text/javascript">
+        function MyApplication() {  
+            this.counter = 0;  
+            this.map = new GMap2(document.getElementById("map"));  
+            this.map.setCenter(new GLatLng(39.9493, 116.3975), 13);  
+            GEvent.bind(this.map, "click", this, this.onMapClick);
+        }
+        MyApplication.prototype.onMapClick = function() {
+            this.counter++;
+            alert("这是您第" + this.counter + " " + "次点击");
+        }
+        window.onload = function(){
+            var application = new MyApplication();
+        }
+    </script>
+
+</head>
+<body>
+    <div id="map" style="width:500px; height:500px;"></div>
+</body>
+</html>
+(如果在IE下出现GMap2未定义的错误，请刷新一遍，火狐下是正常的) 
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<script type="text/javascript" src="http://ditu.google.cn/maps?file=api&v=2&key=ABQIAAAA35MvS7AnL0cjW_AmAJjW7BQQxUWGaJxgL6MJAQ51I1vKwWJYtxROqcWbldYkZFdMcEwKzaganeiujA">
+</script>
+<script type="text/javascript">
+function MyApplication() {
+this.counter = 0;
+this.map = new GMap2(document.getElementById("map"));
+this.map.setCenter(new GLatLng(39.9493, 116.3975), 13);
+GEvent.bind(this.map, "click", this, this.onMapClick);
+}
+MyApplication.prototype.onMapClick = function() {
+this.counter++;
+alert("这是您第" + this.counter + " " + "次点击");
+}
+window.onload = function(){
+var application = new MyApplication();
+}
+</script>
+</head>
+<body>
+<div id="map" style="width:500px; height:500px;"></div>
+</body>  
+
+
+
+监听DOM事件
+       Google地图API事件模型创建并管理自己的自定义事件。但是，DOM也会根据当前使用的特定浏览器事件模型创建和调度自己的事件。如果你希望捕获这些事件，Google地图API提供的独立于浏览器的包装器可以监听和绑定DOM事件而不需要自定义代码。
+
+      GEvent.addDomListener()方法为DOM节点上的DOM注册事件处理程序。同样，GEvent.bindDom()方法允许你给类实例上的DOM事件注册事件处理程序。
+
+删除事件监听器   
+
+      不再需要事件监听器时，应将其删除。甚至在事件只需触发一次的情况下，也可能需要删除。删除闭包内的匿名函数所定义的事件监听器可能很困难。但是，addListener()、addDomListener()、bind() 和 bindDom() 函数会返回 GEventListener 句柄，可用来最终取消注册处理程序。
+
+      下面的示例通过在地图上放置标记来响应点击。任何后续点击都可删除事件监听器。请注意，这会导致不再执行 removeOverlay() 代码。另请注意，您甚至可以从事件监听器自身内部删除事件监听器。
+
+      
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="http://ditu.google.cn/maps?file=api&v=2">
+    </script>
+    <script type="text/javascript">
+        function MyApplication(){
+            this.counter = 0;
+            this.map = new GMap2(document.getElementById("map"));  
+            this.map.setCenter(new GLatLng(39.9493, 116.3975), 13);
+            var myEventListener = GEvent.bind(this.map, "click", this, function(overlay, latlng) {    
+                if (this.counter == 0) {      
+                    if (latlng) {        
+                    this.map.addOverlay(new GMarker(latlng))        
+                    this.counter++;      
+                    } 
+                    else if (overlay instanceof GMarker) {        
+                    this.removeOverlay(marker);      
+                    }    
+                } 
+                else {      
+                GEvent.removeListener(myEventListener);    
+                }  
+            }); 
+        }
+        window.onload = function(){
+            var application = new MyApplication();
+        }
+    </script>
+</head>
+<body onunload = "GUnload()">
+    <div id="map" style="width:500px; height:500px;">
+    </div>
+</body>
+</html>
+(如果在IE下出现GMap2未定义的错误，请刷新一遍，火狐下是正常的) 
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<script type="text/javascript" src="http://ditu.google.cn/maps?file=api&v=2&key=ABQIAAAA35MvS7AnL0cjW_AmAJjW7BQQxUWGaJxgL6MJAQ51I1vKwWJYtxROqcWbldYkZFdMcEwKzaganeiujA">
+</script>
+<script type="text/javascript">
+function MyApplication(){
+this.counter = 0;
+this.map = new GMap2(document.getElementById("map"));
+this.map.setCenter(new GLatLng(39.9493, 116.3975), 13);
+var myEventListener = GEvent.bind(this.map, "click", this, function(overlay, latlng) {
+if (this.counter == 0) {
+if (latlng) {
+this.map.addOverlay(new GMarker(latlng))
+this.counter++;
+}
+else if (overlay instanceof GMarker) {
+this.removeOverlay(marker);
+}
+}
+else {
+GEvent.removeListener(myEventListener);
+}
+});
+}
+window.onload = function(){
+var application = new MyApplication();
+}
+</script>
+</head>
+<body onunload = "GUnload()">
+<div id="map" style="width:500px; height:500px;">
+</div>
+</body>
+</html>

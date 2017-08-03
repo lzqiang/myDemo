@@ -1,0 +1,1 @@
+用css控制鼠标样式的语法如下:<span style="cursor:*">文本或其它页面元素</span>把 * 换成如下15个效果的一种：下面是对这15种效果的解释。移动鼠标到解释上面，看看你的鼠标起了什么变化吧！hand是手型pointer也是手型，这里推荐使用这种，因为这可以在多种浏览器下使用。crosshair是十字型text是移动到文本上的那种效果wait是等待的那种效果default是默认效果help是问号e-resize是向右的箭头ne-resize是向右上的箭头n-resize是向上的箭头nw-resize是向左上的箭头w-resize是向左的箭头sw-resize是左下的箭头s-resize是向下的箭头se-resize是向右下的箭头auto是由系统自动给出效果

@@ -1,0 +1,11 @@
+Myeclipse中虚拟内存的设置 
+针对Myeclise中运行程序出现java.lang.OutOfMemoryError: Java heap space的错误，可以有以几种解决方法：
+
+1. 从Intalled JREs里修改；window->Preferences->Java->Installed JREs，选择当前的JRE，然后edit它；在新窗口里设置Default VM Arguments为 -Xms128M -Xmx512M即可；这个设置应该对所有的工程都有效；
+
+2. 如果仅仅是想对某个工程的有效的话，从Debug... 或Run...里修改，在(x)=Arguments里设置和上面相同的参数即可；
+
+3. 如果是Tomcat的话，window->Preferences->Application Servers->Tomcat->Tomcat 6.x，选择JDK设置即可；
+
+参考：http://hi.baidu.com/zhangzhaoyun/blog/item/fd7c4007782647ca7a89475f.html
+

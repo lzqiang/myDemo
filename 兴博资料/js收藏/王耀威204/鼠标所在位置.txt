@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312"/> 
+    <title>javascript获取/设置 文本框/文本域中的光标位置</title>
+    <meta name="Keywords" content=""/>
+    <meta name="Description" content=""/>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+    <script type="text/javascript">
+        function getTxt1CursorPosition(){
+            var oTxt1 = document.getElementById("txt1");
+            var cursurPosition=-1;
+            if(oTxt1.selectionStart){//非IE浏览器
+                cursurPosition= oTxt1.selectionStart;
+            }else{//IE
+                var range = document.selection.createRange();
+                range.moveStart("character",-oTxt1.value.length);
+                cursurPosition=range.text.length;
+            }
+            alert(cursurPosition);
+        }
+
+        function setTxt1CursorPosition(i){
+            var oTxt1 = document.getElementById("txt2");
+            var cursurPosition=-1;
+            if(oTxt1.selectionStart){//非IE浏览器
+                oTxt1.selectionStart=i;
+            }else{//IE
+                var range = oTxt1.createTextRange();
+                range.move("character",i);
+                range.select();
+            }
+        }
+
+        function getTa1CursorPosition(){
+            var evt =window.event?window.event:getTa1CursorPosition.caller.arguments[0];
+            var oTa1 = document.getElementById("ta1");
+            var cursurPosition=-1;
+            if(oTa1.selectionStart){//非IE浏览器
+                cursurPosition= oTa1.selectionStart;
+            }else{//IE
+                var range = oTa1.createTextRange();
+                range.moveToPoint(evt.x,evt.y);
+                range.moveStart("character",-oTa1.value.length);
+                cursurPosition=range.text.length;
+            }
+            alert(cursurPosition);
+        }
+
+        function setTa1CursorPosition(i){
+            var oTa2 = document.getElementById("ta2");
+            if(oTa2.selectionStart){//非IE浏览器
+                oTa2.selectionStart=i;
+                oTa2.selectionEnd=i;
+            }else{//IE
+                var range = oTa2.createTextRange();
+                range.move("character",i);
+                range.select();
+            }
+        }
+    </script>
+    </head>
+
+<body>
+<input type="text" id="txt1" name="" value="点击我获取光标位置" onkeyup="getTxt1CursorPosition()" onclick="getTxt1CursorPosition()"  />
+
+<input type="text" id="txt2" name="" value="点击我设置光标位置为5" onclick="setTxt1CursorPosition(5)" />
+<hr />
+<textarea id="ta1" rows="" cols="" style="width:100%; height:90px;" onclick="getTa1CursorPosition()">abcdefg
+hijklmn
+opqrst
+uvwxyz
+点击我获取文本域的光标位置</textarea>
+
+<textarea id="ta2" rows="" cols="" style="width:100%; height:90px;" onclick="setTa1CursorPosition(30)">abcdefg
+hijklmn
+opqrst
+uvwxyz
+点击我设置文本域的光标位置为30</textarea>
+</body>
+</html>
+posted on 2010-09-27 17:36 衡锋 阅读(1304) 评论(1)  编辑  收藏 所属分类: javascript 、Web开发 
+

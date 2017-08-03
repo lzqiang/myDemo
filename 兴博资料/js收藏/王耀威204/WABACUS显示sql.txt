@@ -1,0 +1,5 @@
+控制台未能打印执行SQL语句的解决方法
+在自己的项目中如果没有在控制台打印框架执行的SQL语句，即使在wabacus.cfg.xml中指定了<item name="show-sql" value="true"/>也没有打印出来，一般通过如下方法解决： 
+1、将DEMO中的 log4j-1.2.9.jar 复制到lib下 
+2、将wabacus.jar下面的log4j.properties复制到src下 
+3、若src下有log4j.properties请将：log4j.logger.com.wabacus=DEBUG, A1  添加进去 

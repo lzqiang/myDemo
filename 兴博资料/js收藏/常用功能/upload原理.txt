@@ -1,0 +1,166 @@
+FileUpload工作原理
+
+FileUpload 类显示一个文本框控件和一个浏览按钮（<input type="file">），使用户可以选择客户端上的文件并将它上载到 Web 服务器。用户通过在控件的文本框中输入本地计算机上文件的完整路径（例如，C:\MyFiles\TestFile.txt）来指定要上载的文件。用户也可以通过单击“浏览”按钮，然后在“选择文件”对话框中定位文件来选择文件。
+
+<!--[if !supportEmptyParas]--> <!--[endif]-->
+
+FileUpload使用方法
+
+1.选择要上载的文件后。
+
+2.显式提供一个控件或机制，使用户能提交指定的文件。例如，单击按钮上载文件。
+
+3.使用 HasFile 属性来验证 FileUpload 控件确实包含文件。
+
+4.调用 SaveAs 方法将文件内容保存到服务器上的指定路径。
+
+<!--[if !supportEmptyParas]--> <!--[endif]-->
+
+FileUpload使用注意
+
+1.调用 SaveAs 方法时，您必须指定用来保存上载文件的目录的完整路径。如果您没有在应用程序代码中显式指定路径，则当用户试图上载文件时将引发异常。
+
+2.SaveAs 方法将上载的文件写到指定的目录。请确保ASP.NET 应用程序必须具有服务器上该目录的写访问权限。
+
+3.使用 FileName 属性可以获取客户端上使用 FileUpload 控件上载的文件的名称。此属性返回的文件名不包含此文件在客户端上的路径。
+
+4.使用 Server.MapPath方法可以获得虚拟目录下的完整路径。例：
+
+         string path = Server.MapPath("~/Temp/")
+
+5.使用 FileBytes 属性可以检索文件中的所有字节。
+
+6.System.IO.Path.GetExtension(FileUpload1.FileName).ToLower()可以获得上传文件的类型。
+
+7.使用FileUpload控件上传文件时对文件大小的限制可以在配置文件（web.config）中配置。
+
+<system.web>
+
+     <httpRuntime executionTimeout="300" maxRequestLength="40960" useFullyQualifiedRedirectUrl="false"/>
+
+</system.web>
+
+8.PostedFile 属性获取要上载的文件的基础 HttpPostedFile 对象。可以使用此属性访问文件的其他属性。
+
+<!--[if !supportEmptyParas]--> <!--[endif]-->
+
+FileUpload客户端验证
+
+1.文件类型验证。取上传文件的扩展名对其验证。
+
+<script type="text/javascript" language="JavaScript">
+
+   function ClientCheckType(sender,args)
+      {
+          var ext = document.getElementById("FileUpload1").value;
+           ext = ext.substring(ext.length-3,ext.length);
+           ext = ext.toLowerCase();
+
+          if(ext != '.jpg')
+           {
+                 args.IsValid = false;
+            }
+          else
+           {
+                 args.IsValid = true;
+            }
+
+       }
+
+</script> 
+
+2.文件大小验证。定义FSO对象获取文件信息。
+
+<script type="text/javascript" defer>
+
+function ClientCheckSize(sender,args)
+{
+      var obj=document.getElementById("FileUpload1");
+      var fso=new ActiveXObject("Scripting.FileSystemObject");
+      var opath=fso.GetFile(obj.value);
+
+      if (opath.size < 1024)
+       {
+         args.IsValid = false;
+       }
+      else
+       {
+                     args.IsValid = true;
+       }
+}
+</script>
+
+
+<!--[if !supportEmptyParas]--> 在网上找到两个客户端验证上传文件大小的例子，可是都是针对IE的，怪不得IE那么危险。
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+    <title>Check FileSize</title>
+    <script type="text/javascript">
+    
+
+    function changeSrc(filePicker)
+     {
+        var oFileChecker = document.getElementById("fileChecker");
+         oFileChecker.src = filePicker.value;
+        var aa = oFileChecker.src;
+     }
+
+    function checkSize()
+     {
+        var oFileChecker = document.getElementById("fileChecker");
+        if (oFileChecker.fileSize > 1024)
+         {
+             alert("too large");
+         }
+        else
+         {
+             alert("ok");
+         }
+     }
+</script>
+</head>
+<body>
+
+<form action="">
+<input type="text" size="4" value="10" name="fileSizeLimit" id="fileSizeLimit"/> K
+<input type="file" name="file1" id="file1" size="40" onchange="changeSrc(this)"/>
+<img src="about:blank" id="fileChecker" alt="test"   height="18"/>
+<b></b>
+<input type="button" value="提交" onclick="checkSize()"/>
+</form>
+
+</body>
+</html>
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+    <title>Check FileSize</title>
+    <script type="text/javascript" defer>
+function crobj()
+{
+  var obj=document.getElementById("path");
+  var fso=new ActiveXObject("Scripting.FileSystemObject");
+  var opath=fso.GetFile(obj.value);
+  var s="文件大小?"+opath.size+"bytes";
+   alert(s);
+}
+</script>
+
+</head>
+<body>
+
+<form action="">
+<input type="file" id="path" />
+<input type="button" value="提交" onclick="crobj()"/>
+</form>
+
+</body>
+</html>

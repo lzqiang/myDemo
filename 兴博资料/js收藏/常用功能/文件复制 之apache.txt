@@ -1,0 +1,39 @@
+一般的方法，我们要复制一个文件，可能需要读取源文件，生成流对象，再写入一个新的文件中，使用apache commons-io很容就可以处理文件的复制。 
+
+下面的例子演示我们怎样使用FileUtils.copyFile方法在同一个文件夹复制文件和使用FileUtils.copyFileToDirectory方法复制到指定的文件夹中。其中System.getProperty("java.io.tmpdir")为通过JVM读取java.io.tmpdir属性取得临时文件夹，每种操作系统有所不同，Windows一般是C:\DOCUME~1\用户~1\LOCALS~1\Temp，Solaris一般是:/var/tmp/，Linux和Mac OS X一般是:/tmp，Windows的java.io.tmpdir属性值可以看环境变量->用户变量中的TMP。
+
+当然我们一般使用的是绝对或相对路径，如要复制到F:\ajava目录中，我们只需将targetDir改成File targetDir = new File("F:\\ajava");运行后就可以看到结果。
+ 
+package ajava.sample.apache;
+import java.io.File;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
+public class AjavaFileCopyExample {
+    public static void main(String[] args)
+    {
+        // 源File对象
+        File source = new File("ajava.txt");
+       
+        // 备份的File对象
+        File target = new File("ajava-backup.txt");
+       
+        //通过JVM读取java.io.tmpdir属性取得临时文件夹
+        File targetDir = new File(System.getProperty("java.io.tmpdir"));
+       
+        try
+        {
+            //在同一个文件夹复制文件
+            System.out.println("复制 " + source + " 文件到 " + target);
+            FileUtils.copyFile(source, target);
+           
+            // 根据指定的文件夹复制
+            System.out.println("复制 " + source + " 文件到" + targetDir + "目录");
+            FileUtils.copyFileToDirectory(source, targetDir);
+        } catch (IOException e)
+        {
+            // Errors will be reported here if any error occures during copying
+            // the file
+            e.printStackTrace();
+        }
+    }
+}

@@ -1,0 +1,21 @@
+<input type="text" id="d523_y" size="5"/> 年
+<input type="text" id="d523_M" size="3"/> 月
+<input type="text" id="d523_d" size="3"/> 日
+<input type="text" id="d523_HH" size="3"/> 时
+<input type="text" id="d523_mm" size="3"/> 分
+<input type="text" id="d523_ss" size="3"/> 秒 
+<img onclick="WdatePicker({el:'d523',dateFmt:'yyyy-MM-dd HH:mm:ss',onpicked:pickedFunc})" src="../../My97DatePicker/skin/datePicker.gif" width="16" height="22" align="absmiddle" style="cursor:pointer"/>
+<script>
+function pickedFunc(){
+$dp.$('d523_y').value=$dp.cal.getP('y');
+$dp.$('d523_M').value=$dp.cal.getP('M');
+$dp.$('d523_d').value=$dp.cal.getP('d');
+$dp.$('d523_HH').value=$dp.cal.getP('H');
+$dp.$('d523_mm').value=$dp.cal.getP('m');
+$dp.$('d523_ss').value=$dp.cal.getP('s');
+}
+</script>
+
+注意:el:'d523'中,如果你不需要d523这个框,你可以把他改成hidden,但是el属性必须指定
+$dp.$和$dp.cal.getP都是内置函数 
+

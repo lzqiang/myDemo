@@ -1,0 +1,210 @@
+// 刷新间隔时间
+var refreshInterval=60000;
+
+// 当前公司名称
+var companyName;
+
+// 全局控制是否初次加载
+var isFirst = true;
+
+// 控制保留复选框状态对象(选择回调方法时触发更新)
+var selectBoxStates={};
+//刷新
+/*
+function refreshCurrentPage() {
+	refreshComponentDisplay('leftCompanyViewPage','companyViewReport',true);
+}
+function refreshCurrentPage2() {
+	refreshComponentDisplay('leftBuildingViewPage','buildingViewReport',true);
+}
+*///定义 获取class对象的方法
+ function getClass(tagname, className) { //tagname指元素，className指class的值
+        //判断浏览器是否支持getElementsByClassName，如果支持就直接的用
+            if (document.getElementsByClassName) {   
+               //return getElementsByClassName(className);
+           }
+           else {    //当浏览器不支持getElementsByClassName的时候用下面的方法
+                var tagnames = document.getElementsByTagName(tagname);  //获取指定元素
+                var tagnameAll = [];     //这个数组用于存储所有符合条件的元素
+                for (var i = 0; i < tagnames.length; i++) {     //遍历获得的元素
+                    if (tagnames[i].className == className&&tagnames[i].innerHTML=='&nbsp;'){     //如果获得的元素中的class的值等于指定的类名，就赋值给tagnameAll
+                        tagnameAll[tagnameAll.length] = tagnames[i];
+                   }
+               }
+               return tagnameAll;
+           }
+}
+
+function initLeftCompanyView() {
+
+    $('#fg').hide();
+	$('td[dragcolid=2]').hide();
+	$('.cls-data-tr-head-list').hide();
+	$('.cls-data-td-list:odd').hide();
+	$('td[style="border-top:none;border-bottom:none;"]').hide();
+	$('tr[id^="leftCompanyViewPage_guid_companyViewReport_tr_"]').hide();
+	$('img[id^="leftCompanyViewPage_guid_companyViewReport_trgroup_1_"]').hide();
+     var IeClass=getClass('td','cls-data-td-list');
+      for (var i=0;i<IeClass.length;i++) { 
+               IeClass[i].style.display='none';
+           }
+     
+	var oncnt = $('#leftOnlineCnt').text()||'0';
+	var offcnt = $('#leftOfflineCnt').text()||'0';
+	parent.parent.$('#onlineCount').text(oncnt);
+	parent.parent.$('#offlineCount').text(offcnt);
+	if(oncnt&&offcnt) {
+		parent.parent.$('#totalCount').text(parseInt(oncnt)+parseInt(offcnt));
+	} else {
+		parent.parent.$('#totalCount').text('0');
+	}
+	
+	// 刷新避免多余空行
+	var imgSrc = "/muckcar/webresources/skin/muckcar/images/nodeopen.gif";
+	var imgView = $('#leftCompanyViewPage_guid_companyViewReport_trgroup_0_0_img');
+	imgView.click(function(){
+			if(imgSrc==imgView.attr('src')) {
+				//parent.parent.$('#refreshLeftLink').trigger('click');
+			}
+	});
+	if(isFirst) {
+		//window.setInterval("refreshCurrentPage()", refreshInterval);
+		isFirst = false;
+	} else {
+		restoreCheckBoxs();
+	}
+}
+
+function restoreCheckBoxs() {
+	var firstChecked = false;
+	var selectBoxs = $('input[name="leftCompanyViewPage_guid_companyViewReport_rowselectbox_col"]');
+	selectBoxs.each(function(i){
+		var cNum = $(this).parent().next().text();
+		if(cNum&&selectBoxStates[cNum]==true) {
+			$(this).attr('checked',true);
+			// 只要有一个选择了，则第一个就会被选中
+			firstChecked = true;
+		} else {
+			$(this).attr('checked',false);
+		}
+	});
+	$(selectBoxs[0]).attr('checked',firstChecked);
+}
+/**
+* 单击车辆NUM，定位车辆
+**/
+function selCompanyCar(carId){
+	parent.parent.window.frames['monitorFrame'].locSingleCar(carId);
+}
+//左侧渣土车被选中
+//function checkCompanyCar(carId){
+//	parent.window.frames['monitorFrame'].checkCompanyCarList([15070,15071,15072]);
+//	//method([15070,15071,15072])
+//}
+
+//点击单个车辆
+function clickSingleCar(carId){
+	var flag=1;//普通车辆定位
+	parent.parent.window.frames['monitorFrame'].locSingleCar(carId,flag);
+}
+var allCarIdArr=[];
+function selLeftCompanyCallback(pageid,reportid,selectedTrObjArr,deselectedTrObjArr) {
+	// 每次重置
+	//allCarIdArr=[];
+	// 当前选中的
+	var allSelectedTrObjsArr=getAllSelectedTrObjs(pageid,reportid);
+	var carIdValArr = getCarIdValArr(allSelectedTrObjsArr);
+	
+	// 记忆选中情况
+	selectRecord(selectedTrObjArr);
+	deselectRecord(deselectedTrObjArr);
+	
+
+	
+	parent.parent.window.frames['monitorFrame'].checkCompanyCarList(allCarIdArr);
+	
+	//restoreCheckBoxs();
+}
+
+
+function getCarIdValArr(trObjsArr)
+{
+	var carIdValArr = [];
+	if(trObjsArr==null||trObjsArr.length==0) 
+		return '';
+	for(var i=0;i<trObjsArr.length;i++)
+	{
+		var tdChilds=trObjsArr[i].getElementsByTagName('TD');
+		for(var j=0;j<tdChilds.length;j++)
+		{
+			var name=tdChilds[j].getAttribute('name');//获取当前列对应的<col/>的列名
+			var value=tdChilds[j].getAttribute('value');//获取选中行的当前列的数据
+			if(name&&name!=''&&'CAR_ID'==name)
+			{
+				carIdValArr.push(value);
+			}
+			
+		}
+	}
+	
+	return carIdValArr;
+}
+
+
+function selectRecord(trObjsArr)
+{
+	if(trObjsArr==null||trObjsArr.length==0) 
+		return '';
+	for(var i=0;i<trObjsArr.length;i++)
+	{
+		var tdChilds=trObjsArr[i].getElementsByTagName('TD');
+		for(var j=0;j<tdChilds.length;j++)
+		{
+			var name=tdChilds[j].getAttribute('name');//获取当前列对应的<col/>的列名
+			var value=tdChilds[j].getAttribute('value');//获取选中行的当前列的数据
+			if(name&&name!=''&&'CAR_ID'==name)
+			{
+				allCarIdArr.push(value);
+			} 
+			if(name&&name!=''&&'CAR_NUM'==name)
+			{
+				selectBoxStates[$(value).text()] = true;
+			} 
+		}
+	}
+	
+}
+
+function deselectRecord(trObjsArr)
+{
+	if(trObjsArr==null||trObjsArr.length==0) 
+		return '';
+	for(var i=0;i<trObjsArr.length;i++)
+	{
+		var tdChilds=trObjsArr[i].getElementsByTagName('TD');
+		for(var j=0;j<tdChilds.length;j++)
+		{
+			var name=tdChilds[j].getAttribute('name');//获取当前列对应的<col/>的列名
+			var value=tdChilds[j].getAttribute('value');//获取选中行的当前列的数据
+			if(name&&name!=''&&'CAR_ID'==name)
+			{
+				removeInArr(allCarIdArr,value);
+			} 
+			if(name&&name!=''&&'CAR_NUM'==name)
+			{
+				selectBoxStates[$(value).text()] = false;
+			} 
+		}
+	}
+}
+
+/**
+移除数组中的元素(值为value)
+**/
+function removeInArr(arr,value) {
+	for(var n=0;n<arr.length;n++) {
+		if(arr[n]==value) {
+			arr.splice(n,1);
+		}
+	}
+}

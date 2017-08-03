@@ -1,0 +1,138 @@
+oracle表解锁方法
+ 
+1.获取出sid,serial 用于解锁的参数
+ 
+select s.username, s.osuser, s.sid, s.serial#, p.spid  from v$session s,v$process p
+where s.paddr = p.addr    and s.username is not null;
+ 
+select 'alter system kill session ',''''||trim(t2.sid)||','||trim(t2.serial#)||''';'
+from v$locked_object t1,v$session t2 where t1.session_id=t2.sid order by t2.logon_time; 
+  www.2cto.com  
+2.执行sql进行解锁
+ 
+--alter system kill session 'sid,serial#';  
+alter system kill session '156,87';
+------------------------------------------------------------------>
+------------------------------------------------------------------>
+Oracle的锁表与解锁 
+Oracle的锁表与解锁   
+SELECT /*+ rule */ s.username,
+decode(l.type,'TM','TABLE LOCK',
+'TX','ROW LOCK',
+NULL) LOCK_LEVEL,
+o.owner,o.object_name,o.object_type,
+s.sid,s.serial#,s.terminal,s.machine,s.program,s.osuser
+FROM v$session s,v$lock l,dba_objects o
+WHERE l.sid = s.sid
+AND l.id1 = o.object_id(+)
+AND s.username is NOT Null
+
+--kill session语句
+alter system kill session'50,492';
+--以下几个为相关表
+SELECT * FROM v$lock;
+SELECT * FROM v$sqlarea;
+SELECT * FROM v$session;
+SELECT * FROM v$process ;
+SELECT * FROM v$locked_object;
+SELECT * FROM all_objects;
+SELECT * FROM v$session_wait;
+--1.查出锁定object的session的信息以及被锁定的object名
+SELECT l.session_id sid, s.serial#, l.locked_mode,l.oracle_username,
+l.os_user_name,s.machine, s.terminal, o.object_name, s.logon_time
+FROM v$locked_object l, all_objects o, v$session s
+WHERE l.object_id = o.object_id
+AND l.session_id = s.sid
+ORDER BY sid, s.serial# ;
+--2.查出锁定表的session的sid, serial#,os_user_name, machine name, terminal和执行的语句
+--比上面那段多出sql_text和action
+SELECT l.session_id sid, s.serial#, l.locked_mode, l.oracle_username, s.user#,
+l.os_user_name,s.machine, s.terminal,a.sql_text, a.action
+FROM v$sqlarea a,v$session s, v$locked_object l
+WHERE l.session_id = s.sid
+AND s.prev_sql_addr = a.address
+ORDER BY sid, s.serial#;
+--3.查出锁定表的sid, serial#,os_user_name, machine_name, terminal，锁的type,mode
+SELECT s.sid, s.serial#, s.username, s.schemaname, s.osuser, s.process, s.machine,
+s.terminal, s.logon_time, l.type
+FROM v$session s, v$lock l
+WHERE s.sid = l.sid
+AND s.username IS NOT NULL
+ORDER BY sid;
+
+这个语句将查找到数据库中所有的DML语句产生的锁，还可以发现，
+任何DML语句其实产生了两个锁，一个是表锁，一个是行锁。
+杀锁命令
+alter system kill session 'sid,serial#'
+SELECT /*+ rule */ s.username,
+decode(l.type,'TM','TABLE LOCK',
+'TX','ROW LOCK',
+NULL) LOCK_LEVEL,
+o.owner,o.object_name,o.object_type,
+s.sid,s.serial#,s.terminal,s.machine,s.program,s.osuser
+FROM v$session s,v$lock l,dba_objects o
+WHERE l.sid = s.sid
+AND l.id1 = o.object_id(+)
+AND s.username is NOT NULL
+如果发生了锁等待，我们可能更想知道是谁锁了表而引起谁的等待
+以下的语句可以查询到谁锁了表，而谁在等待。
+以上查询结果是一个树状结构，如果有子节点，则表示有等待发生。
+如果想知道锁用了哪个回滚段，还可以关联到V$rollname，其中xidusn就是回滚段的USN
+col user_name format a10
+col owner format a10
+col object_name format a10
+col object_type format a10
+SELECT /*+ rule */ lpad(' ',decode(l.xidusn ,0,3,0))||l.oracle_username User_name,
+o.owner,o.object_name,o.object_type,s.sid,s.serial#
+FROM v$locked_object l,dba_objects o,v$session s
+WHERE l.object_id=o.object_id
+AND l.session_id=s.sid
+ORDER BY o.object_id,xidusn DESC
+================================================================================>>
+
+   其实解锁并不复杂，用PL/SQL可以很方便解锁，可以用两种方式得到目前被锁住的表。第一种是，直接从，Tools->Session里面查看，里面有很多的Session和进程，下面有一个Lock的Tab，选中那个Tab，然后一条一条地去上面Session，如果Lock这一栏有数据，就说明被锁住了，在Objec_Name里面可以看到表名。 
+
+      如果是自己的表，可以得到Sid和Serial#，接着执行以下语句就可以解锁： 
+
+      alter system kill session 'sid,serial#'; 
+
+     第二种方法是用语句得到详细的被锁住的表的信息，语句如下： 
+
+
+SELECT /*+ rule */ s.username, 
+decode(l.type,'TM','TABLE LOCK', 
+'TX','ROW LOCK', 
+NULL) LOCK_LEVEL, 
+o.owner,o.object_name,o.object_type, 
+s.sid,s.serial#,s.terminal,s.machine,s.program,s.osuser 
+FROM v$session s,v$lock l,dba_objects o 
+WHERE l.sid = s.sid 
+AND l.id1 = o.object_id(+) 
+AND s.username is NOT Null 
+
+
+
+
+-----------------------------------------------------------------------------------
+这个语句经测试也可以
+select
+s.username,
+decode(l.type,'tm','table lock','tx','row lock',null) lock_level,
+o.owner,
+o.object_name,
+o.object_type,
+s.sid,
+s.serial#,
+s.terminal,
+s.machine,
+s.program,
+s.osuser
+from v$session s,v$lock l,dba_objects o
+where l.sid = s.sid
+and l.id1 = o.object_id(+)
+and s.username is not null;
+
+--kill session语句
+alter system kill session'sid,serial#';
+
+

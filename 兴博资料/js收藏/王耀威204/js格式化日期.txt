@@ -1,0 +1,13 @@
+//使用方法 
+var now = new Date(); 
+var nowStr = now.format("yyyy-MM-dd hh:mm:ss"); 
+//使用方法2: 
+var testDate = new Date(); 
+var testStr = testDate.format("YYYY年MM月dd日hh小时mm分ss秒"); 
+alert(testStr); 
+//示例： 
+alert(new Date().Format("yyyy年MM月dd日")); 
+alert(new Date().Format("MM/dd/yyyy")); 
+alert(new Date().Format("yyyyMMdd")); 
+alert(new Date().Format("yyyy-MM-dd hh:mm:ss"));
+

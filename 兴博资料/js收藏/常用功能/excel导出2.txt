@@ -1,0 +1,33 @@
+OutputStream out = null;
+int length = 0;
+try {
+out = resp.getOutputStream();
+//kk是传入的下载内容
+String kk = "\"adasd\"\",asdasd\",\"asdasdasd\"";
+byte[] bString = kk.getBytes();
+int len = 0;
+length = bString.length;
+resp.setContentType("application/x-msdownload");
+String fileName = "test.xls";
+resp.setHeader(
+"Content-disposition",
+"attachment; filename=" + fileName);
+while (len < length) {
+int remainedLen = length - len;
+if (remainedLen > 1024){
+remainedLen = 1024;
+}
+out.write(bString, len, remainedLen);
+out.flush();
+len = len + remainedLen;
+}
+} catch (Exception e) {
+e.printStackTrace();
+} finally {
+try {
+if (out != null) {
+out.close();
+}
+} catch (Exception e) {
+e.printStackTrace();
+}

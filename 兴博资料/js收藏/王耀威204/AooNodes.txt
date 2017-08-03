@@ -1,0 +1,17 @@
+ //获取所有选中节点的值
+    function GetCheckedAll() {
+        var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+        var nodes = treeObj.getCheckedNodes(true);
+        var msg = "name--id--pid\n";
+        for (var i = 0; i < nodes.length; i++) {
+            msg += nodes[i].name+"--"+nodes[i].id+"--"+nodes[i].pId+"\n";
+        }
+        $("#msg").val();
+        $("#msg").val(msg);
+    }
+
+onCheck:onCheck
+
+function onCheck(e,treeId,treeNodes){
+  alert(e.type);
+}

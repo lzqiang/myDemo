@@ -1,0 +1,16 @@
+ function fixWidthTable(percent){  
+14.                return getWidth(0.6) * percent;  
+15.        }  
+16.          
+17.        function getWidth(percent){  
+18.            return $(window).width() * percent;  
+19.        }  
+20.  
+21.        $(function(){  
+22.             $(window).resize(function(){  
+23.                //alert("change....");  
+24.                $("#tt").datagrid({  
+25.                    width: getWidth(0.6)  
+26.                });                
+27.            });  
+28.  

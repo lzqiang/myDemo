@@ -1,0 +1,24 @@
+$("button:eq(2)").click(function(){ 
+var text2=$("input:text:eq(2)"); 
+if(text2.attr("disabled")==false){ 
+//通过设置disabled的boolean属性将第三个text输入框disabled属性置为true 
+text2.attr("disabled",true); 
+}else{ 
+//通过将第三个text输入框disabled属性置为false来移除disabled属性 
+text2.attr("disabled",false); 
+} 
+});
+
+第二种：移除disabled属性，具体代码及解释如下： 
+复制代码 代码如下:
+
+$("button:eq(1)").click(function(){ 
+var text2=$("input:text:eq(1)"); 
+if(text2.attr("disabled")==false){ 
+//通过设置disabled的值将第二个text输入框置为disabled 
+text2.attr("disabled","disabled"); 
+}else{ 
+//通过移除的方式将第二个text输入框的disable属性删除 
+text2.removeAttr("disabled"); 
+} 
+});

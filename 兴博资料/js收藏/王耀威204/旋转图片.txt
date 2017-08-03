@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<title> ImageRotation </title> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta> 
+<style type="text/css"> #demo { cursor:pointer; position:absolute;} 
+</style> 
+<script type="text/javascript" src="base.src.js"></script> 
+<script type="text/javascript">     
+window.onload = function() {       
+ 	 rotate(document.getElementById('demo'), 10);    
+ };
+ </script> 
+</head>
+ <body>
+ 	<div id="container" style="width:500px;height:400px;position:relative;margin:0 auto">   
+ 	 <div id="demo">        
+	 <img src="http://images.cnblogs.com/cnblogs_com/bluedream2009/201609/o_mm.jpg" width="500" height="333" />    
+ 	</div>
+ 	</div> 
+    </body> 
+</html> 
+
+
+base.src.js
+
+ var    
+ userAgent = navigator.userAgent,    
+ isIE = /msie/i.test(userAgent) && !window.opera,     
+ isWebKit = /webkit/i.test(userAgent),     
+ isFirefox = /firefox/i.test(userAgent); 
+ function rotate(target, degree) {     
+	if (isWebKit) {       
+	  target.style.webkitTransform = "rotate(" + degree + "deg)";     
+	} else if (isFirefox) {     
+	    target.style.MozTransform = "rotate(" + degree + "deg)";    
+	 } else if (isIE) { 
+	        //chessDiv.style.filter = "progid:DXImageTransform.Microsoft.BasicImage(rotation=" + degree + ")";    
+        degree = degree / 180 * Math.PI;        
+ 	var sinDeg = Math.sin(degree);        
+ 	var cosDeg = Math.cos(degree);                  
+ 	target.style.filter = "progid:DXImageTransform.Microsoft.Matrix(" +  "M11=" + cosDeg + ",M12=" + (-sinDeg) + ",M21=" + sinDeg + ",M22=" + cosDeg + ",SizingMethod='auto expand')";    
+ } else {      
+   target.style.transform = "rotate(" + degree + "deg)"; 
+    } 
+} 

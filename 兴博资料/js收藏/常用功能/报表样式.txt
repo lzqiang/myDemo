@@ -1,0 +1,133 @@
+public class InterceptorPages_SupplyBill_Report1 extends
+02.                
+AbsInterceptorDefaultAdapter { 
+03. 
+ 
+04.        
+public RowDataByInterceptor beforeDisplayReportDataPerRow( 
+05.                        
+AbsReportType reportTypeObj, ReportRequest rrequest, int rowindex, 
+06.                        
+int colspans, List lstColBeans) { 
+07.                
+RowDataByInterceptor rowdata = new RowDataByInterceptor(); 
+08. 
+ 
+09.                
+if (rowindex < 0) {// 当前正在显示标题部分 
+10.                        
+/** 
+11.                         
+* 下面在数据标题行前面插入一行动态的标题行 
+12.                         
+*/
+13.                        
+String insertedHtml = "<tr><td colspan='"
+14.                                        
++ colspans 
+15.                                        
++ "' align='center' bgcolor='#dddddd'><font size='3'><b>送  货  通  知  单</b><br/><b>Delivery Notice</b></font></td></tr>"; 
+16.                        
+rowdata.setInsertDisplayRowHtml(insertedHtml); 
+17.                
+} else { 
+18.                        
+if (rowindex == 0) {// 第一行 
+19.                                
+// 显示数据行 
+20.                                
+String insertedHtml = "<tr><td colspan='"
+21.                                                
++ colspans 
+22.                                                
++ "' align='center' bgcolor='#dddddd'><font size='3'><b>送  货  通  知  单</b><br/><b>Delivery Notice</b></font></td></tr>"; 
+23.                                
+rowdata.setInsertDisplayRowHtml(insertedHtml); 
+24.                        
+} else if (rowindex == Integer.MAX_VALUE) { 
+25.                                 
+ 
+26.                        
+} 
+27. 
+ 
+28.                         
+ 
+29.                
+} 
+30.                
+return rowdata; 
+31.        
+} 
+32.}我想实现动态修改样式，如背景，字体和颜色？ 
+如果静态设置，有需要如何操作呢？ 
+我希望我的表单可以实现手动输入，应该怎样设置report？ 
+页面配置代码如下：查看打印?01.  
+ 
+02.<page id="listpage_supplybill" js="/webresources/script/validate.js"  css="/webresources/component/tiny_mce/themes/advanced/skins/o2k7/ui.css"> 
+03.  
+<report id="report1" title="<img src='images/zltd_logo.png'>" width="800px" type="form" 
+04. 
+dataexport="richexcel|word" pagesize="-1"  interceptor="com.mywabacus.interceptor.InterceptorPages_SupplyBill_Report1" jsvalidatetype="1"> 
+05.   
+<display valuetdwidth="200px" labelbgcolor="#000000" labeltdwidth="100px" labelalign="center" valuealign="left"> 
+06.    
+<col column="{non-fromdb}" property="ContractNumber" label="合同编号" /> 
+07.    
+<col column="{non-fromdb}" property="DeliverNum" label="发货单号"  br="true"> 
+08.     
+<inputbox defaultvalue="20121108001">20121108001</inputbox> 
+09.    
+</col> 
+10.     
+ 
+11.    
+<col column="{non-fromdb}" property="Customer" labelstyleproperty="style='height:40px'" label="客户名称: <br>Customer:"  /> 
+12.    
+<col column="{non-fromdb}" property="ShipFrom" labelstyleproperty="style='height:40px'" label="发货方: <br>Ship From:"  br="true"/> 
+13.     
+ 
+14.    
+<col column="{non-fromdb}" property="ShipTo" labelstyleproperty="style='height:40px'" label="到货地点: <br>Ship to:"> 
+15.      
+<!--<inputbox jsvalidate="isNotEmpty({0}不能为空)"/>-->
+16.    
+</col> 
+17.    
+<col column="{non-fromdb}" property="Addr" labelstyleproperty="style='height:40px'" label="地点: Add:" br="true"/> 
+18.    
+<col column="{non-fromdb}" property="Attn1" labelstyleproperty="style='height:40px'" label="联系人: <br>Attn:"  > 
+19.    
+</col> 
+20.    
+<col column="{non-fromdb}" property="Attn2" labelstyleproperty="style='height:40px'" label="联系人: <br>Attn:" br="true"> 
+21.    
+</col> 
+22.    
+<col column="{non-fromdb}" property="Phone1" labelstyleproperty="style='height:40px'" label="电话: <br>Phone:"  > 
+23.    
+</col> 
+24.    
+<col column="{non-fromdb}" property="Phone2" labelstyleproperty="style='height:40px'" label="电话: <br>Phone: " br="true"> 
+25.    
+</col> 
+26.    
+<col column="{non-fromdb}" property="PONo" labelstyleproperty="style='height:40px'" label="定单号: <br>PO No:"  ></col> 
+27.    
+<col column="{non-fromdb}" property="Shipon" labelstyleproperty="style='height:40px'" label="发货日期:  <br>Ship on:"  br="true"></col> 
+28.    
+<col column="{non-fromdb}" property="Note" labelstyleproperty="style='height:40px' colspan='2';" label="请查收以下所述货物 <br>Please check the below goods: "  valuestyleproperty="colspan='2'"></col> 
+29.   
+</display> 
+30.   
+<sql> 
+31.    
+<select> 
+32.     
+<value>select 1</value> 
+33.    
+</select> 
+34.   
+</sql> 
+35.  
+</report>

@@ -1,0 +1,12 @@
+File[] files = dirFile.listFiles();   
+19.    for (int i = 0; i < files.length; i++) {   
+20.        //删除子文件   
+21.        if (files[i].isFile()) {   
+22.            flag = deleteFile(files[i].getAbsolutePath());   
+23.            if (!flag) break;   
+24.        } //删除子目录   
+25.        else {   
+26.            flag = deleteDirectory(files[i].getAbsolutePath());   
+27.            if (!flag) break;   
+28.        }   
+29.    }   

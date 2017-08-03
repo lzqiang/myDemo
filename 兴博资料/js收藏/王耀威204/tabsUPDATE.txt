@@ -1,0 +1,82 @@
+01.$("#"+tabPanel).tabs('close','首页');  
+$("#"+tabPanel).tabs('close','首页'); 
+
+ 
+
+新建：
+
+ 
+
+[javascript] view plaincopyprint?
+01.$("#"+tabPanel).tabs('add',{  
+02.           title:tabTitle,  
+03.           style:{padding:'1px'},  
+04.       //href:URL, // 使用href会导致页面加载两次，所以使用content代替   
+05.           content:'<iframe name="indextab" scrolling="auto" frameborder="0" style="width:100%;height:100%;"></iframe>',  
+06.       closable:false,  
+07.       fit:true,  
+08.       selected:true  
+09.         });  
+10.         
+11.        window.open(URL,"indextab");  
+$("#"+tabPanel).tabs('add',{
+           title:tabTitle,
+           style:{padding:'1px'},
+       //href:URL, // 使用href会导致页面加载两次，所以使用content代替
+           content:'<iframe name="indextab" scrolling="auto" frameborder="0" style="width:100%;height:100%;"></iframe>',
+       closable:false,
+       fit:true,
+       selected:true
+         });
+       
+        window.open(URL,"indextab");
+ 
+
+这样虽然可以实现，但是造成的结果是 如果有其他打开的tab，首页就会排在后面。
+
+ 
+
+后来通过查找tabs的方法。
+
+用update可以实现：
+
+ 
+
+ 
+
+[javascript] view plaincopyprint?
+01.$("#"+tabPanel).tabs('select',"首页");  
+02.        var tab = $('#'+tabPanel).tabs('getSelected');       
+03.        $("#"+tabPanel).tabs('update',{  
+04.        tab:tab,  
+05.        options:{  
+06.           title:tabTitle,  
+07.           style:{padding:'1px'},  
+08.       //href:URL, // 使用href会导致页面加载两次，所以使用content代替   
+09.           content:'<iframe name="indextab" scrolling="auto" frameborder="0" style="width:100%;height:100%;"></iframe>',  
+10.       closable:false,  
+11.       fit:true,  
+12.       selected:true  
+13.        }  
+14.         });  
+15.         
+16.        window.open(URL,"indextab");  
+$("#"+tabPanel).tabs('select',"首页");
+        var tab = $('#'+tabPanel).tabs('getSelected');     
+        $("#"+tabPanel).tabs('update',{
+        tab:tab,
+        options:{
+           title:tabTitle,
+           style:{padding:'1px'},
+       //href:URL, // 使用href会导致页面加载两次，所以使用content代替
+           content:'<iframe name="indextab" scrolling="auto" frameborder="0" style="width:100%;height:100%;"></iframe>',
+       closable:false,
+       fit:true,
+       selected:true
+        }
+         });
+       
+        window.open(URL,"indextab"); 
+
+ 
+

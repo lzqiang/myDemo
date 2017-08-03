@@ -1,0 +1,36 @@
+
+今天无聊，帮一个网友解决一个很无聊的问题，用JS判断页面是否出现滚动条，在网上看了一些代码，经过验证并不起作用，下面是在网上搜索到的代码：
+
+ 
+
+当可视区域小于页面的实际高度时，判定为出现滚动条，即：
+
+if (document.documentElement.clientHeight < document.documentElement.offsetHeight) scroll = true;
+
+要使用 document.documentElement ，必须在页面头部加入声明：
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+ 
+
+其实，这段代码是不起作用的，因为他没考虑到一个问题，就是浏览器的边框，当我们在获取页面的offsetHeight高度时是包括了浏览器的边框的，浏览器的边框是2个像素，所以这时无论在任何情况下clientHeight 始终是小于offsetHeight的，这就使得即使没有滚动条它也为true,因此我们要修正这个错误，代码应该这样改，在offsetHeight上减去4个像素，即：
+
+if (document.documentElement.clientHeight < document.documentElement.offsetHeight-4){
+
+//执行相关脚本。
+
+}
+
+还有，这里要搞清楚，上面这代码是判断横向滚动条的，我们一般要判断的是纵向滚动，代码如下：
+
+ 
+
+if (document.documentElement.clientWidth < document.documentElement.offsetWidth-4){
+
+//执行相关脚本。
+
+｝
+
+呵呵，问题搞定，其实我觉得这是个非常无聊的问题，我想没几个人想着去判断滚动条的有无，没有什么实际意义，在这里帮助一下那些需要这功能的朋
+
+友走出误区，免得浪费大量时间去网上搜而无果

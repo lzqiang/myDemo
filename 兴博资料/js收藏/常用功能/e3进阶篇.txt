@@ -1,0 +1,266 @@
+.Tree入门与进阶篇  2009-05-02 13:58:28|  分类： JAVA学习中 |  标签： |字号大中小 订阅 .
+
+
+E3在线演示：http://www.javae3.com/Index.jsp 
+
+ 
+
+本文同步发表到如下网站: 
+http://user.qzone.qq.com/307916217/blog/1211390631
+
+http://www.javae3.com/posts/list/51.page#107
+
+1.写在最前面 
+
+用E3组件很久了，对于黄老大滴无私奉献精神盛为感动。一直以来想帮着做点什么，今天，写此一文，希望能对初次接触E3的朋友有一定参考借鉴意义。谨以此为E3的成长壮大献上自己一点绵薄之力，了表心意。鉴于作者水平和精力有限，恳请各路大侠们批评指正!
+
+E3官方网站:http://www.javae3.com   QQGroup:63787587 
+
+2.E3.Tree简单介绍 
+
+E3.Tree包装了著名的Xtree JS和时下流行的Ext.Tree.(想了解更多就自己Google吧)E3.Tree屏蔽了各种JS的差异提供统一的Java编程接口
+
+来生成相应的树JS脚本并输出到Web页面显示.
+
+3.E3.Tree入门篇 
+
+用原始点的方法构造一颗简单的树
+
+Java代码如下所示:
+
+Java代码 
+
+
+1.//new一个树模型构造器   
+2.DefaultTreeModel treeModel = new DefaultTreeModel();   
+3.  
+4.//new一个节点   
+5.WebTreeNode rootNode = new WebTreeNode("团长", "root");   
+6.//添加节点事件   
+7.rootNode.setAction("javascript:doAction('./main.jsp')");   
+8.//设置节点图片   
+9.rootNode.setIcon(RequestUtil.getUrl("/resource/images/xgll_06.png", request));   
+10.//将rootNode绑定为树根节点   
+11.treeModel.addRootNode(rootNode);   
+12.  
+13.//再new一个节点   
+14.WebTreeNode node1 = new WebTreeNode("一营长", "node1");   
+15.//添加节点事件   
+16.node1.setAction("");   
+17.//设置节点图片   
+18.node1.setIcon(RequestUtil.getUrl("/resource/images/xgll_03.png", request));   
+19.//将node1绑定为树根节点的一个儿子节点   
+20.rootNode.addNode(node1);   
+21.  
+22.//再new一个节点   
+23.WebTreeNode node2 = new WebTreeNode("二营长", "node2");   
+24.//添加节点事件   
+25.node2.setAction("");   
+26.//设置节点图片   
+27.node2.setIcon(RequestUtil.getUrl("/resource/images/xgll_03.png", request));   
+28.//将node2绑定为树根节点的一个儿子节点   
+29.rootNode.addNode(node2);   
+30.  
+31.//再new一个节点   
+32.WebTreeNode node3 = new WebTreeNode("二营一连长", "node3");   
+33.//添加节点事件   
+34.node3.setAction("");   
+35.//设置节点图片   
+36.node3.setIcon(RequestUtil.getUrl("/resource/images/xgll_03.png", request));   
+37.//将node2绑定为node2的一个儿子节点   
+38.node2.addNode(node3);   
+39.  
+40.//构造树导向器   
+41.TreeDirector director = new DefaultTreeDirector();   
+42.//构造树Builder(XTree)(图1)   
+43.XTreeBuilder treeBuilder = new XTreeBuilder();   
+44.//设置树客户端持久状态(记住当前节点展开状态),只针对XTree有效   
+45.treeBuilder.setUsePersistence(true);   
+46./*  
+47.如果你想生成一颗EXT.Tree的话，就使用下面的Builder来构造这棵树,可见使用E3.Tree对不同的JS树模型提供了统一的编程接口，在不同的数模型之间切换时非常方便的，甚至只需要一行代码就搞定。可见黄老大一片良苦用心。。。  
+48.*/  
+49.//构造EXT.Tree的Builder()（图2)   
+50.//ExtTreeBuilder treeBuilder = new ExtTreeBuilder();   
+51.//设置EXT.Panel风格的树标题   
+52.//treeBuilder.setTitle("这是一颗EXT版的E3.Tree");   
+53.treeBuilder.init(request);   
+54.//完成构造任务   
+55.director.build(treeModel, treeBuilder);   
+56.//获取构造树脚本,说明此脚本即为在你WEB 页面上显示的树脚本，因此如果WEB页面树显示不正常，请先调试确认是否生成了此脚本.   
+57.String treeScript = treeBuilder.getTreeScript();   
+58.//调试用   
+59.//log.info(treeScript);   
+60.//System.out.println("The TreeScript as follows:\n" + treeScript);   
+61.//这就没必要再写了吧！就是把树脚本放到request域完成和WebUI的交互显示了.   
+62.request.setAttribute("treeScript", treeScript);   
+63.//  
+
+//new一个树模型构造器DefaultTreeModel treeModel = new DefaultTreeModel();//new一个节点WebTreeNode rootNode = new WebTreeNode("团长", "root");//添加节点事件rootNode.setAction("javascript:doAction('./main.jsp')");//设置节点图片rootNode.setIcon(RequestUtil.getUrl("/resource/images/xgll_06.png", request));//将rootNode绑定为树根节点treeModel.addRootNode(rootNode);//再new一个节点WebTreeNode node1 = new WebTreeNode("一营长", "node1");//添加节点事件node1.setAction("");//设置节点图片node1.setIcon(RequestUtil.getUrl("/resource/images/xgll_03.png", request));//将node1绑定为树根节点的一个儿子节点rootNode.addNode(node1);//再new一个节点WebTreeNode node2 = new WebTreeNode("二营长", "node2");//添加节点事件node2.setAction("");//设置节点图片node2.setIcon(RequestUtil.getUrl("/resource/images/xgll_03.png", request));//将node2绑定为树根节点的一个儿子节点rootNode.addNode(node2);//再new一个节点WebTreeNode node3 = new WebTreeNode("二营一连长", "node3");//添加节点事件node3.setAction("");//设置节点图片node3.setIcon(RequestUtil.getUrl("/resource/images/xgll_03.png", request));//将node2绑定为node2的一个儿子节点node2.addNode(node3);//构造树导向器TreeDirector director = new DefaultTreeDirector();//构造树Builder(XTree)(图1)XTreeBuilder treeBuilder = new XTreeBuilder();//设置树客户端持久状态(记住当前节点展开状态),只针对XTree有效treeBuilder.setUsePersistence(true);/*如果你想生成一颗EXT.Tree的话，就使用下面的Builder来构造这棵树,可见使用E3.Tree对不同的JS树模型提供了统一的编程接口，在不同的数模型之间切换时非常方便的，甚至只需要一行代码就搞定。可见黄老大一片良苦用心。。。*///构造EXT.Tree的Builder()（图2)//ExtTreeBuilder treeBuilder = new ExtTreeBuilder();//设置EXT.Panel风格的树标题//treeBuilder.setTitle("这是一颗EXT版的E3.Tree");treeBuilder.init(request);//完成构造任务director.build(treeModel, treeBuilder);//获取构造树脚本,说明此脚本即为在你WEB 页面上显示的树脚本，因此如果WEB页面树显示不正常，请先调试确认是否生成了此脚本.String treeScript = treeBuilder.getTreeScript();//调试用//log.info(treeScript);//System.out.println("The TreeScript as follows:\n" + treeScript);//这就没必要再写了吧！就是把树脚本放到request域完成和WebUI的交互显示了.request.setAttribute("treeScript", treeScript);//
+
+现在我们还剩下的事就是如何在Web页面上把这颗树显示出来了,这个很简单.只要在你的JSP页面合适区域使用如下语句将树脚本输出就可以.
+
+<%= request.getAttribute("treeScript")%>或者${treeScript}或者...
+
+如果你幸运的话，你应该在页面上看到如下所示的树了。
+
+XTreeBuilder构造的树:
+
+ 
+
+EXTTreeBuilder构造的树:
+
+ 
+
+至此一棵树就算构建完了，但我想你肯定不仅仅满足于此吧。你肯定还想把这棵树放在你首页布局框架的左边，然后单你点击树节点的时候，在你的框架业务区域打开相应界面吧，如果是这样的话那接的往下看 --->
+
+我们以一营长为例:
+
+应用场景：当点击一营长的时候，在框架(Frame)指定区域打开一个页面或者发出一个reques请求执行一个Action方法或者执行一个脚本函数等等.
+
+首先在一营长节点添加单击事件,代码如下
+
+Js代码 
+
+
+1.//打开指定页面   
+2.//node1.setAction("./main.jsp");   
+3.//请求执行Action方法   
+4.node1.setAction("./xgllstzyxhcms/confraternityIntroduceAction.go?reqCode=init");   
+5.然后，在JSP页面写入如下JS函数:   
+6.function doAction(url){   
+7.//mainFrame为你指定框架区域的名字   
+8.parent.mainFrame.location.href = url;   
+9.}  
+
+//打开指定页面//node1.setAction("./main.jsp");//请求执行Action方法node1.setAction("./xgllstzyxhcms/confraternityIntroduceAction.go?reqCode=init");然后，在JSP页面写入如下JS函数:function doAction(url){//mainFrame为你指定框架区域的名字parent.mainFrame.location.href = url;}
+
+小技巧:如果你的树是使用XTreeBuilder构造出的E3.Tree的话，你还可以调用如下脚本将树全部展开:
+
+root.expandAll();
+
+全部收缩没忘记了 : ) 需要的话自己去查WebFX 的XTree相关资料即可.
+
+下课。。。
+
+4.E3.Tree进阶篇 
+
+起立。。。
+
+上一节中我们一起学习了E3.tree的基本"原理"(很基础的了)和一些简单的用法.但在实际应用中，我想更多的应用场景是这样的，你可能要根据数据库里存储的数据来动态的生成一棵树吧，比如说我们的权限管理系统的组织机构模型或者根据其他一些业务需求而生成的业务树。总而言之,都有一个特点就是树的数据源是动态的，数据均来自于数据库或者XML文档等。并非像上一节中所讲的每一个节点以及节点的父子关系都是手动添加。下面，我们就以权限管理根据登录用户的角色而动态生成一颗业务菜单树为例来一起学习一下,本实例的数据源来自数据库(H2)
+
+插上一句,关于H2:
+
+H2是一款非常优秀很非常轻量(体积角度，整个数据库才1.3M)Java开源数据库,也许大家熟知的是HsqlDB,但如果你真的花时间认真用过这两个开源DB后，我保证你会深深爱上H2 顺便宣传一下，因为国内用这个的的确很少，资料也非常有限，半年前我第一次用的时候基本上搜索不出什么中文字资料来。这几天见有个小胖在JavaEye上极力宣传搞普及推广，偶也借此机会再此广告一把.还有H2的作者也是一个非常热心的人，回复我的技术问题邮件甚至还给我纠正拼写错误语法错误和一些建议。不甚感激，希望H2越来越火!
+
+H2官方网站:http://www.h2database.com/
+
+4.1.根据数据库构造树，我们首先要有一个存储树节点的数据表，而且这个表结构要能反映出树的一些属性以及树的级联父子关系来.如下为我的H2见表脚本,
+
+仅供参考:
+
+Sql代码 
+
+
+1.//功能菜单信息表 AB01   
+2.DROP TABLE IF EXISTS AB01;   
+3.CREATE TABLE AB01(   
+4.AB0101 VARCHAR(6) NOT NULL PRIMARY KEY, --功能编号   
+5.AB0102 VARCHAR(50) NOT NULL, --功能名称   
+6.AB0103 VARCHAR(6), --上级功能编号   
+7.AB0104 VARCHAR(100), --菜单图片URI   
+8.AB0105 VARCHAR(100), --功能目标地址   
+9.AB0107 VARCHAR(2), --菜单项类型   
+10.AB0108 INT, --菜单排序号   
+11.AB0199 VARCHAR(50) --   
+12.);  
+
+//功能菜单信息表 AB01DROP TABLE IF EXISTS AB01;CREATE TABLE AB01(AB0101 VARCHAR(6) NOT NULL PRIMARY KEY, --功能编号AB0102 VARCHAR(50) NOT NULL, --功能名称AB0103 VARCHAR(6), --上级功能编号AB0104 VARCHAR(100), --菜单图片URIAB0105 VARCHAR(100), --功能目标地址AB0107 VARCHAR(2), --菜单项类型AB0108 INT, --菜单排序号AB0199 VARCHAR(50) --);
+
+大家可以看到我的表结构中包含了树节点属性字段(AB0102,AB0104,Ab0105)和树父子关系字段(AB0103)以及其他的一些业务属性字段.
+
+4.2. 我们在数据库中加入如下图所示的一些菜单数据信息.
+
+ 
+
+注意:跟节点的上级节点应为Null 
+
+4.3.我们用E3.Tree引擎老动态的上图中的数据关系来生成这棵树.
+
+Java代码 
+
+
+1.log.info("开始启动E3模板引擎绘制导航菜单...");   
+2.Ab03Domain ab03 = (Ab03Domain)request.getSession().getAttribute("userInfo");   
+3.//获取登录用户所属岗位   
+4.Ab04Domain ab04 = ab04Dao.readAb04DomainByAb0301(ab03.getAb0301());   
+5.//获取岗位菜单列表   
+6.List menuList = ab05Dao.readMenuListByAb0201(ab04.getAb0201());   
+7.//业务数据解码器，从业务数据中分解出id和parentid   
+8.UserDataUncoder menuUncoder = new UserDataUncoder(){   
+9.//获取当前节点编号   
+10.public Object getID(Object userData) throws UncodeException {   
+11.Ab01Domain ab01 = (Ab01Domain)userData;   
+12.return ab01.getAb0101();   
+13.}   
+14.//获取父亲节点编号   
+15.public Object getParentID(Object userData) throws UncodeException {   
+16.Ab01Domain ab01 = (Ab01Domain)userData;   
+17.return ab01.getAb0103();   
+18.}   
+19.};   
+20.//Tree模型构造器，用于生成树模型   
+21.AbstractWebTreeModelCreator treeModelCreator = new AbstractWebTreeModelCreator(){   
+22.//该方法负责将业务数据映射到树型节点   
+23.protected Node createNode(Object userData, UserDataUncoder uncoder) {   
+24.Ab01Domain ab01 = (Ab01Domain)userData;   
+25.WebTreeNode result = new WebTreeNode(ab01.getAb0102(), "node" + ab01.getAb0101());   
+26.result.setAction("javascript:doAction('" + ab01.getAb0105() +"')");   
+27.return result;   
+28.}   
+29.};   
+30.treeModelCreator.init(request);   
+31.TreeModel treeModel = treeModelCreator.create(menuList, menuUncoder);   
+32.TreeDirector director = new DefaultTreeDirector();//构造树导向器   
+33.ExtTreeBuilder treeBuilder = new ExtTreeBuilder();//构造树Builder   
+34.//XTreeBuilder treeBuilder = new XTreeBuilder();   
+35.treeBuilder.init(request);   
+36.//treeBuilder.setTitle("eRedC2WP V 0.1");   
+37.director.build(treeModel, treeBuilder);//执行构造   
+38.String treeScript = treeBuilder.getTreeScript();//获取构造树的脚本   
+39.request.setAttribute("treeScript", treeScript);   
+40.log.info("导航菜单绘制完成!");  
+
+log.info("开始启动E3模板引擎绘制导航菜单...");Ab03Domain ab03 = (Ab03Domain)request.getSession().getAttribute("userInfo");//获取登录用户所属岗位Ab04Domain ab04 = ab04Dao.readAb04DomainByAb0301(ab03.getAb0301());//获取岗位菜单列表List menuList = ab05Dao.readMenuListByAb0201(ab04.getAb0201());//业务数据解码器，从业务数据中分解出id和parentidUserDataUncoder menuUncoder = new UserDataUncoder(){//获取当前节点编号public Object getID(Object userData) throws UncodeException {Ab01Domain ab01 = (Ab01Domain)userData;return ab01.getAb0101();}//获取父亲节点编号public Object getParentID(Object userData) throws UncodeException {Ab01Domain ab01 = (Ab01Domain)userData;return ab01.getAb0103();}};//Tree模型构造器，用于生成树模型AbstractWebTreeModelCreator treeModelCreator = new AbstractWebTreeModelCreator(){//该方法负责将业务数据映射到树型节点protected Node createNode(Object userData, UserDataUncoder uncoder) {Ab01Domain ab01 = (Ab01Domain)userData;WebTreeNode result = new WebTreeNode(ab01.getAb0102(), "node" + ab01.getAb0101());result.setAction("javascript:doAction('" + ab01.getAb0105() +"')");return result;}};treeModelCreator.init(request);TreeModel treeModel = treeModelCreator.create(menuList, menuUncoder);TreeDirector director = new DefaultTreeDirector();//构造树导向器ExtTreeBuilder treeBuilder = new ExtTreeBuilder();//构造树Builder//XTreeBuilder treeBuilder = new XTreeBuilder();treeBuilder.init(request);//treeBuilder.setTitle("eRedC2WP V 0.1");director.build(treeModel, treeBuilder);//执行构造String treeScript = treeBuilder.getTreeScript();//获取构造树的脚本request.setAttribute("treeScript", treeScript);log.info("导航菜单绘制完成!");
+
+批注:有了第一节的基础，我想看上面这段代码应该不难了吧!我的DAO实现你不用管，只是个接口而已，后面的实现可以是数据库取数据可以是XML取数据等等。你只需要看明白整个构造树的流程把数据源换成你的就可以了.已经凌晨3:00了。偶就不详细解释了,有问题的可以到E3论坛里寻求技术支持. http://www.javae3.com
+
+4.4.动态生成的E3.Tree效果图如下
+
+ 
+
+课程表:
+
+下一节课将讲解如下内容:
+
+『EXT.Layout布局与E3.Tree的完美整合』
+
+预计发布时间:2008-05-25,敬请期待。。。
+
+读者对象:
+
+a.对业界流行的时髦JS框架EXT有所了解
+
+b.已经学习了E3.Tree入门与进阶篇掌握了E3.Tree基本应用的读者
+
+授课目标:
+
+抛弃FrameSet,使用酷炫的EXT.Layout完成企业应用系统结构的布局,并与E3.tree完美整合.
+
+最后，偶代表黄老大感谢各位对E3的支持与厚爱。
+
+2008年5月21日 AM 03:17:18 XiongChun@昆明
+
+作者技术Blog:
+
+http://user.qzone.qq.com/307916217 
+

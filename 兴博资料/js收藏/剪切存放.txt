@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applications xmlns="http://www.wabacus.com"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.wabacus.com ../xsd/wabacus.applications.xsd">
+	<page id="addCarRecord"   
+	js="/webresources/script/validate.js,/js/condition.js,/js/jquery-1.8.3.min.js,/webresources/script/wabacus_api.js">
+	  <tabpanel id="tab11" margin="10px">
+			
+		<report id="addReport"  parenttitle="办证信息"  type="form">
+		     <interceptor>
+					<preaction>
+								rrequest.authorize("addReport","button","type{search}","display","false");
+								rrequest.authorize("addReport","button","type{save}","display","false");
+								rrequest.authorize("addReport","button","type{reset}","display","false");
+						        
+					</preaction>
+		    </interceptor>
+			<display>
+				<col column="CAR_ID" label="车牌ID" displaytype="hidden" />
+				<col column="CARD_ID" label="办证标识ID" displaytype="hidden" />
+				<col column="ORG_ID"  label="区域标识ID"  displaytype="hidden" />
+				<col column="BUILD_SITE_ID" label="建筑工地id" displaytype="hidden" />
+				<col column="COMPANY_ID" label="运输公司id" displaytype="hidden" />
+				<col column="DRAVEL_ID" label="行驶路线id" displaytype="hidden" />
+				<col column="DUMP_ID" label="行驶路线id" displaytype="hidden" />
+				
+				<col column="ORG_NAME" label="行政区域" displaytype="hidden" clickorderby="true" updatecol="@{ORG_ID}" width="12%">
+				</col>
+				<col column="CAR_TYPE" label="车辆类型" displaytype="hidden" styleproperty="style='mso-number-format:\@' width='12%'" clickorderby="true" width="12%" >
+				</col>
+				<col column="BUILD_SITE_NAME" label="建筑工地" displaytype="hidden" clickorderby="true" updatecol="@{BUILD_SITE_ID}" width="12%">
+				</col>
+				<col column="BUILD_COMPANY_NAME" label="建筑单位" displaytype="hidden" clickorderby="true"  width="12%" br="true" >
+				</col>
+				<col column="TRANS_COMAPY_NAME" label="运输公司" displaytype="hidden" clickorderby="true" updatecol="@{COMPANY_ID}" width="15%" >
+			    </col>
+				<col column="BUILD_ACTION_NAME" label="施工单位"  displaytype="hidden" clickorderby="true"  width="12%" >
+				</col>
+				<col column="STARTDATE" label="准运时间" displaytype="hidden" datatype="date{yyyy-MM-dd}" clickorderby="true"   width="12%">
+				</col>
+				<col column="ENDDATE" label="至" displaytype="hidden" datatype="date{yyyy-MM-dd}" clickorderby="true" width="12%"  br="true">
+				</col>
+				<col column="WAY_NAME" label="行驶路线" displaytype="hidden" clickorderby="true" width="15%" updatecol="@{DRAVEL_ID}">
+			    </col>
+			    <col column="DUMP_NAME" label="倾倒点" displaytype="hidden" clickorderby="true" width="15%" updatecol="@{DUMP_ID}">
+			    </col>
+			    <col column="STARTTIME" label="行驶时间" displaytype="hidden" datatype="date{HH:mm}" clickorderby="true" width="10%" >
+			    </col>
+				<col column="ENDTIME" label="至" displaytype="hidden" datatype="date{HH:mm}" clickorderby="true" width="10%"  br="true">
+				</col>
+				<col column="OPT_ID" label="办证人" displaytype="hidden" clickorderby="true" width="10%">
+				</col>
+				<col column="RMK" label="备注" displaytype="hidden" clickorderby="true" width="10%">
+				</col>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[SELECT   A.ORG_ID,
+									  B.ORG_NAME AS ORG_NAME,
+									  A.CAR_TYPE AS CAR_TYPE,
+									  C.BUILD_SITE_NAME AS BUILD_SITE_NAME,
+									  A.BUILD_COMPANY_NAME AS BUILD_COMPANY_NAME,
+									  A.CARRY_START_DATE AS STARTDATE,
+									  A.CARRY_END_DATE AS ENDDATE,
+									  A.DRAVEL_START_TIME AS STARTTIME,
+									  A.DRAVEL_END_TIME AS ENDTIME,
+									  A.COMPANY_NAME AS BUILD_ACTION_NAME,
+									  G.COMPANY_NAME AS TRANS_COMAPY_NAME,
+									  D.DRAVEL_WAY_NAME AS WAY_NAME,
+									  E.DUMP_NAME AS DUMP_NAME,
+									  A.OPT_ID AS OPT_ID,
+									  A.OPT_DATE AS OPT_DATE,
+									  A.RMK AS RMK,
+									  A.CARD_ID AS CARD_ID,
+									  A.CAR_ID AS CAR_ID,
+									  A.BUILD_SITE_ID AS BUILD_SITE_ID，
+									  A.COMPANY_ID AS COMPANY_ID,
+									  A.DRAVEL_ID AS DRAVEL_ID,
+									  A.DUMP_ID AS DUMP_ID
+									FROM TB_CARD  A LEFT JOIN TB_ORG B ON A.ORG_ID= B.ORG_ID
+									INNER JOIN TB_BUILD_SITE C ON C.ORG_ID=A.ORG_ID
+									INNER JOIN TB_DRAVEL_WAY D ON A.DRAVEL_ID =D.DRAVEL_WAY_ID
+									INNER JOIN TB_DUMP E ON A.DUMP_ID =E.DUMP_ID 
+									INNER JOIN TB_COMPANY_CAR_REL F ON A.CARD_ID=F.CAR_ID
+									INNER JOIN TB_COMPANY G ON F.COMPANY_ID=G.COMPANY_ID  WHERE {#condition#}]]>
+				</value>
+				<condition name="ORG_NAME" label="行政区域：" labelstyle="2" left="30" >
+					 <inputbox styleproperty="style='width:15%' " type="selectbox">
+					            <option value="" label="----------请选择 --------"/>
+						    	<option source="@{SELECT O.ORG_NAME,O.ORG_ID  FROM TB_ORG O  order by O.ORG_NAME}" value="ORG_ID" label="ORG_NAME"></option>      
+					 </inputbox>
+				</condition>
+			    <condition name="BUILD_SITE_NAME" label="建筑工地：" labelstyle="2" left="30">
+					 <inputbox styleproperty="style='width:15%' " type="selectbox" depends="ORG_NAME">
+					            <option value="" label="----------请选择 --------"/>
+						    	<option source="@{SELECT T.BUILD_SITE_ID,T.BUILD_SITE_NAME FROM TB_BUILD_SITE T WHERE T.ORG_ID like '%#ORG_NAME#%' order by T.BUILD_SITE_NAME}" value="BUILD_SITE_ID" label="BUILD_SITE_NAME"></option>      
+					 </inputbox>
+				</condition>
+			 
+				 <condition name="BUILD_COMPANY_NAME" label="行驶路线：" labelstyle="2" left="30">
+					 <inputbox styleproperty="style='width:15%'" type="selectbox" depends="BUILD_SITE_NAME" >
+					           <option value="" label="----------请选择 --------"/>
+							   <option source="@{SELECT T.DRAVEL_WAY_ID,T.DRAVEL_WAY_NAME FROM TB_DRAVEL_WAY T WHERE T.BUILD_SITE_ID like '%#BUILD_SITE_NAME#%' ORDER BY T.DRAVEL_WAY_NAME }" value="DRAVEL_WAY_ID" label="DRAVEL_WAY_NAME"></option>      
+					 </inputbox>
+				</condition>
+				<condition name="COMPANY_BUILD_NAME" label="建筑单位：" br="true" labelstyle="2" left="30">
+					 <inputbox styleproperty="style='width:15%'" type="textbox"></inputbox>
+				</condition>
+				
+				<condition name="DUMP_NAME" label="倾倒地点：" labelstyle="2" left="30">
+					 <inputbox styleproperty="style='width:15%'" type="selectbox">
+					            <option value="" label="--------请选择 --------"/>
+						    	<option source="@{SELECT T.DUMP_ID,T.DUMP_NAME FROM TB_DUMP T ORDER BY T.DUMP_NAME}" value="DUMP_ID" label="DUMP_NAME"></option>      
+					 </inputbox>
+				</condition>
+				 <condition name="TRANS_COMAPY_NAME" label="运输公司：" labelstyle="2" left="30">
+					 <inputbox styleproperty="style='width:15%' " type="selectbox">
+					            <option value="" label="----------请选择 --------"/>
+						    	<option source="@{SELECT T.COMPANY_ID,T.COMPANY_NAME FROM TB_COMPANY T ORDER BY T.COMPANY_NAME }" value="COMPANY_ID" label="COMPANY_NAME"></option>      
+					 </inputbox>
+				</condition>
+				<condition name="CAR_TYPE" label="车辆类型：" labelstyle="2" left="30">
+					<inputbox styleproperty="style='width:15%' " type="selectbox">
+							    <option value="1" label="GPS"></option> 
+					</inputbox>	
+				</condition>
+
+				<condition name="BUILD_ACTION_NAME" label="施工单位：" br="true" labelstyle="2" left="30">
+					<inputbox styleproperty="style='width:15%' " type="textbox" />
+				</condition>
+				
+				<condition name="STARTDATE" label="准运日期：" datatype="date{yyyy-MM-dd}" labelstyle="2" left="31">
+					<inputbox styleproperty="style='width:14.7%' " type="datepicker" jsvalidate="isDate({0}格式不对，必须为yyyy-MM-dd格式)"></inputbox>
+				</condition>
+				
+				<condition name="ENDDATE" label="终止日期：" datatype="date{yyyy-MM-dd}" labelstyle="2" left="31">
+					<inputbox styleproperty="style='width:14.5%'" type="datepicker" jsvalidate="isDate({0}格式不对，必须为yyyy-MM-dd格式)"></inputbox>
+				</condition>
+				
+				<condition name="STARTTIME" label="行驶时间：" datatype="date{HH:mm}" labelstyle="2" left="31">
+					<inputbox styleproperty="style='width:15%' " type="datepicker"  dateformat="HH:mm" >
+					</inputbox>
+				</condition>
+				
+				<condition name="ENDTIME" label="停驶时间：" datatype="date{HH:mm}"  br="true" labelstyle="2" left="30">
+					<inputbox styleproperty="style='width:15%' " type="datepicker"  dateformat="HH:mm" >
+					</inputbox>
+				</condition>
+				
+	            <condition name="RMK" label="备注信息：" labelstyle="2" left="30">
+					<inputbox styleproperty="style='width:14.7%' align='center'" type="textbox">
+					</inputbox>	
+				</condition>
+				
+				<insert>
+					<value>
+						<![CDATA[
+						INSERT INTO TB_CARD (CARD_ID=sequence{seq_car},OPT_ID=@{OPT_ID},DUMP_ID=@{DUMP_ID},DRAVEL_ID=@{DRAVEL_ID},COMPANY_ID=@{COMPANY_ID},ORG_ID=@{ORG_ID},BUILD_COMPANY_NAME=@{BUILD_COMPANY_NAME},CAR_TYPE=@{CAR_TYPE},COMPANY_NAME=@{BUILD_ACTION_NAME},BUILD_SITE_ID=@{BUILD_SITE_ID},CAR_ID=@{CAR_ID},DRAVEL_START_TIME=@{STARTTIME},DRAVEL_END_TIME=@{ENDTIME},CARRY_START_DATE=@{STARTDATE},CARRY_END_DATE=@{ENDDATE},RMK=@{RMK});
+						]]>
+					</value>
+				</insert>
+				<update > 
+					   update TB_CARD,OPT_ID=@{OPT_ID},DUMP_ID=@{DUMP_ID},DRAVEL_ID=@{DRAVEL_ID},COMPANY_ID=@{COMPANY_ID},ORG_ID=@{ORG_ID},BUILD_COMPANY_NAME=@{BUILD_COMPANY_NAME},CAR_TYPE=@{CAR_TYPE},COMPANY_NAME=@{BUILD_ACTION_NAME},BUILD_SITE_ID=@{BUILD_SITE_ID},CAR_ID=@{CAR_ID},DRAVEL_START_TIME=@{STARTTIME},DRAVEL_END_TIME=@{ENDTIME},CARRY_START_DATE=@{STARTDATE},CARRY_END_DATE=@{ENDDATE},RMK=@{RMK})) WHERE CAR_ID=@{CAR_ID}
+				</update>
+			</sql>
+		</report>
+				<buttons>
+				<button name="banzheng" styleproperty="style='margin-bottom:2px;font-size:12px;cursor:hand;width: 73px;height: 25px;background-color: #000;background-image: url(images/tu8.gif);background-repeat: repeat;background-attachment: scroll;background-position: center;border: 0 solid #000000;text-align: center;padding-top: 3px;'"
+				extends="${wabacus.button2.default}" position="top"  label=""  >
+				 invokeServerActionForReportData('addCarRecord','report2',
+					'com.xingbo.muckcar.callback.CertificateInterceptor',
+					{name:'SELECTEDROW',value:true},
+					{   ORG_ID:$('#addCarRecord_guid_addReport_condition_ORG_NAME').val(),
+					    CAR_TYPE:$('#addCarRecord_guid_addReport_condition_CAR_TYPE').val(),
+						BUILD_SITE_ID:$('#addCarRecord_guid_addReport_condition_BUILD_SITE_NAME').val(),
+						BUILD_COMPANY_NAME:$('#addCarRecord_guid_addReport_condition_COMPANY_BUILD_NAME').val(),
+						COMPANY_ID:$('#addCarRecord_guid_addReport_condition_TRANS_COMAPY_NAME').val(),
+						COMPANY_NAME:$('#addCarRecord_guid_addReport_condition_BUILD_ACTION_NAME').val(),
+						CARRY_START_DATE:$('#addCarRecord_guid_addReport_condition_STARTDATE').val(),
+						CARRY_END_DATE:$('#addCarRecord_guid_addReport_condition_ENDDATE').val(),
+						DRAVEL_ID:$('#addCarRecord_guid_addReport_condition_BUILD_COMPANY_NAME').val(),
+						DUMP_ID:$('#addCarRecord_guid_addReport_condition_DUMP_NAME').val(),
+						DRAVEL_START_TIME:$('#addCarRecord_guid_addReport_condition_STARTTIME').val(),
+						DRAVEL_END_TIME:$('#addCarRecord_guid_addReport_condition_ENDTIME').val(),
+						RMK:$('#addCarRecord_guid_addReport_condition_RMK').val()}
+					   ,true,testBeforeInokeCallBackMethod22,testInvokeCallbackMethod22);
+				</button>
+				 
+			</buttons>
+		</tabpanel>
+		 <tabpanel id="tab2" margin="10px">
+		<report id="report2" pagesize="5|10|20|50|100"  parenttitle="可办证车辆"  type="editablelist2" rowselect="checkbox" onload="loadColor">
+			<display>
+			<col column="{sequence:1}" label="序号"/>
+			<col column="COMPANY_ID"   label="运输公司ID"   displaytype="hidden" />
+			<col column="CAR_ID"       label="车牌ID"      displaytype="hidden" />
+			<col column="CAR_NUM"      label="车牌号"      clickorderby="true"  width="15%"></col>
+			
+			<col column="COMPANY_NAME" label="运输公司"     clickorderby="true" updatecol="@{COMPANY_ID}"  width="15%">
+			      <inputbox type="selectbox" servervalidate="isNotEmpty(${invalid.isnotempty})" styleproperty="style='width:15%'">
+					  <option source="@{SELECT T.COMPANY_ID,T.COMPANY_NAME FROM TB_COMPANY T}" value="COMPANY_ID" label="COMPANY_NAME"></option>      
+				 </inputbox>
+			</col>
+			<col column="BORROW_STATUS" label="是否借调"     clickorderby="true"  width="15%"></col>
+		    <col column="STATUS"       label="是否黑名单"   clickorderby="true"  width="15%"></col>
+			<col column="BORROWDATE"   label="借调时间"     clickorderby="true"  width="15%"/>
+			<col column="Online_Flag"  label="是否在线"     clickorderby="true"  width="15%"/>
+			</display>
+			<sql>
+				<value>
+					<![CDATA[  select * from (
+			                    SELECT A.CAR_NUM AS CAR_NUM,A.CAR_ID AS CAR_ID,
+			                         C.COMPANY_ID AS COMPANY_ID,
+			                         C.COMPANY_NAME AS COMPANY_NAME,
+			                          '未借调' AS BORROW_STATUS,
+			                         CASE A.BLACK_STATUS  WHEN 1 THEN '是' ELSE '否' END AS STATUS,
+			                          to_char('','yyyy-mm-dd')||'~'||to_char('','yyyy-mm-dd') AS BORROWDATE,
+			                         CASE A.Online_Flag WHEN 0 THEN '离线' WHEN 1 THEN '在线' else '离线'  END As Online_Flag                 
+			                         FROM TB_CAR A
+			                         LEFT JOIN TB_COMPANY_CAR_REL B ON A.CAR_ID = B.CAR_ID
+			                         LEFT JOIN TB_COMPANY C         ON B.COMPANY_ID = C.COMPANY_ID
+			                         where {C.COMPANY_ID ='#txtno2#'} AND (A.Borrow_Status=0 or A.Borrow_Status is null) and B.status_id=1 and (A.IS_DEL=0 OR A.IS_DEL IS NULL) AND (a.status_id=0 or a.status_id is null) and {#condition#}
+			             union 
+			                      SELECT      E.CAR_NUM AS CAR_NUM,
+			                          D.CAR_ID AS CAR_ID,
+			                          G.COMPANY_ID AS COMPANY_ID,
+			                          G.COMPANY_NAME AS COMPANY_NAME,
+			                           '借调' AS BORROW_STATUS,
+			                          CASE E.BLACK_STATUS  WHEN 1 THEN '是' ELSE '否' END AS STATUS,
+			                          to_char(D.START_DATE,'yyyy-mm-dd')||'~'||to_char(D.END_DATE,'yyyy-mm-dd') AS BORROWDATE,
+			                          CASE E.Online_Flag WHEN 0 THEN '离线' WHEN 1 THEN '在线' else '离线'  END As Online_Flag    
+			                          FROM TB_CAR_BORROW D
+			                          LEFT JOIN TB_CAR E ON D.CAR_ID=E.CAR_ID
+			                          LEFT JOIN TB_COMPANY F ON D.BO_COMPANY_ID=F.COMPANY_ID
+			                          LEFT JOIN TB_CAR_BORROW DD ON D.BORROW_ID=DD.BORROW_ID
+                                      LEFT JOIN TB_COMPANY G ON DD.COMPANY_ID=G.COMPANY_ID
+			                          where   {D.BO_COMPANY_ID='#txtno2#'} AND E.Borrow_Status=1 AND D.STATUS=0 and (e.status_id=0 or e.status_id is null) AND  (E.IS_DEL=0 OR E.IS_DEL IS NULL) and {#condition#}
+			                         ) 
+			                          order by CAR_ID
+                              ]]>
+				</value>
+				<condition name="txtno2">
+				  <inputbox styleproperty="style=display:none;" ></inputbox>
+				</condition>
+				
+				<condition name="txtno1" label="车牌号码">
+					<value>
+						<![CDATA[(CAR_NUM like '%#data#%' )]]>
+					</value>
+					<inputbox >
+					        <typeprompt count="15">
+						       <promptcol label="CAR_NUM" title="车牌号码" matchmode="anywhere"></promptcol>
+						       <datasource>        
+						       	<option source="@{SELECT CAR_NUM  FROM TB_CAR  where {#matchcondition#}}"></option>      
+						       </datasource>
+					       </typeprompt>
+					 </inputbox>
+				</condition>
+				
+				<condition name="txtno3" label="是否黑名单">
+					<value>
+						<![CDATA[(BLACK_STATUS like  '%#data#%')]]>
+					</value>
+					<inputbox type="selectbox" defaultvalue="--请选择--">
+						<option value=''  label='-请选择-'></option>
+						<option value='0' label='否'></option>
+						<option value='1' label='是'></option>
+					</inputbox>
+				</condition>
+				
+				<condition name="txtno4" label="是否离线">
+					<value>
+						<![CDATA[(Online_Flag like  '%#data#%')]]>
+					</value>
+					<inputbox type="selectbox" defaultvalue="--请选择--">
+						<option value=''  label='-请选择-'></option>
+						<option value='0' label='离线'></option>
+						<option value='1' label='在线'></option>
+					</inputbox>
+				</condition>
+			</sql>
+		</report>
+		 <buttons>
+				<button name="banzheng" styleproperty="style='margin-bottom:2px;font-size:12px;cursor:hand;width: 73px;height: 25px;background-color: #000;background-image: url(images/tu8.gif);background-repeat: repeat;background-attachment: scroll;background-position: center;border: 0 solid #000000;text-align: center;padding-top: 3px;'"
+				extends="${wabacus.button2.default}" position="top"  label=""  >
+				 invokeServerActionForReportData('addCarRecord','report2',
+					'com.xingbo.muckcar.callback.CertificateInterceptor',
+					{name:'SELECTEDROW',value:true},
+					{   ORG_ID:$('#addCarRecord_guid_addReport_condition_ORG_NAME').val(),
+					    CAR_TYPE:$('#addCarRecord_guid_addReport_condition_CAR_TYPE').val(),
+						BUILD_SITE_ID:$('#addCarRecord_guid_addReport_condition_BUILD_SITE_NAME').val(),
+						BUILD_COMPANY_NAME:$('#addCarRecord_guid_addReport_condition_COMPANY_BUILD_NAME').val(),
+						COMPANY_ID:$('#addCarRecord_guid_addReport_condition_TRANS_COMAPY_NAME').val(),
+						COMPANY_NAME:$('#addCarRecord_guid_addReport_condition_BUILD_ACTION_NAME').val(),
+						CARRY_START_DATE:$('#addCarRecord_guid_addReport_condition_STARTDATE').val(),
+						CARRY_END_DATE:$('#addCarRecord_guid_addReport_condition_ENDDATE').val(),
+						DRAVEL_ID:$('#addCarRecord_guid_addReport_condition_BUILD_COMPANY_NAME').val(),
+						DUMP_ID:$('#addCarRecord_guid_addReport_condition_DUMP_NAME').val(),
+						DRAVEL_START_TIME:$('#addCarRecord_guid_addReport_condition_STARTTIME').val(),
+						DRAVEL_END_TIME:$('#addCarRecord_guid_addReport_condition_ENDTIME').val(),
+						RMK:$('#addCarRecord_guid_addReport_condition_RMK').val()}
+					   ,true,testBeforeInokeCallBackMethod22,testInvokeCallbackMethod22);
+				</button>
+				 
+			</buttons>
+	</tabpanel>
+<jsp id="jspinfo" >
+				/recordInfo.jsp
+</jsp>
+<tabpanel id="tab3" margin="10px">
+<report id="hasRecord"   pagesize="5|10|15|20|-1"  parenttitle="已办证车辆" >
+			<display>
+			<col column="CAR_ID" label="车辆id" displaytype="hidden" />
+			<col column="{sequence:1}"  label="序号"/>
+            <col column="CAR_NUM"       label="车牌号码"   clickorderby="true"  width="20%"></col>
+			<col column="OPT_DATE"      label="最新办证日期"   clickorderby="true"  width="20%" ></col>
+			<col column="TOTAL"       label="办证数量"   clickorderby="true"  width="20%" ></col>
+			<col column="{non-fromdb}" property="operate" label="操作" width="15%" />
+			</display>
+			<sql>
+				<value>
+					<![CDATA[   SELECT A.CAR_ID AS CAR_ID,B.CAR_NUM AS CAR_NUM,to_char(A.OPT_DATE,'YYYY-MM-DD HH24:MI:SS') AS OPT_DATE,COUNT(A.CARD_ID)AS TOTAL FROM TB_CARD A
+								LEFT JOIN TB_CAR B ON B.CAR_ID=A.CAR_ID
+								WHERE A.STATUS_ID=1 AND {#condition#} 
+								GROUP BY B.CAR_NUM,A.CAR_ID,OPT_DATE
+								ORDER BY opt_date DESC
+					 ]]>
+				</value>
+				<condition name="num_car" label="车牌号码">
+					<value>
+						<![CDATA[(B.CAR_NUM like  '%#data#%' )]]>
+					</value>
+					<inputbox>
+					     <typeprompt count="15">
+						       <promptcol label="CAR_NUM" title="车牌号码" matchmode="anywhere"></promptcol>
+						       <datasource>        
+						       	<option source="@{SELECT CAR_NUM  FROM TB_CAR  where {#matchcondition#}}"></option>      
+						       </datasource>
+					      </typeprompt>
+					 </inputbox>
+				</condition>	
+			</sql>
+			<format>
+					<value>
+						 <![CDATA[
+				  		  operate ="<a href=\"#\" onclick=\"openWin("+CAR_ID+")\">详细信息</a>";
+					     ]]>
+					</value>
+			</format>
+		</report>
+		</tabpanel>
+	</page>
+</applications>

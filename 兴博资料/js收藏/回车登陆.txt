@@ -1,0 +1,19 @@
+$(function() {
+	
+	formClear()
+	
+	// 密码输入完毕后回车提交
+	$('#validatecode').keyup(function(event){
+			event = event || window.event;
+			if(event.keyCode==Ext.EventObject.ENTER) {
+				if(formValidate()) { 
+					var loginCfg = {
+						actionUrl:ctx+"/login.do",
+						accountVal:$('#account').val(),
+						passwordVal:$('#password').val()
+					};
+					login(loginCfg);
+				}
+		}
+	});
+});

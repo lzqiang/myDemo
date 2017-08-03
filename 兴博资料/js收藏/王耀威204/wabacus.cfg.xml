@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wabacus-config xmlns="http://www.wabacus.com"
+			   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			   xsi:schemaLocation="http://www.wabacus.com xsd/wabacus.cfg.xsd">
+	<system>
+		<item name="webroot" value="/muckcar"/><!-- 应用的根URL -->
+		<item name="webroot-abspath" value=""/><!-- 默认为context.getRealPath("/")获取的值，可以直接配置根路径 -->
+		<item name="showreport-url" value="/report.xb"/><!--显示报表数据的URL，就是在web.xml中配置的<url-pattern/>的值可以带参数-->
+		<item name="encode" value="UTF-8"/>
+		<item name="show-sql" value="false"/><!-- 是否显示执行的SQL语句或存储过程 -->
+		<item name="default-cellresize" value="2"/><!-- 指定整个项目中所有单行表头的数据自动列表报表的表格单元格默认可移动性 -->
+		<item name="default-labelstyle" value="2"/><!-- 查询条件提示标签的显示位置 -->
+		<item name="server-validate-class" value="com.xingbo.muckcar.util.ServerValidateUtils"/><!-- 自己开发的服务器端校验类 -->
+		<item name="skin" value="muckcar"/><!-- 皮肤样式 -->
+		<item name="default-mouseoverbgcolor" value="#6FF67B" /><!-- 鼠标滑过时背景色 -->
+		<item name="selectedrow-bgcolor" value="#BBC4D1" />
+		<item name="default-jsvalidatetype" value="1" />
+		<item name="default-checkpermission" value="false"/><!-- 本应用是否要检查权限，如果在不需要检查权限的应用中关闭它，可以改善性能 -->
+		<item name="prompt-dialog-type" value="ymprompt"/><!-- 提示组件类型 ymprompt;artdialog-->
+	</system>
+
+	<datasources default="muckcar_ds_oracle">
+		<datasource name="muckcar_ds_oracle" type="com.wabacus.config.database.datasource.C3P0DataSource" 
+			dbtype="com.wabacus.config.database.type.Oracle">
+			<property name="driver">oracle.jdbc.driver.OracleDriver</property>
+			<property name="url">jdbc:oracle:thin:@192.168.101.252:1521:xb</property>
+			<property name="user">muckcar</property>
+			<property name="password">muckcar</property>
+			
+			<property name="max_size">20</property>   
+  			<property name="min_size">5</property>   
+  			<property name="timeout">6000</property>   
+  			<property name="max_statements">100</property>   
+  			<property name="idle_test_period">50</property>   
+  			<property name="acquire_increment">2</property>  
+		</datasource>
+	</datasources>
+
+	<inputbox-types/>
+	
+	<!-- 配置本项目中所有报表页面都必须包含的js文件 -->
+	 
+	<global-jsfiles>
+		<js-file>js/jquery-1.8.3.min.js</js-file>
+		<js-file>js/validate.js</js-file>
+		<js-file>webresources/component/artDialog/artDialog.js</js-file>
+	</global-jsfiles>
+	
+	<!-- 配置本项目中所有报表页面都必须包含的css文件 -->
+	<global-cssfiles>
+		<css-file>css/muckcar.css</css-file>
+		<css-file>webresources/skin/muckcar/artDialog/artDialog.css</css-file>
+	</global-cssfiles>
+	
+	<global-interceptors>
+	</global-interceptors>
+		
+	<i18n-resources file="resources/i18n/ApplicationResources.xml"/>
+	
+	<!-- 注册所有全局资源文件 -->
+	<global-resources>
+		<resource-file>resources/resources_muckcar_ch.xml</resource-file>
+		<resource-file>resources/resources_importdata.xml</resource-file>
+	</global-resources>
+	
+	<!-- 注册所有报表配置文件 -->
+	<report-files>
+  		<report-file pattern="true">report/(r_)(\S*?)(\.xml)</report-file>
+	</report-files>
+</wabacus-config>

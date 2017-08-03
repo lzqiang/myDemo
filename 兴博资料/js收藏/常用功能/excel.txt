@@ -1,0 +1,2 @@
+ws.setPageSetup(PageOrientation.LANDSCAPE.LANDSCAPE,PaperSize.A4,0.5d,0.5d);
+©иртак. 

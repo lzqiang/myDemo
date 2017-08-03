@@ -1,0 +1,137 @@
+
+[html] view plaincopyprint?
+01.<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+02.<html xmlns="http://www.w3.org/1999/xhtml" >  
+03.<head>  
+04.<title>无标题页</title>  
+05.  <style>  
+06.    
+07.  .header_wrap {  
+08.    background: none repeat scroll 0 0 #488FCE;  
+09.    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);  
+10.    display: block;  
+11.    left: 0;  
+12.    position: fixed;  
+13.    top: 0;  
+14.    width: 100%;  
+15.    z-index: 10;  
+16.}  
+17.ul li{  
+18.    float:left;  
+19.    margin:10px;  
+20.    padding:0px;  
+21.}  
+22.  </style>  
+23.</head>  
+24.<body style="height:1500px">  
+25.  
+26.<header class="header_wrap">  
+27.    <div class="nav">  
+28.    <ul>  
+29.        <li class=""><a href="http://www.phpwind.net/index.php?m=bbs&c=forumlist">首页</a></li>  
+30.        <li class="current"><a href="http://www.phpwind.net/index.php?m=bbs">新帖</a></li>  
+31.        <li class=""><a href="http://www.phpwind.net/index.php?m=like&c=like">喜欢</a></li>  
+32.        <li class=""><a href="http://www.phpwind.net/index.php?m=tag">话题</a></li>  
+33.        <li class=""><a href="http://open.phpwind.com/" target="_blank">云平台</a></li>  
+34.        <li class=""><a href="http://www.phpwind.com/index.php?m=downloads&a=downloadsphpwind" target="_blank">下载</a></li>  
+35.    </ul>  
+36.    </div>  
+37.</header>  
+38.<!--右边-->  
+39.<div id="divRight">  
+40.    <style type="text/css">  
+41.    #divMsgInfo{  
+42.        position:absolute;  
+43.        width:90px;  
+44.        height:300px;  
+45.        font-size:9pt;  
+46.    }  
+47.    </style>  
+48.    <script type="text/javascript">  
+49.        var lastScrollY=0;  
+50.        function heartBeat(){   
+51.            diffY=document.documentElement.scrollTop;   
+52.            percent=0.1*(diffY-lastScrollY);   
+53.            if(percent>0)percent=Math.ceil(percent);   
+54.            else percent=Math.floor(percent);   
+55.            document.getElementById("divMsgInfo").style.top=parseInt(document.getElementById("divMsgInfo").style.top)+percent+"px";  
+56.            lastScrollY=lastScrollY+percent;   
+57.        }  
+58.        var timeright = window.setInterval("heartBeat()",1);  
+59.    </script>  
+60.  
+61.    <div id="divMsgInfo"  runat="server" style=" right:10px; top:120px;">  
+62.        <img src ="left.gif" />  
+63.        <div style="float:right; color:White"><a onclick="clearInterval(timeright);document.getElementById('divRight').innerHTML = ''" style="color:White; cursor:pointer">关闭</a></div>  
+64.    </div>  
+65.</div>  
+66.  
+67.  
+68.  
+69.<!--左边-->  
+70.<div id="divLeftFloat">  
+71.    <style type="text/css">    
+72.    #divMsgLeftInfo{    
+73.        position:absolute;    
+74.        width:90px;   
+75.        height:318px;     
+76.        font-size:9pt;    
+77.    }     
+78.    </style>       
+79.    <script type="text/javascript">     
+80.        var lastScrollYLeft=0;    
+81.        function heartBeatLeft(){      
+82.            diffYLeft=document.documentElement.scrollTop;      
+83.            percent=0.1*(diffYLeft-lastScrollYLeft);      
+84.            if(percent>0)  
+85.                percent=Math.ceil(percent);       
+86.            else percent=Math.floor(percent);       
+87.            document.getElementById("divMsgLeftInfo").style.top=parseInt(document.getElementById("divMsgLeftInfo").style.top)+percent+"px";       
+88.            lastScrollYLeft=lastScrollYLeft+percent;      
+89.        }     
+90.        var timeleft = window.setInterval("heartBeatLeft()",1);    
+91.    </script>       
+92.    <div id="divMsgLeftInfo" style=" left:10px; top:120px;">  
+93.        <a href="http://www.ispeak.cn" target="_blank">  
+94.        <img border="0" src ="/Files/index/FloatImg/20101112115620528353991.png" /></a>                 
+95.        <div style="float:right; color:White">  
+96.            <a onclick="clearInterval(timeleft);document.getElementById('divLeftFloat').innerHTML = ''" style="color:White; cursor:pointer">关闭</a>  
+97.        </div>      
+98.    </div>    
+99.</div>  
+100.  
+101.<!--底部-->  
+102.<div id="divBottomFloat">  
+103.    <style type="text/css">  
+104.    #divMsgBottomInfo{  
+105.        position:absolute;  
+106.        /*background:#eee;*/  
+107.        width:330px;  
+108.        height:188px;  
+109.        font-size:9pt;  
+110.        /* border-color:#442200;*/  
+111.        /* border-color:#000000;*/  
+112.    }  
+113.    </style>  
+114.    <script type="text/javascript">  
+115.        var lastScrollYBottom=0;  
+116.        function heartBeatBottom(){   
+117.            var isIE = document.all && window.external;  
+118.            bodyScrollTop = document.documentElement.scrollTop || document.body.scrollTop;  
+119.            if(isIE){  
+120.                docHeight = document.documentElement.clientHeight || document.body.clientHeight;  
+121.            }else{  
+122.                docHeight = (document.body.clientHeight > document.documentElement.clientHeight)?document.documentElement.clientHeight:document.body.clientHeight;  
+123.            }  
+124.            diffYBottom=(docHeight - parseInt(document.getElementById("divMsgBottomInfo").offsetHeight,10)) + parseInt(bodyScrollTop, 10);  
+125.            document.getElementById("divMsgBottomInfo").style.top=diffYBottom+"px";  
+126.        }  
+127.        var timebottom=window.setInterval("heartBeatBottom()",1);  
+128.    </script>  
+129.    <div id="divMsgBottomInfo"  runat="server" style=" right:10px; top:500px;">  
+130.        <div style="float:right; color:White"><a onclick="clearInterval(timebottom);document.getElementById('divBottomFloat').innerHTML = ''" style="color:White; cursor:pointer">关闭</a></div>  
+131.        <img src ="/images/tmp2.jpg" style="width:330px; height:170px" />     
+132.    </div>  
+133.</div>  
+134.</body>  
+135.</html>  

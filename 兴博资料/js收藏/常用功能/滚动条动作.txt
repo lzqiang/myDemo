@@ -1,0 +1,9 @@
+JS控制滚动条的位置：
+window.scrollTo(x,y);
+
+竖向滚动条置顶(window.scrollTo(0,0);
+竖向滚动条置底 window.scrollTo(0,document.body.scrollHeight)
+
+JS控制TextArea滚动条自动滚动到最下部
+
+document.getElementById('textarea').scrollTop = document.getElementById('textarea').scrollHeight

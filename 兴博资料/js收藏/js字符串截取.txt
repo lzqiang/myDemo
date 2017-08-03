@@ -1,0 +1,7 @@
+function replaceTitle(){
+  for(var i=0;i<1000;i++){
+      var str1=$('#carAlarmSpeedPage_guid_carAlarmSpeedReport_tr_'+i).text();
+      var str2=str1.substring(str1.indexOf('H')+1,str1.lastIndexOf('¶¨'));
+     
+  
+}

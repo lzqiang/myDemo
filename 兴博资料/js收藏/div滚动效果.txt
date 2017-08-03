@@ -1,0 +1,3 @@
+document.getElementById('tracktab').scrollTop =0;//滚动条置顶
+x=(400/(22));//整个div的高度  除以 多少行 得到每行的高度
+document.getElementById('tracktab').scrollTop =(400-(400-(num-9)*x)) ;//得到当前行 在div中的高度  设置 滚动条的高度

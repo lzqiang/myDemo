@@ -1,0 +1,7 @@
+js 如何根据class获取对象  2011-01-24 10:51:08|  分类： 默认分类 |  标签：根据class获取对象   |字号大
+中
+小 订阅 
+var obj = document.getElementsByTagName("span");//先得到所有的SPAN标记
+for(var i=0;i<obj.length;i++)
+{
+if(obj[i].className == 'a')//找出s

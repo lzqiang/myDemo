@@ -1,0 +1,6 @@
+var sc=$("input:chockbox[name="zdid"][chocked=true]");
+var str="";
+sc.each(function(){
+   str+=this.value+",";
+})
+ //获取所有复选框选中的那条数据，得到它们的id，链接起来传到后台去

@@ -1,0 +1,20 @@
+onload="loadColor"
+这个是report的一个属性：loadColor是js函数名称
+
+var sum="";
+function loadColor(){
+	 for(var i=0;i<5;i++){
+	      var str=$('#addCarRecord_guid_report2_STATUS__td'+i).text();
+	      if('是'==str){
+	        sum=sum+i;
+	      }
+	    } 
+	    for(var j=0;j<sum.length;j++){
+	        var index=sum.charAt(j);
+	        
+	        $('#addCarRecord_guid_report2_tr_'+index).css({background: "#7e8065"});
+	        $('#addCarRecord_guid_report2_tr_'+index).css("color", "red");
+	    }
+	    sum="";
+}
+这个方法实现的是斑马线的效果

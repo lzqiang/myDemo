@@ -1,0 +1,236 @@
+Quartz在Spring中动态设置cronExpression （spring设置动态定时任务）
+
+　　　　2007-07-25 13:52
+
+　　　　什么是动态定时任务：是由客户制定生成的，服务端只知道该去执行什么任务，但任务的定时是不确定的（是由客户制定）。
+
+　　　　这样总不能修改配置文件每定制个定时任务就增加一个trigger吧，即便允许客户修改配置文件，但总需要重新启动web服务啊，研究了下Quartz在Spring中的动态定时，发现
+
+　　　　<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean" >
+
+          　　　　　　　　<property name="jobDetail" ref="schedulerJobDetail"/>
+          　　　　　　　　<property name="cronExpression">
+              　　　　　　　　　　　　<value>0/10 * * * * ?</value>
+          　　　　　　　　</property>
+　　　　</bean>
+     　　　　中cronExpression是关键，如果可以动态设置cronExpression的值，也就说如果我们可以直接调用CronTriggerBean中设置cronExpression的方法，就可以顺利解决问题了。
+　　　　熟悉1的朋友可以跳过不看，下面2、3是动态定时任务的具体实现。
+　　　　1、Quartz在Spring中的简单配置
+
+　　　　Spring配置文件：
+
+     　　　　<bean id="schedulerJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+         　　　　　　　　<property name="targetObject" ref="scheduleInfoAction"/>
+         　　　　　　　　<property name="targetMethod" value="simpleJobTest"/>
+         　　　　　　　　<property name="concurrent" value="false"/>
+     　　　　</bean>
+     　　　　<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean" >
+          　　　　　　　　<property name="jobDetail" ref="schedulerJobDetail"/>
+          　　　　　　　　<property name="cronExpression">
+              　　　　　　　　　　　　<value>0/10 * * * * ?</value>
+          　　　　　　　　</property>
+      　　　　</bean>
+     　　　　<bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+         　　　　　　　　<property name="triggers">
+             　　　　　　　　　　　　<list>
+                 　　　　　　　　　　　　　　　　<ref local="cronTrigger"/>
+             　　　　　　　　　　　　</list>
+         　　　　　　　　</property>
+　　　　</bean>
+　　　　在上面的配置中设定了
+　　　　① targetMethod: 指定需要定时执行scheduleInfoAction中的simpleJobTest()方法
+　　　　② concurrent：对于相同的JobDetail，当指定多个Trigger时, 很可能第一个job完成之前，第二个job就开始了。指定concurrent设为false，多个job不会并发运行，第二个job将不会在第一个job完成之前开始。
+　　　　③ cronExpression：0/10 * * * * ?表示每10秒执行一次，具体可参考附表。
+　　　　④ triggers：通过再添加其他的ref元素可在list中放置多个触发器。
+　　　　scheduleInfoAction中的simpleJobTest()方法，注意：此方法没有参数，如果scheduleInfoAction有两个方法simpleJobTest()和simpleJobTest(String argument)，则spring只会去执行无参的simpleJobTest().
+　　　　public void simpleJobTest()
+　　　　{
+         　　　　　　　　log.warn("uh oh, Job is scheduled !'" + "' Success...");
+     　　　　}
+
+　　　　2．Quartz在Spring中动态设置cronTrigger方法一
+　　　　Spring配置文件：
+　　　　<bean id="scheduleInfoAction" class="com.lively.happyoa.jobs.webapp.action.ScheduleInfoAction">
+         　　　　　　　　<property name="scheduler" ref="schedulerFactory"/>
+         　　　　　　　　<property name="scheduleInfoManager" ref="scheduleInfoManager"/>
+     　　　　</bean>
+     　　　　<bean id="schedulerJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+         　　　　　　　　<property name="targetObject" ref="scheduleInfoAction"/>
+         　　　　　　　　<property name="targetMethod" value="reScheduleJob"/>
+         　　　　　　　　<property name="concurrent" value="false"/>
+     　　　　</bean>
+     　　　　<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean" >
+          　　　　　　　　<property name="jobDetail" ref="schedulerJobDetail"/>
+          　　　　　　　　<property name="cronExpression">
+              　　　　　　　　　　　　<value>0/10 * * * * ?</value>
+          　　　　　　　　</property>
+      　　　　</bean>
+     　　　　<bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+         　　　　　　　　<property name="triggers">
+             　　　　　　　　　　　　<list>
+                 　　　　　　　　　　　　　　　　<ref local="cronTrigger"/>
+             　　　　　　　　　　　　</list>
+　　　　　　　　</property>
+　　　　</bean>
+　　　　scheduleInfoAction中的reScheduleJob ()方法及相关方法
+　　　　① reScheduleJob读取数据库，获得自定义定时器调度时间():
+     　　　　private void reScheduleJob() throws SchedulerException, ParseException
+　　　　{
+         　　　　　　　　// 运行时可通过动态注入的scheduler得到trigger
+         　　　　　　　　CronTriggerBean trigger = (CronTriggerBean) scheduler.getTrigger("cronTrigger", Scheduler.DEFAULT_GROUP);
+         　　　　　　　　String dbCronExpression = getCronExpressionFromDB();
+         　　　　　　　　String originConExpression = trigger.getCronExpression();
+     　　　　　　　　// 判断从DB中取得的任务时间(dbCronExpression)和现在的quartz线程中的任务时间(originConExpression)是否相等
+     　　　　　　　　// 如果相等，则表示用户并没有重新设定数据库中的任务时间，这种情况不需要重新rescheduleJob
+         　　　　　　　　if(!originConExpression.equalsIgnoreCase(dbCronExpression))
+　　　　　　　　{
+             　　　　　　　　　　　　trigger.setCronExpression(dbCronExpression);
+             　　　　　　　　　　　　scheduler.rescheduleJob("cronTrigger", Scheduler.DEFAULT_GROUP, trigger);
+         　　　　　　　　}
+     　　　　　　　　// 下面是具体的job内容，可自行设置
+     　　　　　　　　// executeJobDetail();
+　　　　}
+　　　　② getCronExpressionFromDB()：从数据库中获得dbCronExpression的具体代码，由于使用了scheduleInfoManager，所以要在定义相应的setter方法
+     　　　　private String getCronExpressionFromDB()
+　　　　{
+         　　　　　　　　String sql="from ScheduleInfo scheduleInfo where 1=1 ";
+         　　　　　　　　sql=sql+" and scheduleInfo.infoId = '"+"1" + "'";
+         　　　　　　　　List scheduleList = scheduleInfoManager.queryScheduleInListBySql(sql);
+         　　　　　　　　ScheduleInfo scheduleInfo = (ScheduleInfo)scheduleList.get(0);
+         　　　　　　　　String dbCronExpression = scheduleInfo.getCronExpression();
+         　　　　　　　　return dbCronExpression;
+　　　　}
+　　　　③ 在spring配置文件的scheduleInfoAction配置了相应的property（scheduler/ scheduleInfoManager）,要为其设置setter方法
+     　　　　private Scheduler scheduler;
+     　　　　// 设值注入，通过setter方法传入被调用者的实例scheduler
+     　　　　public void setScheduler(Scheduler scheduler)
+　　　　{
+         　　　　　　　　this.scheduler = scheduler;
+    　　　　}
+     　　　　private ScheduleInfoManager scheduleInfoManager;
+     　　　　// 设值注入，通过setter方法传入被调用者的实例scheduleInfoManager
+     　　　　public void setScheduleInfoManager(ScheduleInfoManager scheduleInfoManager)
+　　　　{
+         　　　　　　　　this.scheduleInfoManager = scheduleInfoManager;
+     　　　　}
+
+　　　　3． Quartz在Spring中动态设置cronTrigger方法二
+　　　　在上面的2中我们可以看到，尽管已经可以动态进行rescheduleJob了，不过依然需要我们设置一个cronExpression，如果尝试一下拿掉spring配置中的
+         　　　　<property name="cronExpression">
+              　　　　　　　　<value>0/10 * * * * ?</value>
+          　　　　</property>
+　　　　则容器（如tomcat）启动时会报错。
+　　　　实际中我们希望tomcat启动时就可以直接去读数据库，拿到相应的dbCronExpression，然后定时执行一个job，而不希望配置初始的cronExpression ，观察下面的CronTriggerBean，考虑到cronExpression需要初始化，如果设定一个类InitializingCronTrigger继承CronTriggerBean，然后在这个类中做一些读取DB的初始化工作（设置cronExpression），问题就可以解决了。
+　　　　Spring配置文件：
+　　　　<bean id="scheduleInfoAction" class="com.lively.happyoa.jobs.webapp.action.ScheduleInfoAction">
+         　　　　　　　　<property name="scheduler" ref="schedulerFactory"/>
+         　　　　　　　　<property name="scheduleInfoManager" ref="scheduleInfoManager"/>
+     　　　　</bean>
+     　　　　<bean id="schedulerJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+         　　　　　　　　<property name="targetObject" ref="scheduleInfoAction"/>
+         　　　　　　　　<property name="targetMethod" value="reScheduleJob"/>
+         　　　　　　　　<property name="concurrent" value="false"/>
+     　　　　</bean>
+    　　　　<bean id="cronTrigger" class="com.lively.happyoa.jobs.webapp.action.ScheduleInfoAction.InitializingCronTrigger">
+          　　　　　　　　<property name="jobDetail" ref="schedulerJobDetail"/>
+         　　　　　　　　<!--<property name="cronExpression">
+              　　　　　　　　　　　　<value>0/10 * * * * ?</value>
+          　　　　　　　　</property>-->
+          　　　　　　　　<property name="scheduleInfoManager" ref="scheduleInfoManager"/>
+      　　　　</bean>
+     　　　　<bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+         　　　　　　　　<property name="triggers">
+             　　　　　　　　　　　　<list>
+                 　　　　　　　　　　　　　　　　<ref local="cronTrigger"/>
+             　　　　　　　　　　　　</list>
+         　　　　　　　　</property>
+　　　　</bean>
+　　　　InitializingCronTrigger中的相关方法
+　　　　注意：在注入scheduleInfoManager属性的时候，我们可以去读取DB任务时间（之所以放在setter方法中，是因为需要在设置scheduleInfoManager后进行getCronExpressionFromDB()，否则，也可以①②逻辑把放在类的构造函数中）.
+　　　　注意InitializingCronTrigger必须extends CronTriggerBean.
+　　　　public class InitializingCronTrigger extends CronTriggerBean implements Serializable
+　　　　{
+     　　　　　　　　private ScheduleInfoManager scheduleInfoManager;
+     　　　　　　　　// 设值注入，通过setter方法传入被调用者的实例scheduleInfoManager
+     　　　　　　　　public void setScheduleInfoManager(ScheduleInfoManager scheduleInfoManager)
+　　　　　　　　{
+         　　　　　　　　　　　　this.scheduleInfoManager = scheduleInfoManager;
+         　　　　　　　　　　　　// 因为在getCronExpressionFromDB使用到了scheduleInfoManager，所以
+         　　　　　　　　　　　　// 必须上一行代码设置scheduleInfoManager后进行getCronExpressionFromDB
+         　　　　　　　　　　　　String cronExpression = getCronExpressionFromDB ();    // ①
+         　　　　　　　　　　　　// 因为extends CronTriggerBean ，此处调用父类方法初始化cronExpression
+        　　　　　　　　　　　　setCronExpression(cronExpression);                     // ②
+　　　　　　　　}
+
+     　　　　　　　　private String getCronExpressionFromDB()
+　　　　　　　　{
+         　　　　　　　　　　　　String sql="from ScheduleInfo scheduleInfo where 1=1 ";
+         　　　　　　　　　　　　sql=sql+" and scheduleInfo.infoId = '"+"1" + "'";
+         　　　　　　　　　　　　List scheduleList = scheduleInfoManager.queryScheduleInListBySql(sql);
+         　　　　　　　　　　　　ScheduleInfo scheduleInfo = (ScheduleInfo)scheduleList.get(0);
+         　　　　　　　　　　　　String dbCronExpression = scheduleInfo.getCronExpression();
+         　　　　　　　　　　　　return dbCronExpression;
+　　　　　　　　}
+　　　　　　　　……
+　　　　}
+各个时间可用值如下：
+
+秒 0-59 , - * /
+
+分 0-59 , - * /
+
+小时 0-23 , - * /
+
+日 1-31 , - * ? / L W C
+
+月 1-12 or JAN-DEC , - * /
+
+周几 1-7 or SUN-SAT , - * ? / L C #
+
+年 (可选字段) empty, 1970-2099 , - * /
+
+可用值详细分析如下：
+
+“*”——字符可以用于所有字段，在“分”字段中设为"*"表示"每一分钟"的含义。
+
+“?”——字符可以用在“日”和“周几”字段. 它用来指定 '不明确的值'. 这在你需要指定这两个字段中的某一个值而不是另外一个的时候会被用到。在后面的例子中可以看到其含义。
+
+“-”——字符被用来指定一个值的范围，比如在“小时”字段中设为"10-12"表示"10点到12点"。
+
+“,”——字符指定数个值。比如在“周几”字段中设为"MON,WED,FRI"表示"the days Monday, Wednesday, and Friday"。
+
+“/”——字符用来指定一个值的的增加幅度. 比如在“秒”字段中设置为"0/15"表示"第0, 15, 30, 和 45秒"。而 "5/15"则表示"第5, 20, 35, 和 50". 在'/'前加"*"字符相当于指定从0秒开始. 每个字段都有一系列可以开始或结束的数值。对于“秒”和“分”字段来说，其数值范围为0到59，对于“小时”字段来说其为0到23, 对于“日”字段来说为0到31, 而对于“月”字段来说为1到12。"/"字段仅仅只是帮助你在允许的数值范围内从开始"第n"的值。
+
+“L”——字符可用在“日”和“周几”这两个字段。它是"last"的缩写, 但是在这两个字段中有不同的含义。例如,“日”字段中的"L"表示"一个月中的最后一天" —— 对于一月就是31号对于二月来说就是28号（非闰年）。而在“周几”字段中, 它简单的表示"7" or "SAT"，但是如果在“周几”字段中使用时跟在某个数字之后, 它表示"该月最后一个星期×" —— 比如"6L"表示"该月最后一个周五"。当使用'L'选项时,指定确定的列表或者范围非常重要，否则你会被结果搞糊涂的。
+
+“W”——可用于“日”字段。用来指定历给定日期最近的工作日(周一到周五) 。比如你将“日”字段设为"15W"，意为: "离该月15号最近的工作日"。因此如果15号为周六，触发器会在14号即周五调用。如果15号为周日, 触发器会在16号也就是周一触发。如果15号为周二,那么当天就会触发。然而如果你将“日”字段设为"1W", 而一号又是周六, 触发器会于下周一也就是当月的3号触发,因为它不会越过当月的值的范围边界。'W'字符只能用于“日”字段的值为单独的一天而不是一系列值的时候。
+
+“L”和“W”可以组合用于“日”字段表示为'LW'，意为"该月最后一个工作日"。
+
+“#”—— 字符可用于“周几”字段。该字符表示“该月第几个周×”，比如"6#3"表示该月第三个周五( 6表示周五而"#3"该月第三个)。再比如: "2#1" = 表示该月第一个周一而 "4#5" = 该月第五个周三。注意如果你指定"#5"该月没有第五个“周×”，该月是不会触发的。
+
+“C”—— 字符可用于“日”和“周几”字段，它是"calendar"的缩写。 它表示为基于相关的日历所计算出的值（如果有的话）。如果没有关联的日历, 那它等同于包含全部日历。“日”字段值为"5C"表示"日历中的第一天或者5号以后"，“周几”字段值为"1C"则表示"日历中的第一天或者周日以后"。
+
+对于“月份”字段和“周几”字段来说合法的字符都不是大小写敏感的。
+
+附表：
+"0 0 12 * * ?" 每天中午12点触发
+"0 15 10 ? * *" 每天上午10:15触发
+"0 15 10 * * ?" 每天上午10:15触发
+"0 15 10 * * ? *" 每天上午10:15触发
+"0 15 10 * * ? 2005" 2005年的每天上午10:15触发
+"0 * 14 * * ?" 在每天下午2点到下午2:59期间的每1分钟触发
+"0 0/5 14 * * ?" 在每天下午2点到下午2:55期间的每5分钟触发
+"0 0/5 14,18 * * ?" 在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发
+"0 0-5 14 * * ?" 在每天下午2点到下午2:05期间的每1分钟触发
+"0 10,44 14 ? 3 WED" 每年三月的星期三的下午2:10和2:44触发
+"0 15 10 ? * MON-FRI" 周一至周五的上午10:15触发
+"0 15 10 15 * ?" 每月15日上午10:15触发
+"0 15 10 L * ?" 每月最后一日的上午10:15触发
+"0 15 10 ? * 6L" 每月的最后一个星期五上午10:15触发
+"0 15 10 ? * 6L 2002-2005" 2002年至2005年的每月的最后一个星期五上午10:15触发
+"0 15 10 ? * 6#3" 每月的第三个星期五上午10:15触发
+至于每个符号 看看例子就好了.很简单了.
+
+作者“信仰的力量”
+

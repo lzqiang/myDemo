@@ -1,0 +1,10 @@
+formatter:function(val,rec){ 
+if (val < 20){ 
+return '<span style="color:red;">('+val+')</span>'; 
+} else { 
+return val; 
+} 
+} 
+}, 
+
+ÏêÏ¸³ö´¦²Î¿¼£ºhttp://www.jb51.net/article/25984.htm

@@ -1,0 +1,47 @@
+@Override
+	public void doStart(ReportRequest rrequest, ReportBean rbean) {
+		// TODO Auto-generated method stub
+		rrequest.getRequest().setAttribute("abc",rrequest.getRequest().getParameter("realDate"));
+		super.doStart(rrequest, rbean);
+	}
+
+	@Override
+	public Object beforeLoadData(ReportRequest rrequest, ReportBean rbean,
+			Object typeObj, String sql) {
+		//request{nbsp}request{org}request{build}request{realdate}单车办证统计报表
+                //request{nbsp}request{org}request{build}request{realdate}工地车辆号码统计
+                //request{org}车辆request{car_num}request{startdate}request{enddate}request{type}信息统计
+		String ORGNAME="";
+		String name=rrequest.getRequest().getParameter("ORG_NAME");
+		if(name!=null&&""!=name){
+			int org_id=Integer.parseInt(name);
+			Connection conn = null;
+			ResultSet rs = null;
+			PreparedStatement prepareStmt = null;
+			String wayIdSql = "Select * from tb_org where org_id=?";
+			try {
+				conn = WabacusDBUtil.getConnection();
+				prepareStmt = conn.prepareStatement(wayIdSql);
+				prepareStmt.setInt(1,org_id);
+				rs = prepareStmt.executeQuery();
+		        while(rs.next()){
+		        	ORGNAME=rs.getString("ORG_NAME");
+		        } 
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				DBUtil.closeConn(conn, prepareStmt, rs);
+			}
+			
+		}
+		
+		if(null==rrequest.getRequest().getParameter("realDate")||""==rrequest.getRequest().getParameter("realDate")){
+			rrequest.getRequest().setAttribute("realdate",rrequest.getRequest().getParameter("realDate"));
+		}else{
+			rrequest.getRequest().setAttribute("realdate","("+rrequest.getRequest().getParameter("realDate")+")");
+		}
+		
+		rrequest.getRequest().setAttribute("org",ORGNAME);
+		rrequest.getRequest().setAttribute("build",rrequest.getRequest().getParameter("BUILD_SITE_NAME"));
+		return super.beforeLoadData(rrequest, rbean, typeObj, sql);
+	}

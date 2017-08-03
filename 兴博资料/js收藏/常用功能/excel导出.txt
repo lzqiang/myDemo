@@ -1,0 +1,37 @@
+ ServletOutputStream outmm = response.getOutputStream();
+   // 输入流
+   FileInputStream hFile = new FileInputStream("data.xls");
+   // 创建一个hFile大小的字节型数组
+   byte[] data = new byte[hFile.available()];
+   // 头信息的编码默认为ISO-8859-1，把文件名转成默认编码传递
+   String filename = new String(("data.xls").getBytes(), "utf-8");
+   // 头信息
+   response.addHeader("Content-Disposition", "attachment; filename="
+     + filename);
+   // 头信息
+   response.addIntHeader("Content-Length", hFile.available());
+   // 读数据到数组
+   hFile.read(data);
+   // 记得要关闭输入流
+   hFile.close();
+   response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+   outmm.write(data);
+   outmm.close();
+   out.clear();
+  } catch (IOException e) {
+  } finally {
+   // 删除文件
+ 
+  }
+
+
+////////////////////////////////////////////////
+
+ response.setContentType("bin");response.setHeader("Content-disposition","attachment;filename=test.xls");你在servlet里面设置响应头为这样，然后就能够实现下载了，然后使用输出流进行输出下载.....还有问题的话就问.. 你要是想全部代码都写的话..加我扣扣 1195391953..提问者评价搞定了，Thanks!!! 评论(3)|赞同5 
+vltava︶︺︸ |八级采纳率47%
+
+擅长：JAVA相关
+ 按默认排序|按时间排序 
+其他3条回答
+ 2011-05-16 14:39simpledong|四级 
+// 创建临时文件(excel为Workbook对象)        response.reset();        response.setContentType("application/download");        response.setHeader("Content-Disposition",                "attachment;filename=" + excel.getFileName());        excel.getExcel().write(response.getOutputStream());        response.flushBuffer();

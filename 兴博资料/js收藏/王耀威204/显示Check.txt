@@ -1,0 +1,23 @@
+function ShowCheckNode()
+
+        {
+
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+
+            var nodes = zTree.getCheckedNodes(true);
+
+            var purview = "";
+
+
+
+            for (var i = 0; i < nodes.length; i++) {
+
+            if(!nodes[i].getCheckStatus().half)
+
+                purview +=  nodes[i].code+",";
+
+            }          
+
+            alert(purview);
+
+        }    

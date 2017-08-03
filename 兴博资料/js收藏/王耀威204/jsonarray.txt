@@ -1,0 +1,28 @@
+public String getVihcleNoList() {
+   List vihcleNoList= bsLogisticsOrderInfoDao.getVihcleNoList();
+   JSONArray jsonArray=new JSONArray();
+   boolean isFlag=true;
+   JSONObject jsonObject=new JSONObject();
+
+
+   try {
+   
+   jsonObject.put("id","");
+   jsonObject.put("text","");
+   jsonObject.put("id","");
+   jsonObject.put("text","全部");
+   jsonArray.put(jsonObject);
+   for(Iterator it=vihcleNoList.iterator();it.hasNext();)
+      {
+      JSONObject jsonObj=new JSONObject();
+      String temp= (String)it.next();//这里报异常？String temp= it.next().toString().trim();
+      jsonObj.put("id",temp);
+      jsonObj.put("text",temp);
+      jsonArray.put(jsonObj);
+      }
+    } catch (Exception e) {
+    e.printStackTrace();
+    }
+    return jsonArray.toString();
+    }
+

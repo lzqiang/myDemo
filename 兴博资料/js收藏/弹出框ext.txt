@@ -1,0 +1,12 @@
+var config = {     
+       title:"飞出的消息框",     
+       msg:"这是一个自定义对话框，是飞出来的哦",     
+       width:400,     
+       multiline:true,     
+       closable:false,     
+       buttons:Ext.MessageBox.YESNOCANCEL,     
+       icon:Ext.MessageBox.QUESTION,     
+       animEl:"fly"     
+     };     
+     Ext.MessageBox.show(config); 
+

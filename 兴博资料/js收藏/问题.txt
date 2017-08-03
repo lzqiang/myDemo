@@ -1,0 +1,3 @@
+黑名单无法同步更新：描述 插入黑名单记录是 无法更新车的状态
+原因 条件不对，显示的是车牌，但值是id
+<button name="button1" position="top" menulabel="重置" extends="${reset.button.default}"></button>

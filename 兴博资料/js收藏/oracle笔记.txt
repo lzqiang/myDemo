@@ -1,0 +1,15 @@
+查询：select sysdate from dual;
+删除表：drop table sudent：
+创建表：create table student(name varchar2(),telephone varchar2(20))
+插入记录:insert into student values();
+删除记录：delete from student where
+修改记录 update  student set name="jack" where id=201314
+commit 提交
+
+启动 关闭数据库 (STARTUP,SHUTDOWN)
+修改数据库(ALERT DATABASE)
+创建数据库(CREATE DATABASE)
+删除数据库(DROP DATABASE)
+创建服务器参数文件(CREATE SPFILE)
+改变归档模式(ALERT DATABASE ARCHIVELOG)
+执行数据库恢复(ALTER DATABASE RECOVER)SYSOPER 的权限比SYSDBA的小

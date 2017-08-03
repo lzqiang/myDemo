@@ -1,0 +1,21 @@
+public Object beforeLoadData(ReportRequest rrequest,ReportBean rbean,Object typeObj,String sql){
+    	//获取登录用户信息
+    	SessionContainer sc = (SessionContainer) rrequest.getRequest().getSession().getAttribute("SessionContainer");
+		UserInfoVo userInfo = sc.getUserInfo();
+		//查看公司id是否0
+		String companyid=userInfo.getCompanyid();
+		//用户权限处理
+		//判断是否是运输公司用户
+		StringBuilder cond=new StringBuilder();//条件拼接
+		cond.append(" 1=1 ");
+		if(!"0".equals(companyid)){
+			cond.append(" AND A.company_id="+companyid);
+		}
+		final String carNum = rrequest.getRequest().getParameter("carNum");
+		if(StringUtils.isNotBlank(carNum)) {
+			cond.append(" AND C.car_num like '%"+carNum+"%'");
+		}
+		sql=sql.replaceAll("%mycondition%",cond.toString());
+		
+        return sql;
+    }

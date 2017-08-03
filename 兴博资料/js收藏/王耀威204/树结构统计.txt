@@ -1,0 +1,74 @@
+SELECT * ¡¡FROM(with tmp_base as (select a.build_site_id,
+                                        a.build_site_name,
+                                        c.car_id,
+                                        c.car_num,
+                                        c.gps_num,
+                                        c.online_flag,
+                                        sum(case when c.gps_num is null then 0 else decode(c.online_flag, 1, 1, 0)end) over(partition by a.build_site_id) online_cnt,
+                                        sum(case when c.gps_num is null then 0 else decode(c.online_flag, 0, 1, 0)end) over(partition by a.build_site_id) offline_cnt,
+                                        sum(case when c.gps_num is null then 1 else decode(c.online_flag, 0, 0, 0)end) over(partition by a.build_site_id) other_cnt,
+                                        e.org_name
+                                   from tb_build_site a,
+                                        tb_card       b,
+                                        tb_car        c,
+                                        tb_org        e,
+                                        eadept        f
+                                  where a.build_site_id = b.build_site_id
+                                    and b.car_id = c.car_id
+                                    and a.org_id = e.org_id
+                                    and f.deptname=e.org_name 
+                                    and C.IS_DEL = 0 AND %mycondition% 
+                                    and (c.status_id is null or
+                                        c.status_id = '0')
+                                    and b.status_id = 1
+                                    and sysdate between b.carry_start_date and
+                                        b.carry_end_date
+                                  ORDER BY C.CAR_NUM)
+				         select *
+				           from (select base.*,
+				                        d.longitude_point,
+				                        d.dimensionality_point,
+				                        d.speede,
+				                        to_char(d.record_time, 'yyyy-MM-dd hh24:mi:ss') as record_time,
+				                        row_number() over(partition by base.car_num order by d.record_time desc) rn
+				                   from tmp_base base, tb_car_path d
+				                  where base.gps_num = d.gps_num(+))
+				          where rn = 1)
+
+
+
+
+
+--------------------------------------------
+
+
+SELECT * ¡¡FROM(with tmp_base as (select a.company_id,
+                                        a.company_name,
+                                        c.car_id,
+                                        c.car_num,
+                                        c.gps_num,
+                                        c.online_flag,
+                                        sum(case when c.gps_num is null then 0 else decode(c.online_flag, 1, 1, 0)end) over(partition by a.company_id) online_cnt,
+                                        sum(case when c.gps_num is null then 0 else decode(c.online_flag, 0, 1, 0)end) over(partition by a.company_id) offline_cnt,
+                                        sum(case when c.gps_num is null then 1 else decode(c.online_flag, 0, 0, 0)end) over(partition by a.company_id) other_cnt
+                                   from tb_company         a,
+                                        tb_company_car_rel b,
+                                        tb_car             c
+                                  where a.company_id = b.company_id
+                                    AND C.IS_DEL = 0
+                                    AND %mycondition% 
+                                    and b.car_id = c.car_id
+                                    and b.status_id = 1
+                                    and (c.status_id is null or
+                                        c.status_id = '0')
+                                  ORDER BY C.CAR_NUM)
+         select *
+           from (select base.*,
+                        d.longitude_point,
+                        d.dimensionality_point,
+                        d.speede,
+                        to_char(d.record_time, 'yyyy-MM-dd hh24:mi:ss') as record_time,
+                        row_number() over(partition by base.car_num order by d.record_time desc) rn
+                   from tmp_base base left join tb_car_path d 
+                  on base.gps_num = d.gps_num)
+          where rn = 1)

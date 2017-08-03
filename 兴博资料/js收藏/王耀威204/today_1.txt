@@ -1,0 +1,42 @@
+with tj_1 as(
+SELECT  BK.CAR_BREAK_ID,
+       BK.DIMENSIONALITY_POINT,
+       BK.LONGITUDE_POINT,
+       TO_CHAR(BK.CAR_BREAK_TIME, 'MM-DD HH24:MI:ss') AS CAR_BREAK_TIME,
+       BK.CAR_BREAK_TIME CAR_BREAK_TIME_1,
+       C.CAR_ID,
+       C.CAR_NUM,
+       C.GPS_NUM,
+       R.RULE_NAME,
+       (SELECT COUNT(distinct CAR_ID)
+          FROM TB_CAR_BREAK T1
+         WHERE T1.CAR_BREAK_TIME >= SYSDATE - (3 / 24 / 60)
+           AND T1.CAR_BREAK_TYPE = 1
+           and BUILD_SITE_ID is not null
+           and COMPANY_ID is not null) as cnt
+
+  From TB_BUILD_SITE     B,
+       TB_CARD           CD,
+       TB_CAR_BREAK      BK,
+       TB_CAR_ALARM_RULE R,
+       TB_CAR            C
+ WHERE 
+ B.BUILD_SITE_ID = CD.BUILD_SITE_ID
+ AND CD.CAR_ID = BK.CAR_ID
+ AND BK.CAR_BREAK_TYPE = R.RULE_TYPE
+ AND BK.CAR_ID = C.CAR_ID
+ AND TRUNC(SYSDATE) BETWEEN CD.CARRY_START_DATE AND CD.CARRY_END_DATE
+ AND BK.CAR_BREAK_TIME BETWEEN TRUNC(SYSDATE) AND SYSDATE
+ AND ((to_char(BK.CAR_BREAK_TIME, 'hh24:mi:ss') BETWEEN CD.dravel_start_time and
+ CD.dravel_end_time and CD.dravel_start_time < CD.dravel_end_time) or
+ ((to_char(BK.CAR_BREAK_TIME, 'hh24:mi:ss') > CD.dravel_start_time or
+ to_char(BK.CAR_BREAK_TIME, 'hh24:mi:ss') < CD.dravel_end_time) and
+ CD.dravel_start_time > CD.dravel_end_time))
+ AND C.IS_DEL = 0
+ AND CD.STATUS_ID = 1
+ )
+ select * from tj_1 
+ where (CAR_ID,CAR_BREAK_TIME_1) IN (
+ SELECT TCB.CAR_ID,MAX(TCB.CAR_BREAK_TIME) CAR_BREAK_TIME FROM TB_CAR_BREAK TCB GROUP BY TCB.CAR_ID
+ )
+ ORDER BY CAR_BREAK_TIME_1

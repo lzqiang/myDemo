@@ -1,0 +1,124 @@
+、导入jar:
+
+commons-collections-2.1.1.jar
+
+
+commons-logging.jar
+
+
+E3-Base.jar
+
+E3-TemplateEngine.jar
+
+E3-Tree.jar
+
+
+log4j.jar
+
+velocity-1.4.jar
+
+
+二、配置web监听(解压导出E3所需资源，该步骤可选，在tomcat5.5版本需要)
+
+web.xml:
+
+     <listener>
+        <listener-class>
+            net.jcreate.e3.commons.resource.loader.LoadResourcesListener
+        </listener-class>
+    </listener>
+    <listener>
+        <listener-class>
+            net.jcreate.e3.tree.loader.LoadResourcesListener
+        </listener-class>
+    </listener>
+
+
+三、业务数据
+
+配置实体bean。至少包括三个属性：id,parentid,name。变量名可以随便指定，而且支持字符和数据类型。
+
+public class TreeNode {
+private String id;
+private String title;
+private String parentId;
+private String url;
+
+set get方法。
+}
+
+四 、核心的servlet代码：
+
+// 模拟数据(E3 TREE所有的业务数据都放在List集合里，id,parentid,title不能为空,只有根节点的parentid可以为null)
+List treeNodes = new ArrayList();
+TreeNode root = new TreeNode();
+root.setId("000000");
+root.setTitle("根节点");
+treeNodes.add(root);
+for(int i=0; i<10; i++){
+TreeNode node = new TreeNode();
+node.setId(String.valueOf(i));
+node.setParentId("000000");
+node.setTitle("节点"+i);
+node.setUrl("url");
+treeNodes.add(node);
+}
+TreeNode leaf = new TreeNode();
+leaf.setId("leaf");
+leaf.setParentId(String.valueOf(1));
+leaf.setTitle("叶子1");
+treeNodes.add(leaf);
+// 业务数据解码器，从业务数据中分解出ID和PARENTID
+UserDataUncoder uncoder = new UserDataUncoder(){
+public Object getID(Object arg0) throws UncodeException {
+TreeNode node = (TreeNode) arg0;
+return node.getId();
+}
+public Object getParentID(Object arg0) throws UncodeException {
+TreeNode node = (TreeNode) arg0;
+return node.getParentId();
+}
+};
+// 模型构造器，用于生成树模型
+AbstractWebTreeModelCreator modelCreator = new AbstractWebTreeModelCreator(){
+protected Node createNode(Object arg0, UserDataUncoder arg1) {
+TreeNode node = (TreeNode) arg0;
+WebTreeNode result = new WebTreeNode(node.getTitle(),"node"+node.getId());
+if(node.getUrl() != null && !node.getUrl().equals("")){
+result.setAction("javascript: doAction('"+node.getUrl()+"')");
+}
+return result;
+}
+};
+modelCreator.init(request);
+// 创建树模型（模型构造器在解码器的辅助下，生成树模型）
+TreeModel treeModel = modelCreator.create(treeNodes, uncoder);
+// 创建导向器
+TreeDirector director = new DefaultTreeDirector();
+// 树构造器
+WebTreeBuilder treeBuilder = new XTreeBuilder(); // XTtre风格
+//WebTreeBuilder treeBuilder = new ExtTreeBuilder(); // ExtTree风格
+treeBuilder.init(request);
+// 导向器利用树模型和树构造器创建脚本
+director.build(treeModel, treeBuilder);
+String treeScript = treeBuilder.getTreeScript();
+
+
+request.setAttribute("treeScript", treeScript);
+request.getRequestDispatcher("/index.jsp").forward(request, response);
+
+
+jsp:
+
+<script type="text/javascript">
+function doAction(url){
+location.href = url;
+}
+</script>
+  </head>
+  
+  <body>
+    ${treeScript } 
+  </body>
+
+

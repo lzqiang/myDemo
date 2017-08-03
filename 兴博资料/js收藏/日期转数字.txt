@@ -1,0 +1,13 @@
+	private Integer prase(String str) {
+		if (null == str) {
+			return 0;
+		}
+		String sum = "";
+		char[] ch = str.toCharArray();
+		for (int i = 0; i < ch.length; i++) {
+			if (ch[i] >= '0' && ch[i] <= '9') {
+				sum = sum + ch[i];
+			}
+		}
+		return Integer.parseInt(sum);
+	}

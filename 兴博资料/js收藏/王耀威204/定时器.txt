@@ -1,0 +1,213 @@
+在servlet中启动定时器
+一，继承HttpServlet的写法：
+
+1，Servlet
+
+import java.io.IOException;    
+import java.util.Timer;    
+import javax.servlet.RequestDispatcher;    
+import javax.servlet.ServletContext;    
+import javax.servlet.ServletException;    
+import javax.servlet.http.HttpServlet;    
+import javax.servlet.http.HttpServletRequest;    
+import javax.servlet.http.HttpServletResponse;    
+   
+
+   
+public class ConvergeDataServlet extends HttpServlet {    
+   
+    private static final long serialVersionUID = 1L;    
+   
+    private Timer timer1 = null;    
+        
+    private Task task1;    
+        
+    /** 
+      * Constructor of the object. 
+      */   
+    public ConvergeDataServlet() {    
+        super();    
+     }    
+   
+    /** 
+      * Destruction of the servlet. 
+
+      */   
+    public void destroy() {    
+        super.destroy();    
+        if(timer1!=null){    
+             timer1.cancel();    
+         }    
+     }    
+   
+        
+    public void doGet(HttpServletRequest request, HttpServletResponse response)    
+            throws ServletException, IOException {    
+            
+     }    
+   
+        
+    public void doPost(HttpServletRequest request, HttpServletResponse response)    
+            throws ServletException, IOException {    
+         doGet(request, response);           
+     }    
+   
+    // init方法启动定时器    
+    public void init() throws ServletException {    
+            
+         ServletContext context = getServletContext();    
+            
+        // (true为用定时间刷新缓存)    
+         String startTask = getInitParameter("startTask");    
+                    
+        // 定时刷新时间(分钟)    
+         Long delay = Long.parseLong(getInitParameter("delay"));    
+            
+        // 启动定时器    
+        if(startTask.equals("true")){    
+             timer1 = new Timer(true);    
+             task1 = new Task(context);    
+             timer1.schedule(task1, delay * 60 * 1000, delay * 60 * 1000);    
+         }    
+     }    
+}    
+2，任务 
+
+
+import java.util.TimerTask;    
+
+   
+import javax.servlet.ServletContext;    
+   
+public class Task extends TimerTask{    
+   
+    private ServletContext context;    
+        
+    private static boolean isRunning = true;    
+        
+    public Task(ServletContext context){    
+        this.context = context;    
+     }    
+        
+            
+    @Override   
+    public void run() {    
+        if(isRunning){    
+              
+         }    
+     }    
+   
+}    
+
+3，web.xml中的配置
+
+< servlet >
+     < servlet-name >taskservlet< / servlet-name >
+    < servlet-class >com.task< /servlet-class >
+    < init-param >
+    < param-name >startTask< /param-name >
+    < param-value >true< /param-value >
+    < /init-param >
+    < init-param >
+    < param-name >intervalTime< /param-name >
+    < param-value >1< /param-value >
+    < /init-param >
+    < load-on-startup >300< /load-on-startup >
+< /servlet > 
+
+二，继承ServletContextListener
+
+1，定时器
+
+/**
+* 
+*/
+package com.annlee.website.util;
+
+import java.util.Timer;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+/**
+* @author Administrator 定时器
+*/
+public class TimerListener implements ServletContextListener {
+
+private Timer timer;
+private AnnleeTimerTask task;
+
+public void contextDestroyed(ServletContextEvent arg0) {
+   timer.cancel();
+   System.out.println("定时器已销毁");
+}
+
+public void contextInitialized(ServletContextEvent event) {
+
+   timer = new java.util.Timer(true);
+   task = new AnnleeTimerTask(event.getServletContext());
+   System.out.println("定时器已启动");
+   timer.schedule(task, 0, 60 * 1000);
+   System.out.println("已经添加任务调度表");
+}
+
+}
+
+
+2，任务
+
+package com.annlee.website.util;
+
+import java.util.Calendar;
+import java.util.TimerTask;
+
+import javax.servlet.ServletContext;
+
+import com.annlee.website.model.service.member.UsmAccessDataService;
+
+/**
+* 定时器的任务
+*/
+public class AnnleeTimerTask extends TimerTask {
+
+private ServletContext context; 
+    private static boolean isRunning = false;
+    private static boolean flag = true;
+    private static final int C_SCHEDULE_HOUR = 0;
+    private UsmAccessDataService accessDataService;
+   
+    public AnnleeTimerTask(ServletContext context){
+     this.context = context; 
+    } 
+
+    public void run() {
+    accessDataService = new UsmAccessDataService();
+        Calendar cal = Calendar.getInstance();
+        if (!isRunning) {
+            if (C_SCHEDULE_HOUR == cal.get(Calendar.HOUR_OF_DAY) && flag) {
+                isRunning = true;
+            //    accessDataService.SendHttpByMonth(0,0, 0);
+                System.out.println("正在执行任务");
+                isRunning = false;
+                flag = false;
+                context.log("指定任务执行结束");
+            }
+        } else {
+            context.log("上一次任务执行还未结束");
+        }
+        if(C_SCHEDULE_HOUR != cal.get(Calendar.HOUR_OF_DAY)){
+            flag = true;
+        }
+      }
+
+}
+
+
+3，web.xml中的配置
+
+<listener>
+   <listener-class>
+    com.annlee.website.util.TimerListener
+   </listener-class>
+</listener>
+
